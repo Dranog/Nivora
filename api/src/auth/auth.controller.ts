@@ -21,7 +21,7 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: 7 * 24 * 3600 * 1000, // 7 jours
     });
-    return { user };
+    return { user, token };
   }
 
   @Post('logout')

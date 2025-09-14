@@ -1,22 +1,31 @@
-﻿import { cookies } from "next/headers"
+import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Card } from "@/components/ui/Card"
+import { API_URL } from "@/lib/api"
 
 async function login(formData: FormData) {
   "use server"
   const email = String(formData.get("email") || "")
+  const password = String(formData.get("password") || "")
   const next = String(formData.get("next") || "/dashboard")
-  if (!email) return
+  if (!email || !password) return
 
+  const res = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  })
+  if (!res.ok) return
+  const { token } = await res.json()
   const cookieStore = cookies() as any
   cookieStore.set({
-    name: "session",
-    value: "demo",
+    name: "token",
+    value: token,
     httpOnly: true,
     path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: 60 * 60 * 24 * 7,
     sameSite: "lax",
   })
   redirect(next)
