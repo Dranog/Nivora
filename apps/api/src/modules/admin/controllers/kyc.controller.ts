@@ -43,9 +43,9 @@ export class KycController {
         where,
         skip,
         take: limitNum,
-        orderBy: { submittedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
         include: {
-          user: {
+          users_kyc_verifications_userIdTousers: {
             select: {
               id: true,
               email: true,
@@ -54,17 +54,6 @@ export class KycController {
               avatar: true,
               kycStatus: true,
               kycLevel: true,
-            },
-          },
-          documents: {
-            select: {
-              id: true,
-              type: true,
-              url: true,
-              status: true,
-              aiConfidence: true,
-              aiAnalysis: true,
-              uploadedAt: true,
             },
           },
         },
