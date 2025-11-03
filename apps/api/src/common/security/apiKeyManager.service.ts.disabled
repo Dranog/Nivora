@@ -1,0 +1,144 @@
+// path: apps/api/src/common/security/apiKeyManager.service.ts
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { z } from 'zod';
+import * as crypto from 'crypto';
+
+const prisma = new PrismaClient();
+
+const rotateSchema = z.object({
+  actorUserId: z.string().cuid(),
+});
+
+function timingSafeEqualStr(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ab, bb);
+}
+
+function base62(bytes: Buffer): string {
+  // compact URL-safe base62 (0-9A-Za-z), no padding
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let carry = 0n;
+  for (const byte of bytes) carry = (carry << 8n) + BigInt(byte);
+  const chars: string[] = [];
+  while (carry > 0n) {
+    const idx = Number(carry % 62n);
+    chars.push(alphabet[idx]);
+    carry = carry / 62n;
+  }
+  return chars.reverse().join('') || '0';
+}
+
+function generateKey(): { publicKey: string; secret: string } {
+  const rnd = crypto.randomBytes(32);
+  const secret = `olvr_${base62(rnd)}`;
+  // public portion for logs (first 6 + last 4)
+  const publicKey = `${secret.slice(0, 6)}…${secret.slice(-4)}`;
+  return { publicKey, secret };
+}
+
+@Injectable()
+export class ApiKeyManagerService {
+  private readonly logger = new Logger(ApiKeyManagerService.name);
+
+  // Récupère la clé actuelle (ne retourne pas la valeur entière pour sécurité)
+  async getPublic(): Promise<{ hasKey: boolean; publicPreview?: string }> {
+    const s = await prisma.settings.findUnique({ where: { id: 'singleton' } });
+    if (!s?.apiKey) return { hasKey: false };
+    return { hasKey: true, publicPreview: `${s.apiKey.slice(0, 6)}…${s.apiKey.slice(-4)}` };
+  }
+
+  // Valide une clé fournie (comparaison constant-time)
+  async validate(key: string): Promise<boolean> {
+    if (!key || key.length < 16) return false;
+    const s = await prisma.settings.findUnique({ where: { id: 'singleton' } });
+    if (!s?.apiKey) return false;
+    return timingSafeEqualStr(s.apiKey, key);
+  }
+
+  // Génère / remplace la clé — journalise dans AuditLog
+  async rotate(input: { actorUserId: string }): Promise<{ publicPreview: string; secret: string }> {
+    const data = rotateSchema.parse(input);
+    const { publicKey, secret } = generateKey();
+
+    try {
+      const now = new Date();
+      const settings = await prisma.settings.upsert({
+        where: { id: 'singleton' },
+        update: { apiKey: secret, updatedById: data.actorUserId, updatedAt: now },
+        create: {
+          id: 'singleton',
+          platformName: 'Oliver',
+          contactEmail: 'contact@oliver.local',
+          darkMode: false,
+          autoBackup: true,
+          showTooltips: true,
+          passwordLength: 12,
+          require2FA: false,
+          allowedIPs: [],
+          apiKey: secret,
+          updatedById: data.actorUserId,
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: data.actorUserId,
+          event: 'API_KEY_ROTATED',
+          resource: 'settings',
+          meta: { settingsId: settings.id, publicPreview: publicKey },
+        },
+      });
+
+      return { publicPreview: publicKey, secret };
+    } catch (err) {
+      this.logger.error('Rotation API key échouée', err instanceof Error ? err.stack : String(err));
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: data.actorUserId,
+          event: 'API_KEY_ROTATION_ERROR',
+          resource: 'settings',
+          meta: { message: (err as Error).message },
+        },
+      });
+      throw err;
+    }
+  }
+
+  // Révoque en mettant une nouvelle clé aléatoire très courte (invalidante)
+  async revoke(input: { actorUserId: string }): Promise<void> {
+    const data = rotateSchema.parse(input);
+    const dummy = `revoked_${crypto.randomBytes(8).toString('hex')}`;
+    try {
+      await prisma.settings.update({
+        where: { id: 'singleton' },
+        data: { apiKey: dummy },
+      });
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: data.actorUserId,
+          event: 'API_KEY_REVOKED',
+          resource: 'settings',
+          meta: {},
+        },
+      });
+    } catch (err) {
+      this.logger.error('Révocation API key échouée', err instanceof Error ? err.stack : String(err));
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: data.actorUserId,
+          event: 'API_KEY_REVOKE_ERROR',
+          resource: 'settings',
+          meta: { message: (err as Error).message },
+        },
+      });
+      throw err;
+    }
+  }
+}

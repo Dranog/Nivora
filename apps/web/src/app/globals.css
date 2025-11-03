@@ -1,0 +1,197 @@
+/* OLIVER - Global Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Oliver Turquoise Palette */
+    --background: 210 20% 98%;
+    --foreground: 0 0% 9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+
+    /* Primary: Oliver Turquoise #00A6A6 */
+    --primary: 180 100% 33%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 17% 96%;
+    --secondary-foreground: 0 0% 9%;
+
+    --muted: 210 17% 95%;
+    --muted-foreground: 0 0% 46%;
+
+    --accent: 175 100% 38%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 100% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 180 100% 33%;
+
+    --radius: 0.875rem;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 180 100% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 64%;
+
+    --accent: 175 90% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 95% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 180 100% 40%;
+  }
+
+  * { @apply border-border; }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 { @apply font-semibold tracking-tight; }
+}
+
+@layer components {
+  .oliver-card { @apply rounded-2xl bg-card shadow-card border border-border/50; }
+  .oliver-btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-medium transition-all shadow-sm hover:shadow-md; }
+  .oliver-btn-secondary { @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-xl font-medium transition-all; }
+  .oliver-input { @apply rounded-xl border-input bg-background px-4 py-2.5 text-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20; }
+  .oliver-badge { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold transition-colors; }
+  .oliver-badge-primary { @apply oliver-badge bg-primary/10 text-primary; }
+  .oliver-badge-success { @apply oliver-badge bg-success/10 text-success; }
+  .oliver-badge-warning { @apply oliver-badge bg-warning/10 text-warning; }
+  .oliver-badge-error { @apply oliver-badge bg-destructive/10 text-destructive; }
+}
+
+@layer utilities {
+  .scrollbar-oliver { scrollbar-width: thin; scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent; }
+  .scrollbar-oliver::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-oliver::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-oliver::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.2); border-radius: 9999px; }
+  .scrollbar-oliver::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.3); }
+
+  .oliver-gradient {
+    background: linear-gradient(135deg, hsl(180 100% 33%) 0%, hsl(175 100% 38%) 100%);
+  }
+  .oliver-gradient-subtle {
+    background: linear-gradient(135deg, hsl(180 100% 33% / 0.1) 0%, hsl(175 100% 38% / 0.05) 100%);
+  }
+}
+
+/* Animations douces */
+@keyframes oliver-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.oliver-fade-in { animation: oliver-fade-in 0.3s ease-out; }
+
+/* === Correctifs champs numériques (flèches + chevauchement) === */
+/* Chrome / Edge / Safari */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* === Dashboard Optimizations - Micro-interactions & Animations === */
+@keyframes dashboard-widget-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dashboard-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.dashboard-widget-enter {
+  animation: dashboard-widget-enter 0.4s ease-out forwards;
+}
+
+/* Card hover micro-interactions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Smooth scale on hover for cards */
+@layer utilities {
+  .hover-scale-card:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Skeleton shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #e0e0e0 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+}

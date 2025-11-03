@@ -1,0 +1,259 @@
+// path: apps/api/src/common/pdf/pdfExport.service.ts
+import { Injectable, Logger } from '@nestjs/common';
+import { z } from 'zod';
+import { PrismaClient, ExportStatus, ExportType, ExportFormat, StorageProvider, Prisma } from '@prisma/client';
+import PDFDocument from 'pdfkit';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import * as crypto from 'crypto';
+import { Readable } from 'stream';
+
+const prisma = new PrismaClient();
+
+const envSchema = z.object({
+  S3_REGION: z.string().min(1),
+  S3_BUCKET: z.string().min(1),
+  S3_ACCESS_KEY_ID: z.string().min(1),
+  S3_SECRET_ACCESS_KEY: z.string().min(1),
+  CDN_URL: z.string().url().optional(),
+});
+const env = envSchema.parse({
+  S3_REGION: process.env.S3_REGION ?? '',
+  S3_BUCKET: process.env.S3_BUCKET ?? '',
+  S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID ?? '',
+  S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY ?? '',
+  CDN_URL: process.env.CDN_URL,
+});
+
+const s3 = new S3Client({
+  region: env.S3_REGION,
+  credentials: { accessKeyId: env.S3_ACCESS_KEY_ID, secretAccessKey: env.S3_SECRET_ACCESS_KEY },
+});
+
+const exportInputSchema = z.object({
+  initiatedById: z.string().cuid(),
+  type: z.nativeEnum(ExportType),
+  filters: z.object({
+    from: z.string().datetime().optional(),
+    to: z.string().datetime().optional(),
+    userId: z.string().cuid().optional(),
+  }).default({}),
+  limit: z.number().int().min(1).max(500).default(100),
+});
+type ExportInput = z.infer<typeof exportInputSchema>;
+
+@Injectable()
+export class PdfExportService {
+  private readonly logger = new Logger(PdfExportService.name);
+
+  async exportPdf(input: ExportInput): Promise<{ exportId: string; url?: string; key?: string }> {
+    const data = exportInputSchema.parse(input);
+
+    const taskId = crypto.randomUUID();
+    const exportHistory = await prisma.exportHistory.create({
+      data: {
+        type: data.type,
+        format: ExportFormat.PDF,
+        storageProvider: StorageProvider.S3,
+        initiatedById: data.initiatedById,
+        status: ExportStatus.PROCESSING,
+        taskId,
+        filters: data.filters as unknown as Prisma.InputJsonValue,
+        filtersHash: this.hash(JSON.stringify(data.filters)),
+        progress: 0,
+        createdAt: new Date(),
+      },
+    });
+
+    try {
+      const { rows, columns } = await this.fetchRows(data);
+
+      const { buffer, rowCount } = await this.buildPdfBuffer({
+        title: `Export ${data.type} — ${new Date().toISOString()}`,
+        columns,
+        rows,
+        watermark: 'Oliver Platform',
+      });
+
+      const key = `exports/${data.type}/${exportHistory.id}.pdf`;
+      await s3.send(new PutObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: key,
+        Body: Readable.from(buffer),
+        ContentType: 'application/pdf',
+      }));
+
+      const url = env.CDN_URL ? `${env.CDN_URL}/${key}` : undefined;
+
+      await prisma.exportHistory.update({
+        where: { id: exportHistory.id },
+        data: {
+          status: ExportStatus.COMPLETED,
+          fileKey: key,
+          fileUrl: url,
+          fileSizeBytes: buffer.length,
+          rowCount,
+          completedAt: new Date(),
+          progress: 100,
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: data.initiatedById,
+          event: 'EXPORT_COMPLETED',
+          resource: 'export_history',
+          meta: ({ exportId: exportHistory.id, type: data.type, format: 'PDF', rowCount }) as Prisma.InputJsonValue,
+        },
+      });
+
+      return { exportId: exportHistory.id, url, key };
+    } catch (err) {
+      this.logger.error('Erreur export PDF', err instanceof Error ? err.stack : String(err));
+      await prisma.exportHistory.update({
+        where: { id: exportHistory.id },
+        data: { status: ExportStatus.FAILED, errorMessage: (err as Error).message, errorCode: 'PDF_EXPORT_ERROR' },
+      });
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: data.initiatedById,
+          event: 'EXPORT_FAILED',
+          resource: 'export_history',
+          meta: ({ exportId: exportHistory.id, message: (err as Error).message }) as Prisma.InputJsonValue,
+        },
+      });
+      throw err;
+    }
+  }
+
+  private async fetchRows(input: ExportInput): Promise<{ columns: string[]; rows: Record<string, unknown>[] }> {
+    const { type, filters, limit } = input;
+    const whereDate: { gte?: Date; lte?: Date } = {};
+    if (filters.from) whereDate.gte = new Date(filters.from);
+    if (filters.to) whereDate.lte = new Date(filters.to);
+
+    if (type === 'USERS') {
+      const rows = await prisma.user.findMany({
+        where: {
+          AND: [
+            filters.userId ? { id: filters.userId } : {},
+            Object.keys(whereDate).length ? { createdAt: whereDate } : {},
+          ],
+        },
+        select: {
+          id: true, email: true, username: true, role: true, status: true,
+          kycStatus: true, kycLevel: true, createdAt: true, lastActiveAt: true,
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      });
+      return {
+        columns: ['id', 'email', 'username', 'role', 'status', 'kycStatus', 'kycLevel', 'createdAt', 'lastActiveAt'],
+        rows,
+      };
+    }
+
+    if (type === 'TRANSACTIONS') {
+      const rows = await prisma.transaction.findMany({
+        where: {
+          AND: [
+            filters.userId ? { userId: filters.userId } : {},
+            Object.keys(whereDate).length ? { createdAt: whereDate } : {},
+          ],
+        },
+        select: {
+          id: true, userId: true, creatorId: true, targetUserId: true,
+          type: true, category: true, amount: true, currency: true,
+          status: true, createdAt: true,
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      });
+      return {
+        columns: ['id', 'userId', 'creatorId', 'targetUserId', 'type', 'category', 'amount', 'currency', 'status', 'createdAt'],
+        rows,
+      };
+    }
+
+    if (type === 'PAYMENTS') {
+      const rows = await prisma.payment.findMany({
+        where: {
+          AND: [
+            filters.userId ? { userId: filters.userId } : {},
+            Object.keys(whereDate).length ? { createdAt: whereDate } : {},
+          ],
+        },
+        select: {
+          id: true, userId: true, type: true, amount: true, currency: true,
+          status: true, paidAt: true, createdAt: true,
+        },
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      });
+      return {
+        columns: ['id', 'userId', 'type', 'amount', 'currency', 'status', 'paidAt', 'createdAt'],
+        rows,
+      };
+    }
+
+    const rows: Record<string, unknown>[] = [
+      { note: `Type ${type} non couvert en export PDF`, generatedAt: new Date().toISOString() },
+    ];
+    return { columns: Object.keys(rows[0]), rows };
+  }
+
+  private async buildPdfBuffer(params: {
+    title: string;
+    columns: string[];
+    rows: Record<string, unknown>[];
+    watermark?: string;
+  }): Promise<{ buffer: Buffer; rowCount: number }> {
+    const doc = new PDFDocument({ margin: 40, size: 'A4', info: { Title: params.title, Author: 'Oliver Platform' } });
+    const chunks: Buffer[] = [];
+    doc.on('data', (c) => chunks.push(c));
+    const done = new Promise<Buffer>((resolve) => doc.on('end', () => resolve(Buffer.concat(chunks))));
+
+    doc.fontSize(18).text(params.title, { align: 'left' });
+    doc.moveDown(0.5);
+    doc.fontSize(10).fillColor('#666666').text(new Date().toLocaleString(), { align: 'left' });
+    doc.moveDown(1);
+    doc.fillColor('#000000');
+
+    doc.font('Helvetica-Bold').fontSize(10);
+    doc.text(params.columns.join(' | '));
+    doc.moveDown(0.5);
+    doc.font('Helvetica');
+    doc.moveTo(40, doc.y).lineTo(555, doc.y).stroke();
+
+    for (const row of params.rows) {
+      const line = params.columns.map((c) => this.formatCell(row[c])).join(' | ');
+      doc.moveDown(0.3);
+      doc.text(line, { width: 515 });
+    }
+
+    if (params.watermark) {
+      doc.save();
+      doc.rotate(30, { origin: [300, 400] });
+      doc.fontSize(40).fillColor('#e6e6e6').opacity(0.35).text(params.watermark, 100, 300, { align: 'center' });
+      doc.restore();
+      doc.opacity(1).fillColor('#000000');
+    }
+
+    doc.end();
+    const buffer = await done;
+    return { buffer, rowCount: params.rows.length };
+  }
+
+  private formatCell(v: unknown): string {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'number') return Number.isFinite(v) ? String(v) : '';
+    if (typeof v === 'string') return v;
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    try { return JSON.stringify(v); } catch { return String(v); }
+  }
+
+  private hash(s: string): string {
+    return crypto.createHash('sha256').update(s).digest('hex');
+  }
+}

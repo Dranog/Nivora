@@ -1,0 +1,257 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests (emergency only)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: '20.x'
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-Deployment Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./apps/web
+
+      - name: Run linter
+        if: ${{ !inputs.skip_tests }}
+        run: pnpm run lint
+        working-directory: ./apps/web
+
+      - name: Run tests
+        if: ${{ !inputs.skip_tests }}
+        run: pnpm run test:ci
+        working-directory: ./apps/web
+
+      - name: Build application
+        run: pnpm run build
+        working-directory: ./apps/web
+        env:
+          NODE_ENV: production
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: ./apps/web/.next
+          retention-days: 1
+
+  deploy-to-vercel:
+    name: Deploy to Vercel Production
+    runs-on: ubuntu-latest
+    needs: pre-deployment-checks
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/web
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/web
+
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | tee deploy.log | grep -o 'https://[^ ]*' | tail -1)
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Deployed to: $DEPLOY_URL"
+        working-directory: ./apps/web
+
+      - name: Comment deployment URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Deployed to production: ${{ steps.deploy.outputs.url }}'
+            })
+
+  post-deployment-tests:
+    name: Post-Deployment Verification
+    runs-on: ubuntu-latest
+    needs: deploy-to-vercel
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Wait for deployment to be ready
+        run: |
+          echo "Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+
+      - name: Health check
+        run: |
+          HEALTH_URL="https://oliver.example.com/api/health"
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL || echo "000")
+
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Health check passed (200 OK)"
+          else
+            echo "❌ Health check failed (HTTP $RESPONSE)"
+            exit 1
+          fi
+
+      - name: Status check
+        run: |
+          STATUS_URL="https://oliver.example.com/api/status"
+          RESPONSE=$(curl -s $STATUS_URL)
+
+          echo "Status response:"
+          echo "$RESPONSE" | jq '.'
+
+          VERSION=$(echo "$RESPONSE" | jq -r '.version')
+          COMMIT=$(echo "$RESPONSE" | jq -r '.build.commit')
+
+          echo "Deployed version: $VERSION"
+          echo "Deployed commit: $COMMIT"
+
+      - name: Run smoke tests
+        run: |
+          # Test homepage
+          curl -f -s https://oliver.example.com/ > /dev/null
+          echo "✅ Homepage accessible"
+
+          # Test login page
+          curl -f -s https://oliver.example.com/login > /dev/null
+          echo "✅ Login page accessible"
+
+          # Test API endpoints
+          curl -f -s https://oliver.example.com/api/health > /dev/null
+          echo "✅ API health endpoint accessible"
+
+  notify-deployment:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-to-vercel, post-deployment-tests]
+    if: always()
+
+    steps:
+      - name: Deployment Success Notification
+        if: ${{ needs.post-deployment-tests.result == 'success' }}
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "✅ Production deployment successful!",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Production Deployment Successful* ✅\n\n*Branch:* `${{ github.ref_name }}`\n*Commit:* `${{ github.sha }}`\n*Author:* ${{ github.actor }}\n*URL:* https://oliver.example.com"
+                  }
+                }
+              ]
+            }
+
+      - name: Deployment Failure Notification
+        if: ${{ needs.post-deployment-tests.result == 'failure' || needs.deploy-to-vercel.result == 'failure' }}
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "❌ Production deployment FAILED!",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Production Deployment FAILED* ❌\n\n*Branch:* `${{ github.ref_name }}`\n*Commit:* `${{ github.sha }}`\n*Author:* ${{ github.actor }}\n*Action:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
+                  }
+                }
+              ]
+            }
+
+  rollback-on-failure:
+    name: Automatic Rollback
+    runs-on: ubuntu-latest
+    needs: post-deployment-tests
+    if: failure()
+    environment:
+      name: production
+
+    steps:
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Rollback to previous deployment
+        run: |
+          echo "⚠️ Post-deployment tests failed. Initiating rollback..."
+          vercel rollback --token=${{ secrets.VERCEL_TOKEN }} --yes
+          echo "✅ Rolled back to previous deployment"
+
+      - name: Notify rollback
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "⚠️ Production deployment rolled back due to failed post-deployment tests",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Automatic Rollback Triggered* ⚠️\n\n*Reason:* Post-deployment tests failed\n*Commit:* `${{ github.sha }}`\n*Action:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
+                  }
+                }
+              ]
+            }

@@ -1,0 +1,1523 @@
+{
+  "admin": {
+    "login": {
+      "title": "Administration",
+      "subtitle": "Connectez-vous pour accéder au panel admin",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "help": "Besoin d'aide ? Contactez le support technique"
+    },
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "users": "Utilisateurs",
+      "transactions": "Transactions",
+      "reports": "Signalements",
+      "moderation": "Modération",
+      "accounting": "Comptabilité",
+      "posts": "Publications",
+      "support": "Support",
+      "kyc": "Vérification KYC",
+      "payouts": "Retraits",
+      "chargebacks": "Litiges",
+      "legal": "Juridique",
+      "health": "Santé Système",
+      "settings": "Paramètres"
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "subtitle": "Bienvenue ! Voici ce qui se passe aujourd'hui.",
+      "totalUsers": "Utilisateurs Totaux",
+      "totalRevenue": "Revenus Totaux",
+      "transactions": "Transactions",
+      "salesOverview": "Aperçu des Ventes",
+      "salesTrend": "Tendance des revenus au fil du temps",
+      "recentTransactions": "Transactions Récentes",
+      "fromLastMonth": "par rapport au mois dernier",
+      "viewAll": "Voir tout",
+      "viewReports": "Voir les rapports",
+      "table": {
+        "date": "Date",
+        "description": "Description",
+        "amount": "Montant",
+        "tag": "Étiquette"
+      },
+      "chart": {
+        "revenue": "Revenu"
+      },
+      "months": {
+        "january": "Janvier",
+        "february": "Février",
+        "march": "Mars",
+        "april": "Avril",
+        "may": "Mai",
+        "june": "Juin",
+        "july": "Juillet",
+        "august": "Août",
+        "september": "Septembre",
+        "october": "Octobre",
+        "november": "Novembre",
+        "december": "Décembre"
+      },
+      "demoTransactions": {
+        "transaction": "Transaction",
+        "purchaseCode": "Code d'achat",
+        "invoiceDetails": "Détails facture",
+        "transactionDoc": "Document transaction",
+        "depositDetails": "Détails dépôt"
+      }
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "addNew": "Ajouter",
+      "searchPlaceholder": "Rechercher",
+      "allUsers": "Tous",
+      "admins": "Admins",
+      "creators": "Créateurs",
+      "pendingKyc": "KYC En Attente",
+      "suspended": "Suspendus",
+      "filters": {
+        "all": "Tous",
+        "admins": "Admins",
+        "creators": "Créateurs",
+        "fans": "Fans",
+        "active": "Actifs",
+        "suspended": "Suspendus",
+        "banned": "Bannis",
+        "new": "Nouveaux"
+      },
+      "selected": "utilisateur(s) sélectionné(s)",
+      "suspendSelected": "Suspendre Sélection",
+      "resetPasswords": "Réinitialiser Mots de Passe",
+      "exportCsv": "Exporter CSV",
+      "tableHeaders": {
+        "name": "Nom",
+        "email": "Email",
+        "role": "Rôle",
+        "category": "Catégorie",
+        "status": "Statut",
+        "accountAge": "Âge du Compte",
+        "lastLogin": "Dernière Connexion",
+        "actions": "Actions"
+      },
+      "suspend": "Suspendre",
+      "reset": "Réinitialiser",
+      "view": "Voir",
+      "noUsers": "Aucun utilisateur ne correspond aux filtres.",
+      "userAdded": "Utilisateur ajouté",
+      "userAddedMessage": "créé avec succès.",
+      "suspendConfirm": "Suspendre",
+      "suspendMessage": "Verrouiller immédiatement le compte\nMasquer tout le contenu\nEnvoyer un email de suspension\nRéactivation manuelle requise",
+      "actionCancelled": "Action annulée",
+      "noChanges": "Aucune modification effectuée.",
+      "userSuspended": "Utilisateur suspendu",
+      "userSuspendedMessage": "a été suspendu et notifié par email.",
+      "loadingProfile": "Chargement du profil",
+      "redirecting": "Redirection en cours…",
+      "resetPasswordConfirm": "Réinitialiser le mot de passe de",
+      "emailWillBeSent": "Un email sera envoyé à :",
+      "actionCancelledEmail": "Action annulée",
+      "noEmailSent": "Aucun email envoyé.",
+      "emailSent": "Email envoyé",
+      "resetEmailSent": "Un email de réinitialisation a été envoyé à",
+      "deleteConfirm": "SUPPRIMER DÉFINITIVEMENT",
+      "deleteMessage": "Cette action est IRRÉVERSIBLE et va :\n• Supprimer toutes ses données\n• Retirer l'ensemble de son contenu\n• Annuler ses abonnements\n• Effacer l'historique des transactions",
+      "deletionCancelled": "Suppression annulée",
+      "confirmName": "Écris exactement le nom pour confirmer :",
+      "invalidName": "Nom non valide",
+      "deletionAborted": "La suppression a été annulée.",
+      "userDeleted": "Utilisateur supprimé",
+      "userDeletedMessage": "a été définitivement supprimé.",
+      "bulkSuspendConfirm": "Suspendre",
+      "bulkSuspendMessage": "utilisateur(s) sélectionné(s) ?\n\nTous seront immédiatement verrouillés.",
+      "bulkSuspendSuccess": "Suspension groupée effectuée",
+      "bulkSuspendSuccessMessage": "utilisateur(s) suspendu(s).",
+      "bulkResetConfirm": "Envoyer un email de réinitialisation à",
+      "bulkResetMessage": "utilisateur(s) ?",
+      "bulkResetSuccess": "Emails envoyés",
+      "bulkResetSuccessMessage": "email(s) de réinitialisation envoyés.",
+      "exportSuccess": "Export CSV",
+      "exportSuccessMessage": "utilisateur(s) exporté(s).",
+      "suspendDialog": {
+        "title": "Suspendre {name} ?",
+        "description": "Cette action va :",
+        "detail1": "Verrouiller immédiatement le compte",
+        "detail2": "Masquer tout le contenu",
+        "detail3": "Envoyer un email de suspension",
+        "detail4": "Réactivation manuelle requise"
+      },
+      "resetPasswordDialog": {
+        "title": "Réinitialiser le mot de passe de {name} ?",
+        "description": "Un email de réinitialisation sera envoyé :",
+        "detail1": "Email : {email}"
+      },
+      "deleteDialog": {
+        "title": "Supprimer définitivement {name} ?",
+        "description": "Cette action est IRRÉVERSIBLE :",
+        "detail1": "Supprimer toutes les données",
+        "detail2": "Retirer l'ensemble de son contenu",
+        "detail3": "Annuler ses abonnements",
+        "detail4": "Effacer l'historique des transactions"
+      },
+      "bulkSuspendDialog": {
+        "title": "Suspendre {count} utilisateur(s) ?",
+        "description": "Tous les utilisateurs sélectionnés seront :",
+        "detail1": "Verrouillés immédiatement",
+        "detail2": "Notifiés par email"
+      },
+      "bulkResetDialog": {
+        "title": "Réinitialiser {count} mot(s) de passe ?",
+        "description": "Des emails de réinitialisation seront envoyés :",
+        "detail1": "Un email par utilisateur sélectionné",
+        "detail2": "Valable 24 heures"
+      },
+      "actions": {
+        "changeRole": "Changer Rôle",
+        "suspend": "Suspendre",
+        "unsuspend": "Réactiver",
+        "ban": "Bannir",
+        "delete": "Supprimer",
+        "resetPassword": "Réinitialiser Mot de Passe",
+        "sendEmail": "Envoyer Email",
+        "view": "Voir",
+        "viewProfile": "Voir Profil",
+        "viewAdmin": "Voir Admin"
+      },
+      "roleDialog": {
+        "title": "Changer le rôle de {name}",
+        "save": "Enregistrer"
+      },
+      "unsuspendDialog": {
+        "title": "Réactiver {name} ?",
+        "description": "Le compte sera réactivé immédiatement."
+      },
+      "emailDialog": {
+        "title": "Envoyer un email à {name}",
+        "placeholder": "Écrivez votre message...",
+        "send": "Envoyer"
+      },
+      "banDialog": {
+        "title": "Bannir définitivement {name} ?",
+        "description": "Cette action est PERMANENTE :",
+        "detail1": "Bannissement définitif du compte",
+        "detail2": "Suppression immédiate de tout contenu",
+        "detail3": "Remboursement automatique des abonnements",
+        "detail4": "Blacklist de l'adresse email"
+      },
+      "toasts": {
+        "roleChanged": "Rôle de {name} changé avec succès",
+        "suspended": "{name} a été suspendu",
+        "unsuspended": "{name} a été réactivé",
+        "passwordResetSent": "Email de réinitialisation envoyé à {email}",
+        "emailSent": "Email envoyé à {name}",
+        "banned": "{name} a été banni définitivement",
+        "deleted": "{name} a été supprimé"
+      },
+      "roles": {
+        "admin": "Administrateur",
+        "creator": "Créateur",
+        "user": "Utilisateur"
+      },
+      "statuses": {
+        "verified": "Vérifié",
+        "pending": "En attente",
+        "rejected": "Rejeté",
+        "suspended": "Suspendu"
+      },
+      "time": {
+        "years": "ans",
+        "year": "an",
+        "months": "mois",
+        "month": "mois",
+        "weeks": "semaines",
+        "week": "semaine",
+        "days": "jours",
+        "day": "jour",
+        "hours": "heures",
+        "hour": "heure",
+        "minutes": "minutes",
+        "minute": "minute",
+        "ago": "il y a",
+        "agoFormat": "il y a {time}",
+        "never": "jamais"
+      },
+      "addUser": {
+        "title": "Ajouter un Utilisateur",
+        "profilePhoto": "Photo de Profil",
+        "uploadPhoto": "Télécharger",
+        "changePhoto": "Changer la Photo",
+        "photoHelp": "PNG, JPG, GIF jusqu'à 5MB — ou collez une URL d'image",
+        "fullName": "Nom Complet",
+        "fullNamePlaceholder": "Entrer le nom complet",
+        "emailAddress": "Adresse Email",
+        "emailPlaceholder": "utilisateur@exemple.com",
+        "avatarUrlPlaceholder": "URL de l'avatar (https://...)",
+        "userRole": "Rôle Utilisateur",
+        "selectRole": "Sélectionner un rôle",
+        "category": "Catégorie",
+        "selectCategory": "Sélectionner une catégorie",
+        "cancel": "Annuler",
+        "createUser": "Créer l'Utilisateur",
+        "creating": "Création...",
+        "validation": {
+          "nameRequired": "Le nom est requis",
+          "nameTooShort": "Le nom doit contenir au moins 2 caractères",
+          "emailRequired": "L'email est requis",
+          "emailInvalid": "Format d'email invalide",
+          "avatarUrlInvalid": "L'URL de l'avatar doit commencer par http(s)://",
+          "photoTooLarge": "La photo doit faire moins de 5MB",
+          "invalidFileType": "Veuillez télécharger un fichier image",
+          "fixErrors": "Veuillez corriger les erreurs dans le formulaire"
+        },
+        "confirmCreate": "Créer l'utilisateur ?\n\nNom : {name}\nEmail : {email}\nRôle : {role}\nCatégorie : {category}",
+        "unsavedChanges": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir fermer ?",
+        "userAddedTitle": "Utilisateur Ajouté avec Succès",
+        "userAddedMessage": "{name} a été ajouté à la plateforme",
+        "categories": {
+          "standard": "Standard",
+          "premium": "Premium",
+          "vip": "VIP",
+          "trial": "Essai"
+        },
+        "roleLabels": {
+          "user": "Utilisateur",
+          "creator": "Créateur",
+          "admin": "Administrateur",
+          "moderator": "Modérateur",
+          "support": "Support"
+        }
+      }
+    },
+    "userDetail": {
+      "tabs": {
+        "overview": "Aperçu",
+        "finances": "Finances",
+        "content": "Contenu",
+        "activity": "Activité",
+        "subscribers": "Abonnés",
+        "subscriptions": "Abonnements",
+        "kyc": "Documents KYC",
+        "moderation": "Modération",
+        "security": "Sécurité",
+        "logs": "Logs"
+      },
+      "actions": {
+        "quickActions": "Actions Rapides",
+        "sendEmail": "Envoyer Email",
+        "changeRole": "Changer Rôle",
+        "suspend": "Suspendre",
+        "unsuspend": "Réactiver",
+        "ban": "Bannir",
+        "resetPassword": "Reset Password",
+        "viewAs": "Voir comme",
+        "forceLogout": "Déconnecter",
+        "addNote": "Ajouter Note",
+        "emailSent": "Email envoyé",
+        "roleChanged": "Rôle modifié",
+        "suspended": "Compte suspendu",
+        "banned": "Compte banni",
+        "passwordReset": "Mot de passe réinitialisé",
+        "viewingAs": "Consultation en cours",
+        "loggedOut": "Sessions fermées",
+        "noteAdded": "Note ajoutée"
+      },
+      "stats": {
+        "totalRevenue": "Revenus Totaux",
+        "subscribers": "Abonnés",
+        "posts": "Posts Publiés",
+        "engagement": "Taux Engagement"
+      },
+      "overview": {
+        "recentActivity": "Activité Récente",
+        "activeSubscriptions": "Abonnements Actifs",
+        "totalSpent": "Dépenses Totales",
+        "likedPosts": "Posts Aimés",
+        "memberSince": "Membre Depuis"
+      },
+      "finances": {
+        "balance": "Balance Actuelle",
+        "thisMonth": "Ce Mois",
+        "allTime": "Total Historique",
+        "transactions": "Transactions",
+        "date": "Date",
+        "type": "Type",
+        "description": "Description",
+        "amount": "Montant",
+        "status": "Statut",
+        "types": {
+          "subscription": "Abonnement",
+          "payout": "Retrait",
+          "tip": "Tip",
+          "ppv": "PPV",
+          "refund": "Remboursement",
+          "purchase": "Achat"
+        },
+        "statuses": {
+          "completed": "Terminé",
+          "processing": "Traitement",
+          "pending": "En Attente"
+        }
+      },
+      "content": {
+        "posts": "Publications",
+        "views": "Vues",
+        "likes": "Likes",
+        "comments": "Commentaires"
+      },
+      "activity": {
+        "timeline": "Timeline Complète",
+        "loadMore": "Charger plus"
+      },
+      "subscribers": {
+        "activeSubscribers": "Abonnés Actifs",
+        "newThisMonth": "Nouveaux ce Mois",
+        "churnRate": "Taux de Désabonnement",
+        "growthChart": "Croissance des Abonnés",
+        "list": "Liste des Abonnés",
+        "subscriber": "Abonné",
+        "email": "Email",
+        "since": "Depuis",
+        "plan": "Plan",
+        "status": "Statut",
+        "days": "jours",
+        "months": "mois",
+        "statuses": {
+          "active": "Actif",
+          "trial": "Essai",
+          "cancelled": "Annulé"
+        }
+      },
+      "moderation": {
+        "totalReports": "Signalements",
+        "warnings": "Warnings",
+        "activeSanctions": "Sanctions Actives",
+        "trustScore": "Score de Confiance",
+        "reportsHistory": "Historique des Signalements",
+        "warningsGiven": "Warnings Donnés",
+        "adminNotes": "Notes Admin (Internes)",
+        "noReports": "Aucun signalement",
+        "date": "Date",
+        "type": "Type",
+        "reason": "Raison",
+        "content": "Contenu",
+        "status": "Statut",
+        "action": "Action",
+        "details": "Détails",
+        "admin": "Admin",
+        "addNotePlaceholder": "Ajouter une note interne...",
+        "saveNote": "Enregistrer",
+        "types": {
+          "post": "Post",
+          "comment": "Commentaire",
+          "profile": "Profil",
+          "message": "Message"
+        },
+        "reasons": {
+          "spam": "Spam",
+          "harassment": "Harcèlement",
+          "nsfw": "Contenu NSFW",
+          "copyright": "Violation Copyright",
+          "other": "Autre"
+        },
+        "statuses": {
+          "resolved": "Résolu",
+          "pending": "En Cours",
+          "rejected": "Rejeté"
+        },
+        "actions": {
+          "none": "Aucune",
+          "warning": "Warning",
+          "suspended": "Suspendu"
+        }
+      },
+      "security": {
+        "kycStatus": "Statut KYC",
+        "twoFactor": "Authentification à Deux Facteurs",
+        "activeSessions": "Sessions Actives",
+        "ipHistory": "Historique IP",
+        "kyc": {
+          "verified": "Vérifié",
+          "pending": "En Attente",
+          "rejected": "Rejeté",
+          "notSubmitted": "Non Soumis"
+        },
+        "document": "Document",
+        "approvedDate": "Date d'approbation",
+        "submittedDate": "Date de soumission",
+        "rejectedDate": "Date de rejet",
+        "reason": "Raison",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "device": "Appareil",
+        "browser": "Navigateur",
+        "ip": "Adresse IP",
+        "location": "Localisation",
+        "lastActive": "Dernière Activité",
+        "action": "Action",
+        "disconnect": "Déconnecter",
+        "currentSession": "Session actuelle",
+        "firstSeen": "Première Vue",
+        "lastSeen": "Dernière Vue",
+        "requests": "Requêtes"
+      },
+      "logs": {
+        "adminAudit": "Audit Admin",
+        "dateTime": "Date / Heure",
+        "admin": "Admin",
+        "action": "Action",
+        "details": "Détails",
+        "actions": {
+          "role_change": "Changement de rôle",
+          "suspension": "Suspension",
+          "unsuspension": "Levée suspension",
+          "ban": "Bannissement",
+          "verification": "Vérification",
+          "password_reset": "Réinitialisation MDP",
+          "content_removal": "Suppression contenu",
+          "warning_issued": "Warning envoyé",
+          "note_added": "Note ajoutée",
+          "kyc_approval": "Approbation KYC"
+        }
+      },
+      "kyc": {
+        "title": "Documents KYC",
+        "validateProfile": "Valider le Profil",
+        "rejectProfile": "Rejeter le Profil",
+        "status": {
+          "verified": "Vérifié",
+          "pending": "En Attente",
+          "rejected": "Rejeté",
+          "not_submitted": "Non Soumis",
+          "not_applicable": "Non Applicable"
+        },
+        "documents": {
+          "title": "Documents Obligatoires",
+          "description": "6 documents requis pour valider le profil créateur"
+        },
+        "documentStatus": {
+          "approved": "Validé",
+          "pending": "En Attente",
+          "rejected": "Rejeté",
+          "missing": "Manquant"
+        },
+        "uploadedOn": "Uploadé le",
+        "rejectionReason": "Raison du rejet",
+        "viewDocument": "Voir",
+        "approve": "Valider",
+        "reject": "Rejeter",
+        "rejectDocumentTitle": "Rejeter le Document",
+        "rejectDocumentDescription": "Indiquez la raison du rejet du document «{documentName}». Un email sera envoyé au créateur.",
+        "rejectProfileTitle": "Rejeter le Profil KYC",
+        "rejectProfileDescription": "Indiquez la raison du rejet du profil de {userName}. Un email sera envoyé au créateur.",
+        "rejectionReasonPlaceholder": "Raison du rejet (sera envoyée par email)...",
+        "confirmReject": "Confirmer le Rejet"
+      },
+      "subscriptions": {
+        "title": "Abonnements Actifs",
+        "description": "Créateurs auxquels cet utilisateur est abonné",
+        "creator": "Créateur",
+        "since": "Depuis",
+        "plan": "Plan",
+        "status": "Statut",
+        "nextBilling": "Prochaine Facturation",
+        "noSubscriptions": "Aucun abonnement actif",
+        "statuses": {
+          "active": "Actif",
+          "cancelled": "Annulé"
+        }
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "subtitle": "Historique complet et gestion",
+      "autoRefreshOn": "Auto (30s)",
+      "autoRefreshOff": "Auto OFF",
+      "refresh": "Rafraîchir",
+      "exportCsv": "Export CSV",
+      "searchLabel": "Recherche",
+      "searchPlaceholder": "ID, email, nom…",
+      "searchButton": "Rechercher",
+      "autoRefreshCheckbox": "Auto-refresh 30s",
+      "totalVolume": "Volume Total",
+      "loading": "Chargement…",
+      "vsLastMonth": "vs mois dernier",
+      "totalCount": "Nombre Total",
+      "thisMonth": "Ce mois",
+      "avgTransaction": "Moyenne",
+      "currentAverage": "Moyenne actuelle",
+      "avatarManagement": "Gestion de l'avatar utilisateur",
+      "userIdLabel": "ID utilisateur",
+      "userIdPlaceholder": "ex: 9f8a2c…",
+      "avatarUrlLabel": "URL d'avatar (optionnel)",
+      "avatarUrlPlaceholder": "https://…/photo.png",
+      "uploadLabel": "Upload (optionnel)",
+      "updatePhotoButton": "Mettre à jour la photo",
+      "uploadInstructions": "Fournis <strong>soit</strong> une URL <strong>soit</strong> un fichier. Si les deux sont fournis, le fichier est prioritaire.",
+      "unknownError": "Erreur inconnue",
+      "loadingError": "Erreur de chargement",
+      "networkError": "Erreur réseau lors de la récupération des données",
+      "retryButton": "Réessayer",
+      "refreshed": "Actualisé",
+      "metricsUpdated": "Indicateurs mis à jour.",
+      "refreshFailed": "Échec d'actualisation",
+      "unableToRefresh": "Impossible de rafraîchir.",
+      "searchApplied": "Recherche appliquée",
+      "exportConfirm": "Exporter les transactions (selon la recherche en cours) en CSV ?",
+      "exportCompleted": "Export terminé",
+      "csvDownloaded": "Le CSV a été téléchargé.",
+      "exportFailed": "Export échoué",
+      "userIdRequired": "ID utilisateur requis",
+      "provideValidUserId": "Renseigne un ID utilisateur valide.",
+      "avatarMissing": "Avatar manquant",
+      "provideAvatarUrlOrFile": "Fournis une URL d'avatar ou choisis un fichier à envoyer.",
+      "updatePhotoConfirm": "Mettre à jour la photo de l'utilisateur ?",
+      "photoUpdated": "Photo mise à jour",
+      "updateFailed": "Échec de mise à jour"
+    },
+    "accounting": {
+      "title": "Comptabilité",
+      "subtitle": "Transactions financières et rapports",
+      "export": {
+        "csv": "CSV",
+        "excel": "Excel",
+        "pdfReport": "Rapport PDF"
+      },
+      "metrics": {
+        "totalRevenue": "Revenu Total",
+        "totalRevenueDesc": "Tous les paiements reçus",
+        "totalPayouts": "Retraits Totaux",
+        "totalPayoutsDesc": "Retraits des créateurs",
+        "totalFees": "Frais Totaux",
+        "totalFeesDesc": "Coûts de transaction",
+        "pending": "En Attente",
+        "pendingDesc": "En cours de traitement"
+      },
+      "search": {
+        "placeholder": "Rechercher par utilisateur, email, ID de transaction ou description..."
+      },
+      "tabs": {
+        "allTransactions": "Toutes les Transactions",
+        "payments": "Paiements",
+        "payouts": "Retraits",
+        "refunds": "Remboursements",
+        "subscriptions": "Abonnements"
+      },
+      "bulk": {
+        "selected": "sélectionné(s)",
+        "exportSelected": "Exporter Sélection (CSV)"
+      },
+      "table": {
+        "id": "ID",
+        "type": "Type",
+        "user": "Utilisateur",
+        "amount": "Montant",
+        "fee": "Frais",
+        "net": "Net",
+        "status": "Statut",
+        "method": "Méthode",
+        "date": "Date",
+        "actions": "Actions",
+        "noTransactions": "Aucune transaction ne correspond aux filtres."
+      },
+      "types": {
+        "payment": "Paiement",
+        "payout": "Retrait",
+        "refund": "Remboursement",
+        "subscription": "Abonnement",
+        "tip": "Pourboire"
+      },
+      "statuses": {
+        "completed": "Terminé",
+        "pending": "En Attente",
+        "failed": "Échoué",
+        "processing": "En Traitement"
+      },
+      "methods": {
+        "creditCard": "Carte de Crédit",
+        "paypal": "PayPal",
+        "bankTransfer": "Virement Bancaire",
+        "crypto": "Crypto"
+      },
+      "actions": {
+        "details": "Détails",
+        "editAvatar": "Modifier l'Avatar"
+      },
+      "avatarEditor": {
+        "title": "Modifier l'Avatar de l'Utilisateur",
+        "avatarUrl": "URL de l'Avatar",
+        "urlPlaceholder": "https://...",
+        "uploadButton": "Télécharger Image",
+        "uploadingButton": "Téléchargement…",
+        "saveButton": "Enregistrer l'Avatar",
+        "helpText": "Fournis une URL ou télécharge un fichier image."
+      },
+      "toasts": {
+        "invalidAvatar": "Avatar Invalide",
+        "invalidAvatarMessage": "Fournis une URL d'image valide ou télécharge un fichier.",
+        "avatarUpdated": "Avatar Mis à Jour",
+        "avatarUpdatedMessage": "L'avatar de l'utilisateur a été mis à jour avec succès.",
+        "unsupportedFile": "Fichier Non Supporté",
+        "unsupportedFileMessage": "Veuillez sélectionner un fichier image.",
+        "imageLoaded": "Image Chargée",
+        "imageLoadedMessage": "Prévisualise l'avatar avant d'enregistrer.",
+        "uploadFailed": "Échec du Téléchargement",
+        "uploadFailedMessage": "Impossible de lire le fichier sélectionné."
+      },
+      "confirmations": {
+        "exportSelected": "Exporter {count} {label} ?"
+      },
+      "infoBox": {
+        "title": "Couverture Comptabilité",
+        "description": "Vue financière avec options d'export (CSV, Excel, PDF), filtres de transaction, recherche, opérations groupées et piste d'audit complète."
+      }
+    },
+    "moderation": {
+      "title": "Modération de Contenu",
+      "subtitle": "Examiner et modérer le contenu soumis par les utilisateurs",
+      "stats": {
+        "pendingReview": "En Attente de Révision",
+        "flagged": "Signalé",
+        "approved": "Approuvé",
+        "rejected": "Rejeté"
+      },
+      "search": {
+        "placeholder": "Rechercher par titre, créateur ou description…"
+      },
+      "tabs": {
+        "allContent": "Tout le Contenu",
+        "pending": "En Attente",
+        "flagged": "Signalé",
+        "approved": "Approuvé",
+        "rejected": "Rejeté"
+      },
+      "bulk": {
+        "selected": "sélectionné(s)",
+        "approveSelected": "Approuver Sélection",
+        "rejectSelected": "Rejeter Sélection"
+      },
+      "table": {
+        "preview": "Aperçu",
+        "creator": "Créateur",
+        "title": "Titre",
+        "risk": "Risque",
+        "flags": "Signalements",
+        "status": "Statut",
+        "submitted": "Soumis",
+        "actions": "Actions",
+        "noContent": "Aucun contenu ne correspond aux filtres."
+      },
+      "types": {
+        "image": "image",
+        "video": "vidéo",
+        "post": "publication"
+      },
+      "actions": {
+        "editAvatar": "Modifier l'avatar",
+        "review": "Examiner",
+        "approve": "Approuver",
+        "reject": "Rejeter",
+        "close": "Fermer"
+      },
+      "risk": {
+        "label": "Risque : {score}%"
+      },
+      "flags": {
+        "single": "signalement",
+        "plural": "signalements"
+      },
+      "review": {
+        "title": "Examen du Contenu",
+        "submitted": "Soumis {time}"
+      },
+      "avatarEditor": {
+        "title": "Modifier l'Avatar du Créateur",
+        "avatarUrl": "URL de l'Avatar",
+        "urlPlaceholder": "https://...",
+        "uploadingButton": "Téléchargement…",
+        "uploadButton": "Télécharger Image",
+        "saveButton": "Enregistrer l'Avatar",
+        "helpText": "Vous pouvez coller une URL d'image directe ou télécharger un fichier. Les images téléchargées sont stockées en mémoire (data URL) à des fins de démonstration."
+      },
+      "confirmations": {
+        "approveOne": "Approuver le contenu \"{title}\" de {creator} ?\n\nCela le rendra visible à tous les utilisateurs.",
+        "rejectOne": "Rejeter le contenu \"{title}\" de {creator}.\n\nFournis une raison courte (requise) :",
+        "approveBulk": "Approuver {count} élément{plural} sélectionné{plural} ?\n\nIls seront visibles à tous les utilisateurs.",
+        "rejectBulk": "Rejeter {count} élément{plural} sélectionné{plural}.\n\nFournis une raison courte (requise) :",
+        "confirmBulkReject": "Confirmer le rejet groupé ?"
+      },
+      "toasts": {
+        "contentApproved": "Contenu Approuvé",
+        "contentApprovedMessage": "\"{title}\" est maintenant en ligne.",
+        "rejectionAborted": "Rejet Annulé",
+        "rejectionAbortedMessage": "Une raison est requise pour rejeter le contenu.",
+        "contentRejected": "Contenu Rejeté",
+        "contentRejectedMessage": "Le créateur sera notifié avec votre raison.",
+        "bulkApprovalComplete": "Approbation Groupée Terminée",
+        "bulkApprovalMessage": "{count} élément{plural} approuvé{plural}.",
+        "bulkRejectionAborted": "Rejet Groupé Annulé",
+        "bulkRejectionAbortedMessage": "Une raison est requise.",
+        "bulkRejectionComplete": "Rejet Groupé Terminé",
+        "bulkRejectionMessage": "Les créateurs seront notifiés avec votre raison.",
+        "openingReview": "Ouverture de l'Examen",
+        "openingReviewMessage": "Chargement de l'aperçu et des métadonnées…",
+        "unsupportedFile": "Fichier Non Supporté",
+        "unsupportedFileMessage": "Veuillez sélectionner un fichier image.",
+        "imageLoaded": "Image Chargée",
+        "imageLoadedMessage": "Prévisualisez l'avatar avant d'enregistrer.",
+        "uploadFailed": "Échec du Téléchargement",
+        "uploadFailedMessage": "Impossible de lire le fichier sélectionné.",
+        "invalidAvatar": "Avatar Invalide",
+        "invalidAvatarMessage": "Fournis une URL d'image valide ou télécharge un fichier.",
+        "avatarUpdated": "Avatar Mis à Jour",
+        "avatarUpdatedMessage": "L'avatar du créateur a été mis à jour avec succès."
+      },
+      "infoBox": {
+        "title": "Couverture de Modération",
+        "description": "La page inclut : recherche, onglets, sélection, approbation/rejet groupé avec confirmations, actions par élément avec validations, aperçu d'examen, toasts, état robuste (chargement/désactivé), édition d'avatar (URL ou upload), et dégradés cohérents via from-brand-start → to-brand-end."
+      }
+    },
+    "posts": {
+      "title": "Gestion du Contenu",
+      "subtitle": "Modérer et gérer les publications de la plateforme",
+      "stats": {
+        "total": "Publications Totales",
+        "published": "Publiées",
+        "pending": "En Attente",
+        "flagged": "Signalées",
+        "removed": "Supprimées"
+      },
+      "search": {
+        "placeholder": "Rechercher par contenu ou créateur...",
+        "ariaLabel": "Rechercher des publications"
+      },
+      "tabs": {
+        "all": "Toutes les Publications",
+        "published": "Publiées",
+        "pending": "En Attente",
+        "flagged": "Signalées",
+        "removed": "Supprimées"
+      },
+      "bulk": {
+        "selected": "sélectionné(s)",
+        "approve": "Approuver",
+        "remove": "Supprimer"
+      },
+      "table": {
+        "creator": "Créateur",
+        "content": "Contenu",
+        "type": "Type",
+        "visibility": "Visibilité",
+        "stats": "Statistiques",
+        "status": "Statut",
+        "created": "Créé",
+        "actions": "Actions",
+        "selectPost": "Sélectionner la publication de {creator}",
+        "selectAll": "Sélectionner toutes les publications"
+      },
+      "contentTypes": {
+        "image": "Image",
+        "video": "Vidéo",
+        "text": "Texte",
+        "mixed": "Mixte"
+      },
+      "visibility": {
+        "public": "Public",
+        "subscribers": "Abonnés",
+        "ppv": "PPV"
+      },
+      "statuses": {
+        "published": "Publié",
+        "pending": "En Attente",
+        "flagged": "Signalé",
+        "removed": "Supprimé"
+      },
+      "statsLabels": {
+        "views": "vues",
+        "likes": "j'aime"
+      },
+      "actions": {
+        "view": "Voir"
+      },
+      "toasts": {
+        "postsApproved": "Publications Approuvées",
+        "postsApprovedMessage": "{count} publication{plural} approuvée{plural} avec succès",
+        "postsRemoved": "Publications Supprimées",
+        "postsRemovedMessage": "{count} publication{plural} supprimée{plural} avec succès"
+      },
+      "confirmations": {
+        "removeSelected": "Êtes-vous sûr de vouloir supprimer {count} publication{plural} ?"
+      }
+    },
+    "support": {
+      "title": "Tickets de Support",
+      "subtitle": "Gérer les demandes de support client",
+      "stats": {
+        "open": "Ouverts",
+        "inProgress": "En Cours",
+        "waiting": "En Attente",
+        "resolved": "Résolus",
+        "avgResponse": "Temps Moy. Réponse",
+        "satisfaction": "Satisfaction"
+      },
+      "search": {
+        "placeholder": "Rechercher des tickets..."
+      },
+      "tabs": {
+        "all": "Tous les Tickets",
+        "open": "Ouverts",
+        "inProgress": "En Cours",
+        "waiting": "En Attente",
+        "resolved": "Résolus"
+      },
+      "bulk": {
+        "selected": "sélectionné(s)",
+        "assign": "Assigner",
+        "close": "Fermer"
+      },
+      "table": {
+        "ticket": "Ticket",
+        "user": "Utilisateur",
+        "subject": "Sujet",
+        "category": "Catégorie",
+        "priority": "Priorité",
+        "status": "Statut",
+        "assigned": "Assigné",
+        "lastUpdate": "Dernière Mise à Jour",
+        "actions": "Actions",
+        "unassigned": "Non assigné",
+        "messages": "messages"
+      },
+      "categories": {
+        "technical": "Technique",
+        "billing": "Facturation",
+        "account": "Compte",
+        "content": "Contenu",
+        "other": "Autre"
+      },
+      "priorities": {
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "urgent": "Urgent"
+      },
+      "statuses": {
+        "open": "Ouvert",
+        "inProgress": "En Cours",
+        "waiting": "En Attente",
+        "resolved": "Résolu",
+        "closed": "Fermé"
+      },
+      "actions": {
+        "view": "Voir"
+      },
+      "toasts": {
+        "ticketsAssigned": "Tickets Assignés",
+        "ticketsAssignedMessage": "{count} ticket{plural} assigné{plural} avec succès",
+        "ticketsClosed": "Tickets Fermés",
+        "ticketsClosedMessage": "{count} ticket{plural} fermé{plural} avec succès"
+      }
+    },
+    "kyc": {
+      "title": "Vérification KYC",
+      "subtitle": "Examiner et approuver les documents d'identité",
+      "stats": {
+        "pending": "En Attente",
+        "underReview": "En Révision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté",
+        "avgProcessing": "Traitement Moy.",
+        "approvalRate": "Taux d'Approbation"
+      },
+      "search": {
+        "placeholder": "Rechercher par nom ou email...",
+        "ariaLabel": "Rechercher des soumissions KYC"
+      },
+      "tabs": {
+        "all": "Toutes les Soumissions",
+        "pending": "En Attente",
+        "underReview": "En Révision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté"
+      },
+      "bulk": {
+        "selected": "sélectionné(s)",
+        "approve": "Approuver",
+        "reject": "Rejeter"
+      },
+      "table": {
+        "user": "Utilisateur",
+        "documentType": "Type de Document",
+        "riskScore": "Score de Risque",
+        "status": "Statut",
+        "submitted": "Soumis",
+        "reviewedBy": "Examiné par",
+        "actions": "Actions",
+        "selectAll": "Sélectionner toutes les soumissions",
+        "selectUser": "Sélectionner {name}",
+        "notReviewed": "Non examiné",
+        "notAvailable": "N/D",
+        "review": "Examiner"
+      },
+      "documentTypes": {
+        "idCard": "Carte d'Identité",
+        "passport": "Passeport",
+        "driverLicense": "Permis de Conduire"
+      },
+      "statuses": {
+        "pending": "En Attente",
+        "underReview": "En Révision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté"
+      },
+      "actions": {
+        "review": "Examiner"
+      },
+      "confirmations": {
+        "approveSubmissions": "Êtes-vous sûr de vouloir approuver {count} soumission{plural} ?",
+        "rejectSubmissions": "Êtes-vous sûr de vouloir rejeter {count} soumission{plural} ?"
+      },
+      "toasts": {
+        "kycApproved": "KYC Approuvé",
+        "kycApprovedMessage": "{count} soumission{plural} approuvée{plural} avec succès",
+        "kycRejected": "KYC Rejeté",
+        "kycRejectedMessage": "{count} soumission{plural} rejetée{plural} avec succès"
+      }
+    },
+    "payouts": {
+      "title": "Gestion des Retraits",
+      "subtitle": "Traiter et suivre les retraits de gains des créateurs",
+      "stats": {
+        "pending": "En Attente",
+        "processing": "Traitement",
+        "completed": "Terminé",
+        "failed": "Échoué",
+        "totalVolume": "Volume Total (7 jours)"
+      },
+      "search": {
+        "placeholder": "Rechercher par nom, email ou ID de transaction...",
+        "ariaLabel": "Rechercher des retraits"
+      },
+      "tabs": {
+        "all": "Tous les Retraits",
+        "pending": "En Attente",
+        "processing": "Traitement",
+        "completed": "Terminé",
+        "failed": "Échoué"
+      },
+      "bulkActions": {
+        "selected": "sélectionné(s)",
+        "approve": "Approuver",
+        "reject": "Rejeter"
+      },
+      "table": {
+        "selectAll": "Sélectionner tous les retraits",
+        "selectPayout": "Sélectionner le retrait pour {name}",
+        "creator": "Créateur",
+        "amount": "Montant",
+        "method": "Méthode",
+        "status": "Statut",
+        "requested": "Demandé",
+        "processed": "Traité",
+        "transactionId": "ID Transaction",
+        "actions": "Actions",
+        "notAvailable": "N/A",
+        "view": "Voir"
+      },
+      "methods": {
+        "bankTransfer": "Virement Bancaire",
+        "paypal": "PayPal",
+        "stripe": "Stripe",
+        "wire": "Virement International"
+      },
+      "statuses": {
+        "pending": "En Attente",
+        "processing": "Traitement",
+        "completed": "Terminé",
+        "failed": "Échoué",
+        "cancelled": "Annulé"
+      },
+      "confirmations": {
+        "approve": "Êtes-vous sûr de vouloir approuver {count} retrait{plural} ?",
+        "reject": "Êtes-vous sûr de vouloir rejeter {count} retrait{plural} ?"
+      },
+      "toasts": {
+        "approved": "Retraits Approuvés",
+        "approvedMessage": "{count} retrait{plural} approuvé{plural} avec succès",
+        "rejected": "Retraits Rejetés",
+        "rejectedMessage": "{count} retrait{plural} rejeté{plural} avec succès"
+      }
+    },
+    "chargebacks": {
+      "title": "Litiges & Contestations",
+      "subtitle": "Gérer les litiges de paiement et contestations",
+      "stats": {
+        "open": "Ouvert",
+        "underReview": "En Révision",
+        "accepted": "Accepté",
+        "rejected": "Rejeté",
+        "totalAtRisk": "Total à Risque",
+        "winRate": "Taux de Réussite"
+      },
+      "search": {
+        "placeholder": "Rechercher par utilisateur, créateur ou ID de transaction...",
+        "ariaLabel": "Rechercher des litiges"
+      },
+      "tabs": {
+        "all": "Tous les Litiges",
+        "open": "Ouvert",
+        "underReview": "En Révision",
+        "accepted": "Accepté",
+        "rejected": "Rejeté"
+      },
+      "bulkActions": {
+        "selected": "sélectionné(s)",
+        "accept": "Accepter",
+        "reject": "Rejeter"
+      },
+      "table": {
+        "selectAll": "Sélectionner tous les litiges",
+        "selectChargeback": "Sélectionner le litige de {name}",
+        "user": "Utilisateur",
+        "creator": "Créateur",
+        "amount": "Montant",
+        "reason": "Raison",
+        "priority": "Priorité",
+        "status": "Statut",
+        "opened": "Ouvert",
+        "actions": "Actions",
+        "responded": "Répondu:",
+        "review": "Examiner"
+      },
+      "reasons": {
+        "fraudulent": "Fraude",
+        "duplicate": "Doublon",
+        "notReceived": "Non Reçu",
+        "productNotDescribed": "Produit Non Conforme",
+        "other": "Autre"
+      },
+      "statuses": {
+        "open": "Ouvert",
+        "underReview": "En Révision",
+        "accepted": "Accepté",
+        "rejected": "Rejeté",
+        "resolved": "Résolu"
+      },
+      "priorities": {
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "critical": "Critique"
+      },
+      "confirmations": {
+        "accept": "Êtes-vous sûr de vouloir accepter {count} litige{plural} ?",
+        "reject": "Êtes-vous sûr de vouloir rejeter {count} litige{plural} ?"
+      },
+      "toasts": {
+        "accepted": "Litiges Acceptés",
+        "acceptedMessage": "{count} litige{plural} accepté{plural} avec succès",
+        "rejected": "Litiges Rejetés",
+        "rejectedMessage": "{count} litige{plural} rejeté{plural} avec succès"
+      }
+    },
+    "legal": {
+      "title": "Demandes Légales",
+      "subtitle": "Gérer les DMCA, ordonnances judiciaires et conformité légale",
+      "stats": {
+        "pending": "En Attente",
+        "underReview": "En Révision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté",
+        "avgResponse": "Réponse Moyenne",
+        "compliance": "Conformité"
+      },
+      "search": {
+        "placeholder": "Rechercher par demandeur, cible ou description...",
+        "ariaLabel": "Rechercher des demandes légales"
+      },
+      "tabs": {
+        "all": "Toutes les Demandes",
+        "pending": "En Attente",
+        "underReview": "En Révision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté"
+      },
+      "bulkActions": {
+        "selected": "sélectionné(s)",
+        "approve": "Approuver",
+        "reject": "Rejeter"
+      },
+      "table": {
+        "selectAll": "Sélectionner toutes les demandes",
+        "selectRequest": "Sélectionner la demande de {name}",
+        "type": "Type",
+        "submittedBy": "Soumis Par",
+        "target": "Cible",
+        "description": "Description",
+        "priority": "Priorité",
+        "status": "Statut",
+        "submitted": "Soumis",
+        "actions": "Actions",
+        "user": "Utilisateur:",
+        "notAvailable": "N/A",
+        "action": "Action:",
+        "reviewed": "Révisé:",
+        "review": "Examiner",
+        "reviewButton": "Examiner"
+      },
+      "types": {
+        "dmca": "DMCA",
+        "copyright": "Droit d'Auteur",
+        "trademark": "Marque Déposée",
+        "privacy": "Confidentialité",
+        "legalHold": "Conservation Légale",
+        "courtOrder": "Ordonnance Judiciaire",
+        "subpoena": "Citation à Comparaître"
+      },
+      "statuses": {
+        "pending": "En Attente",
+        "underReview": "En Révision",
+        "approved": "Approuvé",
+        "rejected": "Rejeté",
+        "resolved": "Résolu"
+      },
+      "priorities": {
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "critical": "Critique"
+      },
+      "confirmations": {
+        "approve": "Êtes-vous sûr de vouloir approuver {count} demande{plural} légale{plural} ?",
+        "reject": "Êtes-vous sûr de vouloir rejeter {count} demande{plural} légale{plural} ?"
+      },
+      "toasts": {
+        "approved": "Demandes Approuvées",
+        "approvedMessage": "{count} demande{plural} légale{plural} approuvée{plural} avec succès",
+        "rejected": "Demandes Rejetées",
+        "rejectedMessage": "{count} demande{plural} légale{plural} rejetée{plural} avec succès"
+      }
+    },
+    "reports": {
+      "title": "Signalements de Contenu",
+      "subtitle": "Gérer et examiner le contenu signalé",
+      "newReport": "Nouveau Signalement",
+      "totalReports": "Total Signalements",
+      "pending": "En Attente",
+      "reviewing": "En Révision",
+      "resolved": "Résolu",
+      "critical": "Critique",
+      "searchPlaceholder": "Rechercher des signalements...",
+      "allReports": "Tous les Signalements",
+      "rejected": "Rejeté",
+      "selected": "sélectionné(s)",
+      "approve": "Approuver",
+      "approving": "Approbation…",
+      "reject": "Rejeter",
+      "rejecting": "Rejet…",
+      "delete": "Supprimer",
+      "deleting": "Suppression…",
+      "reportedUser": "Utilisateur Signalé",
+      "reportedBy": "Signalé Par",
+      "reason": "Raison",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "status": "Statut",
+      "evidence": "Preuves",
+      "time": "Heure",
+      "actions": "Actions",
+      "files": "fichiers",
+      "review": "Examiner",
+      "reportDetails": "Détails du Signalement",
+      "approveConfirm": "Approuver et résoudre ce signalement ?",
+      "approved": "Approuvé",
+      "reportResolved": "Signalement {id} résolu.",
+      "rejectPrompt": "Fournis une raison pour rejeter ce signalement :",
+      "reasonRequired": "Raison Requise",
+      "rejectionReasonMandatory": "La raison du rejet est obligatoire.",
+      "reportRejected": "Signalement {id} rejeté.",
+      "deleteConfirm": "⚠️ Supprimer définitivement le signalement {id} ?",
+      "deleteConfirmText": "Tape \"DELETE\" pour confirmer :",
+      "cancelled": "Annulé",
+      "confirmTextMismatch": "Le texte de confirmation ne correspond pas.",
+      "deleted": "Supprimé",
+      "reportDeleted": "Signalement {id} supprimé.",
+      "bulkApproveConfirm": "Approuver {count} signalement(s) et marquer comme \"Résolu\" ?",
+      "reportsApproved": "Signalements Approuvés",
+      "reportsResolvedMessage": "Les signalements sélectionnés ont été résolus.",
+      "bulkRejectPrompt": "Fournis une raison pour rejeter ces signalement(s) :",
+      "reportsRejected": "Signalements Rejetés",
+      "reportsRejectedMessage": "Les signalements sélectionnés ont été rejetés.",
+      "bulkDeleteConfirm": "⚠️ Supprimer définitivement {count} signalement(s) ? Ceci ne peut être annulé.",
+      "deletionCancelled": "Suppression Annulée",
+      "reportsDeleted": "Les signalements sélectionnés ont été supprimés.",
+      "invalidFile": "Fichier Invalide",
+      "avatarMustBeImage": "L'avatar doit être une image.",
+      "avatarReady": "Avatar Prêt",
+      "avatarImageLoaded": "Image d'avatar chargée.",
+      "validationError": "Erreur de Validation",
+      "reportedUserNameRequired": "Le nom de l'utilisateur signalé est requis",
+      "reporterNameRequired": "Le nom du rapporteur est requis",
+      "reasonIsRequired": "La raison est requise",
+      "descriptionIsRequired": "La description est requise",
+      "provideAtLeastOneAvatar": "Fournis au moins un avatar (URL ou upload) pour le contexte",
+      "reportCreated": "Signalement Créé",
+      "reportCreatedMessage": "Le signalement {id} a été créé.",
+      "reportedUserName": "Utilisateur Signalé — Nom",
+      "reportedUserAvatarUrl": "Utilisateur Signalé — URL Avatar",
+      "uploadAvatar": "Upload avatar",
+      "reportedByName": "Signalé Par — Nom",
+      "reportedByAvatarUrl": "Signalé Par — URL Avatar",
+      "evidenceFiles": "Preuves (fichiers)",
+      "shortReason": "Raison courte",
+      "description": "Description",
+      "detailedDescription": "Description détaillée",
+      "creating": "Création…",
+      "createReport": "Créer Signalement",
+      "cancel": "Annuler"
+    },
+    "health": {
+      "title": "Santé du Système",
+      "subtitle": "Surveiller l'infrastructure et les services de la plateforme",
+      "refreshAll": "Tout Actualiser",
+      "stats": {
+        "healthy": "Sain",
+        "degraded": "Dégradé",
+        "down": "Hors Ligne",
+        "totalServices": "Total Services",
+        "avgResponse": "Temps Moy",
+        "systemUptime": "Disponibilité Système"
+      },
+      "search": {
+        "placeholder": "Rechercher des services...",
+        "ariaLabel": "Rechercher des services"
+      },
+      "tabs": {
+        "all": "Tous les Services",
+        "healthy": "Sain",
+        "degraded": "Dégradé",
+        "down": "Hors Ligne"
+      },
+      "types": {
+        "database": "Base de Données",
+        "api": "API",
+        "storage": "Stockage",
+        "cache": "Cache",
+        "queue": "File d'Attente",
+        "external": "Externe"
+      },
+      "statuses": {
+        "healthy": "Sain",
+        "degraded": "Dégradé",
+        "down": "Hors Ligne"
+      },
+      "details": {
+        "uptime": "Disponibilité :",
+        "responseTime": "Temps de Réponse :",
+        "errorRate": "Taux d'Erreur :",
+        "lastCheck": "Dernière Vérification :",
+        "na": "N/D"
+      },
+      "actions": {
+        "viewLogs": "Voir Logs",
+        "restart": "Redémarrer"
+      },
+      "confirmations": {
+        "restart": "Êtes-vous sûr de vouloir redémarrer {serviceName} ?"
+      },
+      "toasts": {
+        "healthChecksRunning": "Vérifications en Cours",
+        "refreshingAll": "Actualisation de toutes les vérifications de santé...",
+        "serviceRestarting": "Service en Redémarrage",
+        "serviceRestartingMessage": "{serviceName} est en cours de redémarrage..."
+      },
+      "emptyState": "Aucun service trouvé correspondant à votre recherche"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "loading": "Chargement des paramètres…",
+      "loadingError": "Chargement impossible",
+      "unsavedWarning": "Modifications non sauvegardées. Pense à cliquer sur <strong>Enregistrer</strong>.",
+      "actions": {
+        "reset": "Réinitialiser",
+        "downloadBackup": "Télécharger le backup",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…",
+        "update": "Mettre à jour",
+        "setViaUrl": "Définir via URL"
+      },
+      "core": {
+        "siteName": "Nom du site",
+        "siteNamePlaceholder": "Nom visible sur le site",
+        "supportEmail": "Email support",
+        "supportEmailPlaceholder": "support@exemple.com",
+        "minPasswordLength": "Longueur minimale du mot de passe",
+        "platformFeePct": "Frais de plateforme (%)",
+        "enableRegistrations": "Ouverture des inscriptions",
+        "enableRegistrationsDesc": "Permettre aux nouveaux utilisateurs de s'inscrire.",
+        "defaultRole": "Rôle par défaut",
+        "defaultRolePlaceholder": "Choisir un rôle",
+        "defaultAvatar": "Avatar par défaut"
+      },
+      "security": {
+        "title": "Sécurité",
+        "enforceAdmin2FA": "Forcer la 2FA pour les administrateurs",
+        "enforceAdmin2FADesc": "Empêche l'accès admin sans double authentification.",
+        "lockoutThreshold": "Seuil d'échecs avant verrouillage",
+        "lockoutWindow": "Fenêtre d'analyse (min)",
+        "lockoutDuration": "Durée du verrouillage (min)"
+      },
+      "branding": {
+        "title": "UI / Branding",
+        "primaryColor": "Couleur primaire",
+        "colorAriaLabel": "Couleur",
+        "logo": "Logo",
+        "favicon": "Favicon"
+      },
+      "emails": {
+        "title": "Notifications / Emails",
+        "sendgridEnabled": "Activer l'envoi via SendGrid",
+        "sendgridEnabledDesc": "Nécessite SENDGRID_API_KEY côté serveur.",
+        "fromEmail": "Email expéditeur",
+        "testEmail": "Envoyer un test (simulation)"
+      },
+      "imageUpload": {
+        "promptTitle": "Mettre à jour {label} ?",
+        "promptMessage": "OK = Entrer une URL\nAnnuler = Uploader un fichier",
+        "urlPrompt": "Colle une URL valide (https:// …)",
+        "noUrl": "Aucune URL fournie",
+        "noUrlMessage": "{label} inchangé.",
+        "invalidUrl": "URL invalide",
+        "invalidUrlMessage": "Fournis une URL http(s).",
+        "updated": "{label} mis à jour",
+        "fromUrl": "Depuis URL.",
+        "noFile": "Aucun fichier",
+        "noFileMessage": "{label} inchangé.",
+        "fileTooLarge": "Fichier trop volumineux",
+        "fileTooLargeMessage": "Max {maxMB} Mo.",
+        "invalidFile": "Fichier non valide",
+        "invalidFileMessage": "Sélectionne une image.",
+        "localImageApplied": "Image locale appliquée."
+      },
+      "avatarPrompt": {
+        "urlPrompt": "Coller une URL pour avatar par défaut :",
+        "avatarUpdated": "Avatar mis à jour"
+      },
+      "testEmailPrompt": {
+        "addressPrompt": "Adresse de test (réception) :",
+        "success": "SendGrid OK",
+        "successMessage": "Test simulé côté serveur.",
+        "error": "Test email impossible"
+      },
+      "validationErrors": {
+        "siteNameTooShort": "Le nom du site doit contenir au moins 2 caractères.",
+        "invalidSupportEmail": "L'email support est invalide.",
+        "invalidPasswordLength": "La longueur minimale du mot de passe doit être entre 8 et 128.",
+        "invalidPlatformFee": "Les frais de plateforme doivent être entre 0 et 100 %.",
+        "defaultAvatarRequired": "L'avatar par défaut est requis.",
+        "invalidPrimaryColor": "Couleur primaire invalide (hex).",
+        "logoRequired": "Logo requis.",
+        "faviconRequired": "Favicon requis.",
+        "invalidLockoutThreshold": "Seuil de verrouillage invalide (3–20).",
+        "invalidLockoutWindow": "Fenêtre d'analyse invalide (1–120).",
+        "invalidLockoutDuration": "Durée de verrouillage invalide (5–1440).",
+        "invalidSendgridEmail": "Email d'expéditeur SendGrid invalide."
+      },
+      "toasts": {
+        "validation": "Validation",
+        "settingsSaved": "Paramètres sauvegardés",
+        "settingsSavedMessage": "Les changements ont été appliqués.",
+        "saveFailed": "Échec sauvegarde",
+        "actionCancelled": "Action annulée",
+        "actionCancelledMessage": "Aucune modification effectuée.",
+        "resetNotSaved": "Réinitialisé (non sauvegardé)",
+        "resetNotSavedMessage": "Clique sur Enregistrer pour appliquer."
+      },
+      "confirmations": {
+        "resetAll": "Réinitialiser tous les paramètres aux valeurs par défaut ?"
+      }
+    }
+  },
+  "profile": {
+    "notFound": {
+      "title": "404",
+      "message": "Utilisateur introuvable",
+      "description": "Cet utilisateur n'existe pas"
+    },
+    "back": "Retour",
+    "roles": {
+      "creator": "Créateur",
+      "fan": "Fan"
+    },
+    "stats": {
+      "totalSpent": "Dépenses Totales",
+      "subscriptions": "Abonnements",
+      "likedPosts": "Posts Aimés",
+      "memberSince": "Membre Depuis"
+    },
+    "tabs": {
+      "subscriptions": "Abonnements",
+      "history": "Historique",
+      "settings": "Paramètres"
+    },
+    "subscriptions": {
+      "title": "Mes Abonnements",
+      "creator": "Créateur",
+      "plan": "Plan",
+      "since": "Depuis",
+      "nextBilling": "Prochain Paiement",
+      "status": "Statut",
+      "statuses": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "noSubscriptions": "Aucun abonnement actif"
+    },
+    "history": {
+      "title": "Historique des Achats",
+      "date": "Date",
+      "description": "Description",
+      "amount": "Montant",
+      "status": "Statut",
+      "statuses": {
+        "completed": "Terminé"
+      }
+    },
+    "settings": {
+      "title": "Paramètres du Compte",
+      "email": "Email",
+      "username": "Nom d'utilisateur",
+      "editProfile": "Modifier le Profil"
+    },
+    "creator": {
+      "followers": "Abonnés",
+      "subscribe": "S'abonner",
+      "message": "Message",
+      "tip": "Tip",
+      "subscriptions": "Abonnements",
+      "popular": "Plus populaire",
+      "perMonth": "/mois",
+      "locked": "Abonnement requis",
+      "tabs": {
+        "all": "Tous",
+        "photos": "Photos",
+        "videos": "Vidéos",
+        "free": "Gratuit",
+        "paid": "Payant"
+      }
+    }
+  },
+  "common": {
+    "logout": "Déconnexion",
+    "profile": "Profil",
+    "search": "Rechercher...",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "thisMonth": "ce mois",
+    "view": "Voir",
+    "actions": "Actions"
+  }
+}

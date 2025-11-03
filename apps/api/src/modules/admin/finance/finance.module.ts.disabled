@@ -1,0 +1,33 @@
+// apps/api/src/modules/admin/finance/finance.module.ts
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PrismaService } from '../../../common/prisma/prisma.service';
+import { AuditModule } from '../../../common/audit/audit.module';
+import { IntegrationsModule } from '../../integrations/integrations.module';
+
+// Services
+import { AccountingService } from './services/accounting.service';
+import { ExportGeneratorService } from '../services/export-generator.service';
+
+// Controllers
+import { AccountingController } from './controllers/accounting.controller';
+
+// Gateway
+import { ModerationGateway } from '../gateways/moderation.gateway';
+
+@Module({
+  imports: [
+    JwtModule.register({}),
+    AuditModule,
+    IntegrationsModule,
+  ],
+  controllers: [AccountingController],
+  providers: [
+    AccountingService,
+    ExportGeneratorService,
+    ModerationGateway,
+    PrismaService,
+  ],
+  exports: [AccountingService],
+})
+export class FinanceModule {}

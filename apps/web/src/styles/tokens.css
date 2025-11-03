@@ -1,0 +1,266 @@
+/**
+ * Design Tokens - F0 Foundation
+ * Brand: Turquoise #2DBEC7
+ * Theme: Light/Dark with CSS Variables
+ */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ========================================
+   COLOR SCALES - OKLCH for better gradients
+   ======================================== */
+
+@theme inline {
+  /* Brand Turquoise Scale - #14B8A6 base (Teal) */
+  --color-turquoise-50: oklch(0.97 0.02 186);
+  --color-turquoise-100: oklch(0.93 0.05 186);
+  --color-turquoise-200: oklch(0.86 0.08 186);
+  --color-turquoise-300: oklch(0.77 0.11 186);
+  --color-turquoise-400: oklch(0.69 0.14 186);
+  --color-turquoise-500: oklch(0.69 0.14 186); /* #14B8A6 - Primary */
+  --color-turquoise-600: oklch(0.58 0.13 186); /* #0D9488 - Hover */
+  --color-turquoise-700: oklch(0.38 0.09 186); /* #115E59 - Active */
+  --color-turquoise-800: oklch(0.32 0.07 186);
+  --color-turquoise-900: oklch(0.25 0.05 186);
+  --color-turquoise-950: oklch(0.16 0.03 186);
+
+  /* Neutral Scale - Grey */
+  --color-neutral-50: oklch(0.98 0 0);
+  --color-neutral-100: oklch(0.96 0 0);
+  --color-neutral-200: oklch(0.90 0 0);
+  --color-neutral-300: oklch(0.83 0 0);
+  --color-neutral-400: oklch(0.64 0 0);
+  --color-neutral-500: oklch(0.50 0 0);
+  --color-neutral-600: oklch(0.42 0 0);
+  --color-neutral-700: oklch(0.35 0 0);
+  --color-neutral-800: oklch(0.25 0 0);
+  --color-neutral-900: oklch(0.17 0 0);
+  --color-neutral-950: oklch(0.10 0 0);
+
+  /* Semantic Colors */
+  --color-success: oklch(0.65 0.17 145);
+  --color-warning: oklch(0.75 0.15 85);
+  --color-error: oklch(0.58 0.22 25);
+  --color-info: oklch(0.60 0.15 250);
+
+  /* Design Token Aliases */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Border Radius - Design System Spec */
+  --radius-xs: 0.25rem; /* 4px */
+  --radius-sm: 0.5rem; /* 8px - Cards, inputs */
+  --radius-md: 0.875rem; /* 14px - Buttons, modals */
+  --radius-lg: 1.25rem; /* 20px - Large surfaces */
+  --radius-xl: 1.5rem; /* 24px */
+  --radius-2xl: 2rem; /* 32px */
+  --radius-full: 9999px; /* Pills, avatars */
+
+  /* Spacing - consistent scale */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* ========================================
+   LIGHT THEME
+   ======================================== */
+
+:root {
+  --radius: 0.5rem;
+
+  /* Turquoise brand as primary */
+  --primary: var(--color-turquoise-500);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Backgrounds */
+  --background: oklch(1 0 0);
+  --foreground: var(--color-neutral-900);
+
+  /* Card & Surfaces */
+  --card: oklch(1 0 0);
+  --card-foreground: var(--color-neutral-900);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--color-neutral-900);
+
+  /* Secondary - lighter turquoise */
+  --secondary: var(--color-turquoise-100);
+  --secondary-foreground: var(--color-turquoise-900);
+
+  /* Muted - neutral grey */
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-600);
+
+  /* Accent - medium turquoise */
+  --accent: var(--color-turquoise-100);
+  --accent-foreground: var(--color-turquoise-900);
+
+  /* Destructive */
+  --destructive: var(--color-error);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Borders & Inputs */
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-200);
+  --ring: var(--color-turquoise-500);
+}
+
+/* ========================================
+   DARK THEME
+   ======================================== */
+
+.dark {
+  /* Turquoise brand stays vibrant */
+  --primary: var(--color-turquoise-400);
+  --primary-foreground: var(--color-neutral-950);
+
+  /* Dark backgrounds */
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-50);
+
+  /* Dark surfaces */
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-50);
+
+  /* Secondary - darker turquoise */
+  --secondary: var(--color-turquoise-900);
+  --secondary-foreground: var(--color-turquoise-100);
+
+  /* Muted - dark grey */
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+
+  /* Accent */
+  --accent: var(--color-turquoise-800);
+  --accent-foreground: var(--color-turquoise-100);
+
+  /* Destructive */
+  --destructive: var(--color-error);
+  --destructive-foreground: oklch(1 0 0);
+
+  /* Borders & Inputs - subtle in dark mode */
+  --border: var(--color-neutral-800);
+  --input: var(--color-neutral-800);
+  --ring: var(--color-turquoise-400);
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Accessible focus styles - AA compliant */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Remove default button styles */
+  button {
+    @apply cursor-pointer;
+  }
+
+  /* Improve text rendering */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  /* Accessible skip link */
+  .skip-link {
+    @apply absolute left-0 top-0 -translate-y-full focus:translate-y-0;
+    @apply bg-primary text-primary-foreground px-4 py-2 z-50;
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+@layer utilities {
+  /* Text gradients with turquoise */
+  .text-gradient-turquoise {
+    @apply bg-gradient-to-r from-turquoise-400 to-turquoise-600 bg-clip-text text-transparent;
+  }
+
+  /* Animated gradient backgrounds */
+  .bg-gradient-animated {
+    background: linear-gradient(
+      -45deg,
+      var(--color-turquoise-400),
+      var(--color-turquoise-500),
+      var(--color-turquoise-600),
+      var(--color-turquoise-500)
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-background/80 backdrop-blur-md border border-border/50;
+  }
+
+  /* Smooth transitions */
+  .transition-all-smooth {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}

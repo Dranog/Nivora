@@ -1,0 +1,158 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { UserRole as Role } from '@prisma/client';
+import { ReportsService } from '../services/reports.service';
+import {
+  reportsQuerySchema,
+  updateReportSchema,
+  resolveReportSchema,
+  dismissReportSchema,
+  assignReportSchema,
+  bulkReportActionSchema,
+  type ReportsListResponseDto,
+  type ReportDetailDto,
+  type ReportStatsDto,
+  type BulkReportActionResponseDto,
+} from '../dto/reports.dto';
+
+@Controller('admin/reports')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.SUPPORT)
+export class ReportsController {
+  constructor(private readonly reportsService: ReportsService) {}
+
+  /**
+   * GET /admin/reports
+   * Get paginated list of reports with filters
+   */
+  @Get()
+  async getReports(@Query() query: Record<string, unknown>): Promise<ReportsListResponseDto> {
+    const parsed = {
+      page: query.page ? parseInt(query.page as string, 10) : undefined,
+      limit: query.limit ? parseInt(query.limit as string, 10) : undefined,
+      search: query.search as string | undefined,
+      type: query.type as any,
+      severity: query.severity as any,
+      status: query.status as any,
+      assignedToId: query.assignedToId as string | undefined,
+      sortBy: query.sortBy as any,
+      sortOrder: query.sortOrder as 'asc' | 'desc' | undefined,
+      createdFrom: query.createdFrom as string | undefined,
+      createdTo: query.createdTo as string | undefined,
+    };
+
+    const validated = reportsQuerySchema.parse(parsed);
+    return this.reportsService.getReports(validated);
+  }
+
+  /**
+   * GET /admin/reports/stats
+   * Get report statistics
+   */
+  @Get('stats')
+  async getReportStats(): Promise<ReportStatsDto> {
+    return this.reportsService.getReportStats();
+  }
+
+  /**
+   * GET /admin/reports/:id
+   * Get report detail by ID
+   */
+  @Get(':id')
+  async getReportDetail(
+    @Param('id') reportId: string,
+    @CurrentUser() admin: { id: string }
+  ): Promise<ReportDetailDto> {
+    return this.reportsService.getReportDetail(reportId, admin.id);
+  }
+
+  /**
+   * PUT /admin/reports/:id
+   * Update report
+   */
+  @Put(':id')
+  @Roles(Role.ADMIN)
+  async updateReport(
+    @Param('id') reportId: string,
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: { id: string }
+  ): Promise<{ message: string }> {
+    const validated = updateReportSchema.parse(body);
+    await this.reportsService.updateReport(reportId, validated, admin.id);
+    return { message: 'Report updated successfully' };
+  }
+
+  /**
+   * POST /admin/reports/:id/resolve
+   * Resolve report
+   */
+  @Post(':id/resolve')
+  @Roles(Role.ADMIN, Role.SUPPORT)
+  async resolveReport(
+    @Param('id') reportId: string,
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: { id: string }
+  ): Promise<{ message: string }> {
+    const validated = resolveReportSchema.parse(body);
+    await this.reportsService.resolveReport(reportId, validated, admin.id);
+    return { message: 'Report resolved successfully' };
+  }
+
+  /**
+   * POST /admin/reports/:id/dismiss
+   * Dismiss report
+   */
+  @Post(':id/dismiss')
+  @Roles(Role.ADMIN, Role.SUPPORT)
+  async dismissReport(
+    @Param('id') reportId: string,
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: { id: string }
+  ): Promise<{ message: string }> {
+    const validated = dismissReportSchema.parse(body);
+    await this.reportsService.dismissReport(reportId, validated, admin.id);
+    return { message: 'Report dismissed successfully' };
+  }
+
+  /**
+   * POST /admin/reports/:id/assign
+   * Assign report
+   */
+  @Post(':id/assign')
+  @Roles(Role.ADMIN, Role.SUPPORT)
+  async assignReport(
+    @Param('id') reportId: string,
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: { id: string }
+  ): Promise<{ message: string }> {
+    const validated = assignReportSchema.parse(body);
+    await this.reportsService.assignReport(reportId, validated, admin.id);
+    return { message: 'Report assigned successfully' };
+  }
+
+  /**
+   * POST /admin/reports/bulk
+   * Bulk action on reports
+   */
+  @Post('bulk')
+  @Roles(Role.ADMIN)
+  async bulkAction(
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: { id: string }
+  ): Promise<BulkReportActionResponseDto> {
+    const validated = bulkReportActionSchema.parse(body);
+    return this.reportsService.bulkAction(validated, admin.id);
+  }
+}

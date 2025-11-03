@@ -1,0 +1,553 @@
+# SPECS.md - Oliver Platform Admin - Règles Métier
+
+## 1. GESTION DES UTILISATEURS
+
+### 1.1 Suspension d'Utilisateurs
+- **Durées autorisées**: 1-365 jours ou permanent
+- **Interdiction**: Impossible de suspendre un ADMIN ou MODERATOR
+- **Notification obligatoire**: Email envoyé à l'utilisateur avec raison
+- **Effet immédiat**: 
+  - Déconnexion de toutes les sessions
+  - Blocage de l'accès à la plateforme
+  - Suspension des payouts en cours
+- **Historique**: Toutes les suspensions enregistrées dans l'audit log
+- **Levée automatique**: Si durée définie, suspension levée automatiquement à l'expiration
+
+### 1.2 Réinitialisation de Mot de Passe
+- **Génération**: Mot de passe temporaire aléatoire (12 caractères min, alphanumeric + symboles)
+- **Validité**: 24 heures
+- **Notification**: Email avec mot de passe temporaire
+- **Changement forcé**: L'utilisateur doit changer le mot de passe à la première connexion
+
+### 1.3 Suppression d'Utilisateur
+- **Soft delete**: Anonymisation des données
+  - Username → `deleted_user_{userId.slice(0,8)}`
+  - Email → `deleted_{userId}@deleted.com`
+  - Status → DELETED
+- **Conservation**: Transactions et contenu conservés pour raisons légales
+- **Interdiction**: Impossible de supprimer un ADMIN
+
+### 1.4 Export CSV Utilisateurs
+- **Colonnes**: id, username, email, role, status, createdAt, lastActiveAt, kycStatus
+- **Filtres appliqués**: Respect des filtres de recherche actifs
+- **Limite**: Maximum 10,000 utilisateurs par export
+
+## 2. MODÉRATION
+
+### 2.1 Reports (Signalements)
+- **Priorités automatiques**:
+  - CRITICAL: Score AI violence ou adult > 80%
+  - HIGH: Score AI > 60% ou multiple reports sur même contenu
+  - MEDIUM: Score AI > 40%
+  - LOW: Score AI < 40%
+- **SLA par priorité**:
+  - CRITICAL: 1 heure
+  - HIGH: 4 heures
+  - MEDIUM: 24 heures
+  - LOW: 72 heures
+- **Escalation automatique**: Si SLA dépassé, escalation au SENIOR_MODERATOR
+- **Assignation automatique**: Load balancing entre modérateurs disponibles
+
+### 2.2 AI Moderation
+- **Providers**: Google Vision + AWS Rekognition (moyenné)
+- **Scores calculés**:
+  - Violence: 0-100%
+  - Adult: 0-100%
+  - Hate: 0-100% (custom model)
+  - Spam: 0-100% (custom model)
+- **Seuils d'action automatique**:
+  - \> 95% dans n'importe quelle catégorie → Blocage automatique + notification admin
+  - \> 80% → Priorité CRITICAL
+  - < 20% → Auto-approve si pas d'autres flags
+
+### 2.3 Moderation Queue
+- **Floutage par défaut**: Tous les contenus adult potentiels (score > 40%)
+- **Protection modérateur**:
+  - Maximum 4 heures de modération continue
+  - Pause obligatoire 15 minutes toutes les heures
+  - Compteur de contenus reviewés visible
+  - Alert si seuil de fatigue atteint (50 contenus/heure)
+
+### 2.4 Décisions de Modération
+- **APPROVE**: Contenu publié, report marqué RESOLVED
+- **REJECT**: 
+  - Contenu supprimé
+  - Créateur notifié
+  - Options: WARN (avertissement), BAN (suspension), DELETE_CONTENT
+- **ESCALATE**: Transfert à SENIOR_MODERATOR avec notes
+
+## 3. KYC / VÉRIFICATION D'IDENTITÉ
+
+### 3.1 Soumission KYC
+- **Provider**: Yoti (ou Jumio en backup)
+- **Documents requis**:
+  - Pièce d'identité recto
+  - Pièce d'identité verso
+  - Selfie (liveness check)
+  - Justificatif de domicile (< 3 mois)
+- **Expiration**: 2 ans, revalidation requise
+
+### 3.2 Scores AI KYC
+- **Identity Match**: Comparaison photo ID vs selfie (seuil: 80%)
+- **Liveness**: Détection d'une vraie personne (seuil: 70%)
+- **Document Authenticity**: Détection de faux documents (seuil: 85%)
+
+### 3.3 Auto-Approval
+- **Conditions**: 
+  - Identity Match > 90%
+  - Liveness > 85%
+  - Document Authenticity > 95%
+  - Pas de flags fraud précédents
+- **Si auto-approved**: Email de confirmation immédiat, status VERIFIED
+
+### 3.4 Rejection
+- **Raisons standard**:
+  - "Document unclear or damaged"
+  - "Photo mismatch"
+  - "Liveness check failed"
+  - "Document expired"
+  - "Underage"
+- **Resoumission**: Utilisateur peut resoumettre après 24 heures
+
+### 3.5 Encryption des Documents
+- **Algorithm**: AES-256
+- **Storage**: S3 avec server-side encryption
+- **Access**: Signed URLs avec expiration 5 minutes
+- **Audit**: Tous les accès aux documents KYC loggés
+
+## 4. TRANSACTIONS & COMPTABILITÉ
+
+### 4.1 Calculs Comptables
+```
+revenue = sum(payments.amount WHERE status='SUCCESS' AND type IN ['SUBSCRIPTION','PPV','TIP','PURCHASE'])
+fees = sum(payments.processingFee WHERE status='SUCCESS')
+platformTakeRate = 0.15 (15%)
+commission = revenue * platformTakeRate
+operatingCosts = [manuel ou API externe]
+netProfit = revenue - fees - commission - operatingCosts
+```
+
+### 4.2 Breakdown Revenue
+- **Subscriptions**: Abonnements récurrents
+- **PPV**: Pay-per-view (contenu payant unique)
+- **Tips**: Pourboires
+- **Marketplace**: Achats de produits physiques
+
+### 4.3 Export Formats
+- **CSV**: Colonnes: date, type, username, amount, status
+- **PDF**: 
+  - Header: Logo + Platform Name + Period
+  - Summary table: Revenue, Fees, Commission, Net Profit
+  - Details table: Dernières 50 transactions (si > 50, note en footer)
+  - Footer: Page numbers + Generated by Oliver Admin
+- **XLSX**: Mêmes données que CSV avec formatting (header bold, couleurs)
+
+### 4.4 Export Expiration
+- **Durée de conservation**: 7 jours
+- **URL signée**: Expire après 7 jours
+- **Notification**: Email quand export prêt
+- **Purge automatique**: Cron job quotidien supprime exports > 7 jours
+
+## 5. PAYOUTS (PAIEMENTS AUX CRÉATEURS)
+
+### 5.1 Eligibilité Payout
+- **Seuil minimum**: 50€
+- **KYC requis**: Status VERIFIED
+- **Tax Form**: Si earnings YTD > 600€ (US: $600)
+- **Délai**: Maximum 7 jours ouvrés après approval
+
+### 5.2 Approval Process
+- **Vérifications automatiques**:
+  - Bank details valides (IBAN check)
+  - Tax form complété si applicable
+  - Pas de flags fraud
+  - Solde créateur suffisant
+- **Bulk approval**: Possible si toutes vérifications passent
+
+### 5.3 Failed Payouts
+- **Retry automatique**: 3 tentatives, intervalles 24h
+- **Raisons fréquentes**:
+  - Invalid bank details
+  - Account closed
+  - Insufficient funds (platform)
+  - Processor error
+- **Action requise**: Contact créateur pour update bank details
+
+### 5.4 Tax Forms
+- **Types**:
+  - W-9: US citizens/residents
+  - W-8BEN: Non-US individuals
+  - W-8BEN-E: Non-US entities
+- **Génération 1099**: Automatique en fin d'année pour créateurs US > $600
+- **Validation**: TIN/SSN format, signature, date récente
+
+## 6. SUPPORT TICKETS
+
+### 6.1 Catégories
+- ACCOUNT: Problèmes de compte
+- PAYMENT: Problèmes de paiement
+- TECHNICAL: Bugs, erreurs
+- CONTENT: Questions sur contenu
+- VERIFICATION: KYC, age verification
+- LEGAL: DMCA, droits
+- OTHER: Autre
+
+### 6.2 Priorités
+- **URGENT**: Compte hacké, paiement bloqué > 24h
+- **HIGH**: Problèmes impactant revenus
+- **MEDIUM**: Problèmes fonctionnels
+- **LOW**: Questions générales
+
+### 6.3 SLA (Service Level Agreement)
+- **URGENT**: 1 heure (première réponse)
+- **HIGH**: 4 heures
+- **MEDIUM**: 24 heures
+- **LOW**: 72 heures
+
+### 6.4 Satisfaction Survey
+- **Envoi**: Automatique à la fermeture du ticket
+- **Format**: Étoiles 1-5 + commentaire optionnel
+- **Délai**: 48 heures pour répondre
+
+### 6.5 Canned Responses
+- **Variables supportées**:
+  - {{user.name}}
+  - {{user.email}}
+  - {{ticket.id}}
+  - {{ticket.category}}
+  - {{amount}}
+- **Catégories**: Account Issues, Payment Help, Technical Support, Verification
+
+## 7. LEGAL & COMPLIANCE
+
+### 7.1 DMCA Takedowns
+- **Conformité**: 17 USC §512(c)(3)
+- **Action immédiate**: Contenu désactivé dès réception si valide
+- **Counter-notice period**: 10-14 jours
+- **Restoration**: Si counter-notice valide et pas d'action en justice
+
+### 7.2 Legal Holds
+- **Data freeze**: Impossible de modifier ou supprimer
+- **Types de data**: Posts, Messages, Transactions, Profile, All
+- **Durée**: Jusqu'à release manuel par admin
+- **Export**: Package complet PDF + JSON + Media (ZIP protégé)
+
+### 7.3 Subpoenas
+- **Délai de réponse**: Selon subpoena (généralement 14-30 jours)
+- **Data collection**: Scope défini dans subpoena
+- **Certification**: Chain of custody log
+- **Archive**: Conserver 7 ans
+
+### 7.4 Chargebacks
+- **Evidence auto-collectée**:
+  - Transaction details
+  - User IP + device
+  - Content access logs
+  - Communication history
+  - Previous chargebacks
+- **Délai de soumission**: Selon processor (généralement 7-14 jours)
+- **Win rate target**: > 60%
+
+## 8. GDPR & DATA PRIVACY
+
+### 8.1 Data Export Request (GDPR Article 15)
+- **Délai**: 30 jours maximum
+- **Format**: JSON structuré + fichiers media (ZIP)
+- **Contenu**: Toutes données utilisateur
+- **Expiration download**: 7 jours
+
+### 8.2 Data Deletion Request (GDPR Article 17)
+- **Délai**: 30 jours maximum
+- **Exceptions**: 
+  - Données légalement requises (transactions, fiscal)
+  - Litiges en cours
+  - Legal holds actifs
+- **Anonymisation**: Remplacement données perso par placeholders
+
+### 8.3 Data Retention
+- **Transactions**: 10 ans (obligation fiscale)
+- **Audit logs**: 7 ans
+- **Content**: Tant que compte actif + 1 an après suppression
+- **KYC documents**: 5 ans après fin de relation
+- **Support tickets**: 3 ans
+
+## 9. AUDIT LOG
+
+### 9.1 Actions Loggées
+- **User management**: create, update, suspend, unsuspend, delete, reset-password
+- **KYC**: approve, reject, request-review
+- **Moderation**: decision (approve/reject/escalate)
+- **Payouts**: approve, reject, bulk-approve
+- **Reports**: update, assign, escalate
+- **Settings**: update, api-key-reset
+- **Exports**: create
+- **Legal**: dmca-takedown, legal-hold-create, subpoena-create
+
+### 9.2 Données Capturées
+- Timestamp (précis à la milliseconde)
+- Actor ID (admin qui a fait l'action)
+- Action (verb + resource)
+- Target type + Target ID
+- Metadata (détails complets)
+- IP address
+- User agent (parsed device info)
+- Request fingerprint
+
+### 9.3 Immutabilité
+- **Append-only**: Impossible de modifier ou supprimer
+- **Hashing**: Chaque entrée hashée (SHA-256)
+- **Chaining**: Hash précédent inclus dans hash actuel
+- **Verification**: Endpoint pour vérifier intégrité de la chaîne
+
+## 10. SYSTEM MONITORING
+
+### 10.1 Health Checks
+- **Interval**: Toutes les 30 secondes
+- **Services monitorés**:
+  - API (response time < 200ms)
+  - Database (latency < 50ms)
+  - Redis (hit rate > 80%)
+  - CDN (uptime > 99.9%)
+  - Queue workers (job rate stable)
+  - Email service (delivery rate > 95%)
+  - Payment processors (uptime > 99%)
+
+### 10.2 Alerting
+- **Severities**:
+  - INFO: FYI, pas d'action requise
+  - WARNING: Surveiller, action si persiste
+  - ERROR: Action requise sous 1h
+  - CRITICAL: Action immédiate requise
+- **Channels**: 
+  - Slack (WARNING+)
+  - Email (ERROR+)
+  - PagerDuty (CRITICAL)
+
+### 10.3 Performance Targets
+- **API response time**:
+  - p50: < 100ms
+  - p95: < 200ms
+  - p99: < 500ms
+- **Error rate**: < 0.1%
+- **Uptime**: > 99.9%
+
+## 11. RATE LIMITING
+
+### 11.1 Par Rôle
+- **ADMIN**: 100 req/min
+- **MODERATOR**: 100 req/min
+- **USER**: 60 req/min
+- **Anonymous**: 10 req/min
+
+### 11.2 Par Endpoint
+- **Login**: 5 tentatives/15 min
+- **Export**: 3 exports/heure
+- **Bulk operations**: 1 operation/minute
+- **File upload**: 10 uploads/heure
+
+### 11.3 Dépassement
+- **Réponse**: HTTP 429 Too Many Requests
+- **Headers**: `Retry-After` avec délai en secondes
+- **Ban temporaire**: Si dépassement répété (5x), ban IP 1 heure
+
+## 12. CACHING
+
+### 12.1 Stratégies
+- **Dashboard metrics**: 30 secondes
+- **User lists**: 1 minute
+- **Settings**: 5 minutes
+- **Reports queue**: 10 secondes
+- **System health**: 30 secondes
+
+### 12.2 Invalidation
+- **Automatique**: Expiration TTL
+- **Manuelle**: Lors d'actions modifiant les données
+- **Pattern-based**: Wildcard pour invalider groupes de keys
+
+## 13. PERMISSIONS GRANULAIRES
+
+### 13.1 Structure
+```
+resource.action
+```
+
+### 13.2 Resources
+- users
+- reports
+- moderation
+- kyc
+- transactions
+- accounting
+- payouts
+- support
+- legal
+- settings
+- system
+
+### 13.3 Actions
+- read
+- write
+- delete
+- approve
+- moderate
+- export
+
+### 13.4 Exemples
+- `users.read`: Voir liste utilisateurs
+- `users.suspend`: Suspendre utilisateurs
+- `kyc.approve`: Approuver KYC
+- `payouts.approve`: Approuver payouts
+- `settings.write`: Modifier settings
+
+## 14. BUSINESS RULES CRITIQUES
+
+### 14.1 Ne JAMAIS permettre
+- Modification des audit logs
+- Suppression de transactions complétées
+- Modification de montants de paiements complétés
+- Accès admin sans 2FA (si enabled dans settings)
+- Export de données sensibles sans audit log
+- Approval de payout sans vérifications
+
+### 14.2 TOUJOURS vérifier
+- Role de l'admin avant action critique
+- Permission granulaire pour l'action
+- Validité des données (Zod validation)
+- Existence de la ressource avant modification
+- Ownership si nécessaire
+- Rate limit pas dépassée
+
+### 14.3 TOUJOURS logger
+- Toutes les actions admin dans audit log
+- Tous les échecs d'authentification
+- Tous les dépassements de rate limit
+- Toutes les erreurs système
+- Tous les accès aux données sensibles (KYC, bank details)
+
+## 15. FORMATAGE DES MONTANTS
+
+### 15.1 Stockage
+- **Format**: Integer (centimes)
+- **Exemple**: 19.50€ → 1950
+
+### 15.2 Affichage
+- **Format**: `€{montant.toFixed(2)}`
+- **Couleur**: Vert si positif, rouge si négatif
+- **Milliers**: Séparateur d'espace (19 500)
+
+### 15.3 Calculs
+- **Toujours** en centimes pour éviter floating point errors
+- **Conversion** en euros uniquement pour affichage
+
+## 16. DATES & TIMESTAMPS
+
+### 16.1 Stockage
+- **Format**: DateTime UTC (ISO 8601)
+- **Timezone**: Toujours UTC dans DB
+
+### 16.2 Affichage
+- **Format**: Relatif si < 7 jours ("2h ago", "Yesterday")
+- **Format**: Date complète sinon ("Oct 20, 2025 14:30")
+- **Timezone**: Convertir à timezone utilisateur
+
+## 17. EMAILS TRANSACTIONNELS
+
+### 17.1 Templates Requis
+- KYC Approved
+- KYC Rejected
+- User Suspended
+- Password Reset
+- Payout Approved
+- Payout Failed
+- Tax Form Required
+- Support Ticket Reply
+
+### 17.2 Règles d'envoi
+- **Retry**: 3 tentatives si échec
+- **Tracking**: Open rate, click rate
+- **Unsubscribe**: Lien dans footer (sauf transactionnels critiques)
+- **DKIM/SPF**: Configurés pour deliverability
+
+## 18. SECURITY BEST PRACTICES
+
+### 18.1 Authentication
+- **JWT**: Expiration 7 jours
+- **Refresh tokens**: Expiration 30 jours
+- **2FA**: Optionnel mais recommandé pour admins
+- **Session management**: Max 5 sessions simultanées
+
+### 18.2 Encryption
+- **Passwords**: bcrypt (10 rounds)
+- **KYC documents**: AES-256
+- **Bank details**: AES-256
+- **TIN/SSN**: AES-256
+- **API keys**: Hashed (SHA-256)
+
+### 18.3 Input Validation
+- **Sanitization**: DOMPurify pour HTML
+- **Validation**: Zod schemas strictes
+- **SQL injection**: Impossible avec Prisma (parameterized)
+- **XSS**: Sanitization automatique
+- **CSRF**: Tokens pour toutes requêtes mutantes
+
+## 19. TESTS REQUIS
+
+### 19.1 Unit Tests
+- Tous les services (>80% coverage)
+- Tous les validators
+- Tous les utils
+- Tous les guards
+
+### 19.2 Integration Tests
+- Tous les controllers
+- Tous les workflows complets
+- Toutes les intégrations (Yoti, S3, Email)
+
+### 19.3 E2E Tests
+- Login admin
+- Suspend user flow
+- KYC approval flow
+- Payout approval flow
+- Export accounting flow
+- DMCA takedown flow
+
+## 20. PERFORMANCE OPTIMIZATIONS
+
+### 20.1 Database
+- **Indexes**: Sur toutes foreign keys et colonnes de filtrage
+- **Connection pooling**: Max 20 connections
+- **Query optimization**: Utiliser select, include judicieusement
+- **N+1 queries**: Éviter avec include et relations
+
+### 20.2 Caching
+- **Redis**: Pour données fréquemment accédées
+- **CDN**: Pour assets statiques
+- **Client-side**: React Query avec staleTime
+
+### 20.3 Pagination
+- **Cursor-based**: Pour grandes listes
+- **Limit**: Maximum 100 items par page
+- **Infinite scroll**: Où approprié
+
+## 21. DOCUMENTATION
+
+### 21.1 Code
+- JSDoc pour toutes fonctions publiques
+- Comments pour logique complexe
+- README dans chaque module
+
+### 21.2 API
+- Swagger/OpenAPI
+- Exemples de requests/responses
+- Error codes documentés
+
+### 21.3 Architecture
+- Diagrammes de flux
+- Schema database
+- Diagrammes de déploiement
+
+---
+
+**Version**: 1.0.0  
+**Dernière mise à jour**: 2025-10-20  
+**Responsable**: Tech Lead Oliver Platform

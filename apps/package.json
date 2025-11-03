@@ -1,0 +1,22 @@
+{
+  "name": "oliver-platform",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "pnpm --parallel --filter web --filter api start:dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm --filter api build && pnpm --filter web build",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "test": "pnpm --recursive test",
+    "lint": "pnpm --recursive lint",
+    "clean": "pnpm --recursive exec rm -rf dist .next node_modules"
+  },
+  "dependencies": {
+    "@types/jspdf": "^2.0.0",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2"
+  }
+}

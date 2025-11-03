@@ -1,0 +1,9 @@
+{
+  "siteName": "Oliver Platform",
+  "supportEmail": "support@oliver.app",
+  "minPasswordLength": 12,
+  "platformFeePct": 20,
+  "enableRegistrations": true,
+  "defaultRole": "User",
+  "defaultUserAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Default"
+}

@@ -1,0 +1,775 @@
+# PERMISSIONS.md - Oliver Platform Permissions System
+
+## Overview
+
+Oliver Platform utilise un système de permissions granulaires basé sur la structure:
+```
+resource.action
+```
+
+Où:
+- **resource**: La ressource concernée (users, posts, payments, etc.)
+- **action**: L'action à effectuer (read, write, delete, approve, etc.)
+
+## Rôles Système
+
+### 1. USER (Utilisateur Normal)
+**Description**: Fan qui consomme du contenu  
+**Permissions**: Minimum requis pour utiliser la plateforme
+
+```typescript
+const USER_PERMISSIONS = [
+  // Self management
+  'profile.read.own',
+  'profile.write.own',
+  'profile.delete.own',
+  
+  // Content consumption
+  'posts.read',
+  'videos.read',
+  'content.like',
+  'content.comment',
+  'content.bookmark',
+  
+  // Social
+  'messages.read.own',
+  'messages.write',
+  'subscriptions.create',
+  'subscriptions.cancel',
+  
+  // Payments
+  'payments.read.own',
+  'payments.create',
+  
+  // Support
+  'tickets.create',
+  'tickets.read.own',
+]
+```
+
+### 2. CREATOR (Créateur de Contenu)
+**Description**: Créateur qui publie du contenu et reçoit des revenus  
+**Permissions**: Toutes celles de USER + gestion contenu et revenus
+
+```typescript
+const CREATOR_PERMISSIONS = [
+  ...USER_PERMISSIONS,
+  
+  // Content creation
+  'posts.create',
+  'posts.read.own',
+  'posts.write.own',
+  'posts.delete.own',
+  'videos.create',
+  'videos.read.own',
+  'videos.write.own',
+  'videos.delete.own',
+  
+  // Content management
+  'content.publish',
+  'content.unpublish',
+  'content.schedule',
+  'content.analytics.read.own',
+  
+  // Subscribers
+  'subscribers.read.own',
+  'subscribers.message',
+  
+  // Revenue
+  'payouts.read.own',
+  'payouts.request',
+  'analytics.read.own',
+  
+  // Tax
+  'taxforms.read.own',
+  'taxforms.submit',
+]
+```
+
+### 3. MODERATOR (Modérateur)
+**Description**: Modère le contenu et traite les signalements  
+**Permissions**: Modération uniquement, pas d'accès admin complet
+
+```typescript
+const MODERATOR_PERMISSIONS = [
+  ...USER_PERMISSIONS,
+  
+  // Reports
+  'reports.read',
+  'reports.review',
+  'reports.assign.self',
+  'reports.update',
+  'reports.resolve',
+  
+  // Moderation queue
+  'moderation.queue.read',
+  'moderation.decision.make',
+  'moderation.content.approve',
+  'moderation.content.reject',
+  'moderation.content.escalate',
+  
+  // Content moderation
+  'posts.read.all',
+  'posts.moderate',
+  'videos.read.all',
+  'videos.moderate',
+  'comments.read.all',
+  'comments.moderate',
+  'messages.read.flagged',
+  
+  // Users (limited)
+  'users.read.reported',
+  'users.warn',
+  
+  // AI moderation
+  'ai-moderation.view-scores',
+  
+  // Audit
+  'audit-log.read.own',
+]
+```
+
+### 4. ADMIN (Administrateur)
+**Description**: Accès complet à toutes les fonctionnalités admin  
+**Permissions**: Gestion complète de la plateforme
+
+```typescript
+const ADMIN_PERMISSIONS = [
+  ...USER_PERMISSIONS,
+  ...CREATOR_PERMISSIONS,
+  
+  // Dashboard
+  'dashboard.read',
+  'dashboard.refresh',
+  'analytics.read.all',
+  
+  // Users management
+  'users.read.all',
+  'users.write',
+  'users.suspend',
+  'users.unsuspend',
+  'users.ban',
+  'users.delete',
+  'users.reset-password',
+  'users.impersonate',
+  'users.export',
+  
+  // Reports & Moderation
+  'reports.read.all',
+  'reports.assign',
+  'reports.escalate',
+  'reports.dismiss',
+  'moderation.queue.read.all',
+  'moderation.decision.make',
+  'moderation.decision.override',
+  
+  // KYC
+  'kyc.read',
+  'kyc.approve',
+  'kyc.reject',
+  'kyc.request-review',
+  'kyc.documents.view',
+  
+  // Transactions
+  'transactions.read.all',
+  'transactions.refund',
+  'transactions.export',
+  'transactions.analytics',
+  
+  // Accounting
+  'accounting.read',
+  'accounting.export',
+  'accounting.reports',
+  
+  // Payouts
+  'payouts.read.all',
+  'payouts.approve',
+  'payouts.reject',
+  'payouts.bulk-approve',
+  'payouts.retry',
+  'payouts.export',
+  
+  // Tax forms
+  'taxforms.read.all',
+  'taxforms.approve',
+  'taxforms.reject',
+  'taxforms.generate-1099',
+  
+  // Support
+  'tickets.read.all',
+  'tickets.assign',
+  'tickets.close',
+  'tickets.bulk-update',
+  'canned-responses.manage',
+  
+  // Legal
+  'dmca.read',
+  'dmca.process',
+  'legal-holds.create',
+  'legal-holds.manage',
+  'subpoenas.read',
+  'subpoenas.process',
+  
+  // Chargebacks
+  'chargebacks.read',
+  'chargebacks.submit-evidence',
+  'chargebacks.analytics',
+  
+  // Settings
+  'settings.read',
+  'settings.write',
+  'settings.api-key.reset',
+  
+  // System
+  'system.health.read',
+  'system.alerts.read',
+  'system.alerts.acknowledge',
+  'system.logs.read',
+  
+  // Audit log
+  'audit-log.read.all',
+  'audit-log.export',
+  'audit-log.verify-chain',
+  
+  // Content (all)
+  'posts.read.all',
+  'posts.write.all',
+  'posts.delete.all',
+  'videos.read.all',
+  'videos.write.all',
+  'videos.delete.all',
+  'comments.read.all',
+  'comments.delete.all',
+  'messages.read.all',
+]
+```
+
+### 5. SUPER_ADMIN (Super Administrateur)
+**Description**: Accès root, peut tout faire y compris gérer d'autres admins  
+**Permissions**: Toutes les permissions + gestion des admins
+
+```typescript
+const SUPER_ADMIN_PERMISSIONS = [
+  ...ADMIN_PERMISSIONS,
+  
+  // Admin management
+  'admins.create',
+  'admins.update',
+  'admins.delete',
+  'admins.permissions.manage',
+  
+  // Critical operations
+  'database.backup',
+  'database.restore',
+  'system.maintenance-mode',
+  'system.config.write',
+  
+  // Destructive operations
+  'users.hard-delete',
+  'content.hard-delete',
+  'data.purge',
+]
+```
+
+## Permissions Détaillées par Ressource
+
+### Users
+```typescript
+{
+  // Read
+  'users.read.all': 'View all users',
+  'users.read.own': 'View own profile',
+  'users.read.reported': 'View reported users',
+  
+  // Write
+  'users.write': 'Edit user profiles',
+  'users.write.own': 'Edit own profile',
+  'users.create': 'Create new users',
+  
+  // Moderation
+  'users.suspend': 'Suspend users',
+  'users.unsuspend': 'Unsuspend users',
+  'users.ban': 'Ban users permanently',
+  'users.warn': 'Issue warnings',
+  
+  // Security
+  'users.reset-password': 'Reset user passwords',
+  'users.impersonate': 'Login as user',
+  
+  // Data
+  'users.delete': 'Soft delete users',
+  'users.hard-delete': 'Permanently delete users',
+  'users.export': 'Export user data',
+}
+```
+
+### Reports
+```typescript
+{
+  'reports.read': 'View reports assigned to self',
+  'reports.read.all': 'View all reports',
+  'reports.create': 'Create reports',
+  'reports.review': 'Review reports',
+  'reports.assign': 'Assign reports to moderators',
+  'reports.assign.self': 'Self-assign reports',
+  'reports.update': 'Update report status',
+  'reports.resolve': 'Mark reports as resolved',
+  'reports.dismiss': 'Dismiss reports',
+  'reports.escalate': 'Escalate reports',
+}
+```
+
+### Moderation
+```typescript
+{
+  'moderation.queue.read': 'View moderation queue',
+  'moderation.queue.read.all': 'View all moderation queues',
+  'moderation.decision.make': 'Make moderation decisions',
+  'moderation.decision.override': 'Override moderation decisions',
+  'moderation.content.approve': 'Approve content',
+  'moderation.content.reject': 'Reject content',
+  'moderation.content.escalate': 'Escalate to senior moderator',
+}
+```
+
+### KYC
+```typescript
+{
+  'kyc.read': 'View KYC submissions',
+  'kyc.approve': 'Approve KYC',
+  'kyc.reject': 'Reject KYC',
+  'kyc.request-review': 'Request additional review',
+  'kyc.documents.view': 'View KYC documents',
+}
+```
+
+### Transactions
+```typescript
+{
+  'transactions.read.all': 'View all transactions',
+  'transactions.read.own': 'View own transactions',
+  'transactions.refund': 'Process refunds',
+  'transactions.export': 'Export transactions',
+  'transactions.analytics': 'View transaction analytics',
+}
+```
+
+### Accounting
+```typescript
+{
+  'accounting.read': 'View accounting data',
+  'accounting.export': 'Export accounting reports',
+  'accounting.reports': 'Generate accounting reports',
+}
+```
+
+### Payouts
+```typescript
+{
+  'payouts.read.all': 'View all payout requests',
+  'payouts.read.own': 'View own payouts',
+  'payouts.approve': 'Approve payout requests',
+  'payouts.reject': 'Reject payout requests',
+  'payouts.bulk-approve': 'Bulk approve payouts',
+  'payouts.retry': 'Retry failed payouts',
+  'payouts.request': 'Request payout',
+  'payouts.export': 'Export payout data',
+}
+```
+
+### Tax Forms
+```typescript
+{
+  'taxforms.read.all': 'View all tax forms',
+  'taxforms.read.own': 'View own tax form',
+  'taxforms.approve': 'Approve tax forms',
+  'taxforms.reject': 'Reject tax forms',
+  'taxforms.submit': 'Submit tax form',
+  'taxforms.generate-1099': 'Generate 1099 forms',
+}
+```
+
+### Support
+```typescript
+{
+  'tickets.read.all': 'View all tickets',
+  'tickets.read.own': 'View own tickets',
+  'tickets.create': 'Create tickets',
+  'tickets.assign': 'Assign tickets',
+  'tickets.update': 'Update tickets',
+  'tickets.close': 'Close tickets',
+  'tickets.bulk-update': 'Bulk update tickets',
+  'canned-responses.manage': 'Manage canned responses',
+}
+```
+
+### Legal
+```typescript
+{
+  'dmca.read': 'View DMCA requests',
+  'dmca.process': 'Process DMCA takedowns',
+  'legal-holds.create': 'Create legal holds',
+  'legal-holds.manage': 'Manage legal holds',
+  'subpoenas.read': 'View subpoenas',
+  'subpoenas.process': 'Process subpoenas',
+}
+```
+
+### Chargebacks
+```typescript
+{
+  'chargebacks.read': 'View chargebacks',
+  'chargebacks.submit-evidence': 'Submit chargeback evidence',
+  'chargebacks.analytics': 'View chargeback analytics',
+}
+```
+
+### Settings
+```typescript
+{
+  'settings.read': 'View settings',
+  'settings.write': 'Modify settings',
+  'settings.api-key.reset': 'Reset API key',
+}
+```
+
+### System
+```typescript
+{
+  'system.health.read': 'View system health',
+  'system.alerts.read': 'View system alerts',
+  'system.alerts.acknowledge': 'Acknowledge alerts',
+  'system.alerts.resolve': 'Resolve alerts',
+  'system.logs.read': 'View system logs',
+  'system.maintenance-mode': 'Enable maintenance mode',
+  'system.config.write': 'Modify system config',
+}
+```
+
+### Audit Log
+```typescript
+{
+  'audit-log.read.all': 'View all audit logs',
+  'audit-log.read.own': 'View own audit logs',
+  'audit-log.export': 'Export audit logs',
+  'audit-log.verify-chain': 'Verify audit log chain',
+}
+```
+
+### Dashboard
+```typescript
+{
+  'dashboard.read': 'View admin dashboard',
+  'dashboard.refresh': 'Refresh dashboard metrics',
+}
+```
+
+### Analytics
+```typescript
+{
+  'analytics.read.all': 'View all analytics',
+  'analytics.read.own': 'View own analytics',
+}
+```
+
+### Content
+```typescript
+{
+  // Posts
+  'posts.read': 'View public posts',
+  'posts.read.all': 'View all posts',
+  'posts.read.own': 'View own posts',
+  'posts.create': 'Create posts',
+  'posts.write.own': 'Edit own posts',
+  'posts.write.all': 'Edit all posts',
+  'posts.delete.own': 'Delete own posts',
+  'posts.delete.all': 'Delete all posts',
+  'posts.moderate': 'Moderate posts',
+  'posts.publish': 'Publish posts',
+  'posts.unpublish': 'Unpublish posts',
+  
+  // Videos (same structure)
+  'videos.read': 'View public videos',
+  'videos.read.all': 'View all videos',
+  'videos.read.own': 'View own videos',
+  'videos.create': 'Create videos',
+  'videos.write.own': 'Edit own videos',
+  'videos.write.all': 'Edit all videos',
+  'videos.delete.own': 'Delete own videos',
+  'videos.delete.all': 'Delete all videos',
+  'videos.moderate': 'Moderate videos',
+  'videos.publish': 'Publish videos',
+  'videos.unpublish': 'Unpublish videos',
+  
+  // Comments
+  'comments.read': 'View comments',
+  'comments.read.all': 'View all comments',
+  'comments.create': 'Create comments',
+  'comments.delete.own': 'Delete own comments',
+  'comments.delete.all': 'Delete all comments',
+  'comments.moderate': 'Moderate comments',
+  
+  // Messages
+  'messages.read.own': 'Read own messages',
+  'messages.read.all': 'Read all messages',
+  'messages.read.flagged': 'Read flagged messages',
+  'messages.write': 'Send messages',
+  
+  // General content actions
+  'content.like': 'Like content',
+  'content.comment': 'Comment on content',
+  'content.bookmark': 'Bookmark content',
+  'content.report': 'Report content',
+  'content.hard-delete': 'Permanently delete content',
+}
+```
+
+### Subscriptions
+```typescript
+{
+  'subscriptions.create': 'Subscribe to creators',
+  'subscriptions.cancel': 'Cancel subscriptions',
+  'subscriptions.read.own': 'View own subscriptions',
+}
+```
+
+### Payments
+```typescript
+{
+  'payments.read.own': 'View own payments',
+  'payments.create': 'Make payments',
+}
+```
+
+### Profile
+```typescript
+{
+  'profile.read.own': 'View own profile',
+  'profile.write.own': 'Edit own profile',
+  'profile.delete.own': 'Delete own profile',
+}
+```
+
+## Permission Checking
+
+### Backend Implementation
+
+```typescript
+// apps/api/src/common/guards/permissions.guard.ts
+
+@Injectable()
+export class PermissionsGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredPermissions = this.reflector.get<string[]>(
+      'permissions',
+      context.getHandler()
+    )
+
+    if (!requiredPermissions) {
+      return true
+    }
+
+    const request = context.switchToHttp().getRequest()
+    const user = request.user
+
+    if (!user) {
+      return false
+    }
+
+    return this.hasPermissions(user, requiredPermissions)
+  }
+
+  private hasPermissions(user: User, requiredPermissions: string[]): boolean {
+    const userPermissions = this.getUserPermissions(user.role)
+
+    // Check if user has all required permissions
+    return requiredPermissions.every(permission =>
+      userPermissions.includes(permission)
+    )
+  }
+
+  private getUserPermissions(role: UserRole): string[] {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return SUPER_ADMIN_PERMISSIONS
+      case 'ADMIN':
+        return ADMIN_PERMISSIONS
+      case 'MODERATOR':
+        return MODERATOR_PERMISSIONS
+      case 'CREATOR':
+        return CREATOR_PERMISSIONS
+      case 'USER':
+      default:
+        return USER_PERMISSIONS
+    }
+  }
+}
+```
+
+### Decorator Usage
+
+```typescript
+// apps/api/src/common/decorators/permissions.decorator.ts
+
+export const RequirePermissions = (...permissions: string[]) =>
+  SetMetadata('permissions', permissions)
+
+// Usage in controller
+@Controller('admin/users')
+export class UsersController {
+  @Post(':id/suspend')
+  @RequirePermissions('users.suspend')
+  async suspendUser(@Param('id') id: string) {
+    // ...
+  }
+
+  @Get()
+  @RequirePermissions('users.read.all')
+  async getUsers() {
+    // ...
+  }
+}
+```
+
+### Frontend Implementation
+
+```typescript
+// apps/web/lib/permissions.ts
+
+export function hasPermission(
+  user: User | null,
+  permission: string
+): boolean {
+  if (!user) return false
+
+  const userPermissions = getUserPermissions(user.role)
+  return userPermissions.includes(permission)
+}
+
+export function hasAnyPermission(
+  user: User | null,
+  permissions: string[]
+): boolean {
+  if (!user) return false
+
+  const userPermissions = getUserPermissions(user.role)
+  return permissions.some(permission =>
+    userPermissions.includes(permission)
+  )
+}
+
+export function hasAllPermissions(
+  user: User | null,
+  permissions: string[]
+): boolean {
+  if (!user) return false
+
+  const userPermissions = getUserPermissions(user.role)
+  return permissions.every(permission =>
+    userPermissions.includes(permission)
+  )
+}
+
+// Usage in components
+function UserManagementPage() {
+  const { user } = useAuth()
+
+  if (!hasPermission(user, 'users.read.all')) {
+    return <Forbidden />
+  }
+
+  return (
+    <div>
+      {/* ... */}
+      {hasPermission(user, 'users.suspend') && (
+        <Button onClick={handleSuspend}>Suspend</Button>
+      )}
+    </div>
+  )
+}
+```
+
+## Role Assignment Rules
+
+### 1. Default Role
+- Nouvel utilisateur → **USER**
+- Devient **CREATOR** après:
+  - Age verification complété
+  - KYC complété
+  - Accept Terms of Service (18 USC §2257 compliance)
+
+### 2. Role Promotion
+- **MODERATOR**: Assigné manuellement par ADMIN
+- **ADMIN**: Assigné manuellement par SUPER_ADMIN
+- **SUPER_ADMIN**: Assigné uniquement lors du setup initial
+
+### 3. Role Demotion
+- Possible uniquement par role supérieur
+- SUPER_ADMIN → ADMIN (par autre SUPER_ADMIN)
+- ADMIN → MODERATOR ou USER (par SUPER_ADMIN)
+- MODERATOR → USER (par ADMIN ou SUPER_ADMIN)
+
+### 4. Role Restrictions
+- Impossible de changer son propre role
+- Impossible de suspendre/ban un role égal ou supérieur
+- Impossible de voir audit logs d'un role supérieur
+
+## Permission Inheritance
+
+```
+SUPER_ADMIN
+    ↓ (includes all)
+  ADMIN
+    ↓ (includes all)
+MODERATOR
+    ↓ (includes some)
+ CREATOR
+    ↓ (includes all)
+  USER
+```
+
+## Audit Trail
+
+Toutes les actions nécessitant permissions sont loggées:
+```typescript
+{
+  actorId: string,
+  action: string, // "users.suspend"
+  targetType: string,
+  targetId: string,
+  permission: string, // "users.suspend"
+  granted: boolean,
+  timestamp: Date
+}
+```
+
+## Custom Permissions (Future)
+
+Pour permettre permissions custom par utilisateur:
+```prisma
+model User {
+  // ...
+  permissions Json? @default("[]")
+  // Example: ["users.read.all", "reports.assign"]
+}
+```
+
+Check:
+```typescript
+function userHasPermission(user: User, permission: string): boolean {
+  // Check role-based permissions
+  const rolePerms = getRolePermissions(user.role)
+  if (rolePerms.includes(permission)) return true
+
+  // Check custom permissions
+  const customPerms = user.permissions as string[]
+  return customPerms.includes(permission)
+}
+```
+
+---
+
+**Version**: 1.0.0  
+**Dernière mise à jour**: 2025-10-20

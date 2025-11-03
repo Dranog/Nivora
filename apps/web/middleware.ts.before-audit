@@ -1,0 +1,143 @@
+/**
+ * Middleware - F1 Shell SPA
+ * Auth guards & role-based routing (avec exceptions pour les pages messages)
+ *
+ * Règles:
+ * 1) Les routes publiques passent.
+ * 2) /fan/messages et /creator/messages :
+ *    - Requièrent auth
+ *    - Vérifient le rôle
+ *    - Ne sont PAS bloquées par l'onboarding
+ * 3) Le reste :
+ *    - Auth requise si route protégée
+ *    - Onboarding requis (redirige vers /onboarding)
+ *    - Vérification stricte du rôle pour /fan, /creator, /admin
+ */
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+type Role = 'fan' | 'creator' | 'admin' | null;
+
+interface AuthState {
+  state: {
+    isAuthenticated: boolean;
+    role: Role;
+    onboardingDone: boolean;
+    userId: string | null;
+  };
+}
+
+function parseAuthCookie(raw: string | undefined): AuthState | null {
+  if (!raw) return null;
+  // Certains navigateurs/clients percent-encodent la valeur du cookie
+  const val = raw.startsWith('%7B') ? decodeURIComponent(raw) : raw;
+  try {
+    // Zustand-persist met généralement un JSON { state: { ... } }
+    return JSON.parse(val) as AuthState;
+  } catch {
+    return null;
+  }
+}
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 1) Routes publiques
+  const publicRoutes = ['/', '/about', '/privacy', '/terms', '/login', '/register'];
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  // 2) Récupération de l'état d'auth depuis le cookie (Zustand persist)
+  const authState = parseAuthCookie(request.cookies.get('auth-storage')?.value);
+  const isAuthenticated = authState?.state?.isAuthenticated ?? false;
+  const role = (authState?.state?.role ?? null) as Role;
+  const onboardingDone = authState?.state?.onboardingDone ?? false;
+
+  // Helpers
+  const isCreatorMessages = pathname.startsWith('/creator/messages');
+  const isFanMessages = pathname.startsWith('/fan/messages');
+  const isMessagesPath = isCreatorMessages || isFanMessages;
+
+  const protectedRoots = ['/fan', '/creator', '/admin', '/onboarding', '/settings'];
+  const requiresAuth = protectedRoots.some((r) => pathname.startsWith(r));
+
+  // 3) Auth requise pour les routes protégées
+  if (requiresAuth && !isAuthenticated) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
+
+  // 4) Exceptions messages :
+  //    - Auth + bon rôle requis
+  //    - Onboarding non bloquant
+  if (isMessagesPath) {
+    if (!isAuthenticated) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+    // Rôle : /creator/messages => role === 'creator', /fan/messages => role === 'fan' (ou autoriser creator si tu veux)
+    if (isCreatorMessages && role !== 'creator') {
+      const url = request.nextUrl.clone();
+      url.pathname = role ? `/${role}` : '/';
+      return NextResponse.redirect(url);
+    }
+    if (isFanMessages && role !== 'fan') {
+      // si tu veux autoriser creator à accéder à /fan/messages, commente ce bloc
+      const url = request.nextUrl.clone();
+      url.pathname = role ? `/${role}` : '/';
+      return NextResponse.redirect(url);
+    }
+    // On laisse passer sans vérif onboarding
+    return NextResponse.next();
+  }
+
+  // 5) Onboarding : bloque tout (hors /onboarding) quand non terminé
+  if (isAuthenticated && !onboardingDone && pathname !== '/onboarding') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/onboarding';
+    return NextResponse.redirect(url);
+  }
+
+  // 6) Empêche l'accès à /onboarding si déjà complété
+  if (isAuthenticated && onboardingDone && pathname === '/onboarding') {
+    const url = request.nextUrl.clone();
+    url.pathname = role ? `/${role}` : '/';
+    return NextResponse.redirect(url);
+  }
+
+  // 7) RBAC générique : empêche d'entrer dans l'espace d'un autre rôle
+  if (isAuthenticated && role) {
+    const roleRoots: Record<Exclude<Role, null>, string> = {
+      fan: '/fan',
+      creator: '/creator',
+      admin: '/admin',
+    };
+    for (const [routeRole, routePath] of Object.entries(roleRoots)) {
+      if (pathname.startsWith(routePath) && role !== (routeRole as Role)) {
+        const url = request.nextUrl.clone();
+        url.pathname = roleRoots[role];
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
+  // 8) Par défaut on laisse passer
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    /**
+     * On intercepte tout sauf:
+     * - fichiers statiques Next
+     * - optimisation d'images
+     * - favicon
+     * - assets publics (extensions images usuelles)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+};

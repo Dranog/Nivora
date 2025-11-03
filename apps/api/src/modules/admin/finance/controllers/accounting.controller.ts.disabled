@@ -1,0 +1,126 @@
+// apps/api/src/modules/admin/finance/controllers/accounting.controller.ts
+
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Param,
+  Query,
+  Body,
+  Req,
+  Res,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import type { Response } from 'express';
+import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../../common/guards/roles.guard';
+import { Roles } from '../../../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
+import { UserRole as Role } from '@prisma/client';
+import { ZodValidationPipe } from '../../../../common/pipes/zod-validation.pipe';
+import { AccountingService } from '../services/accounting.service';
+import {
+  GetAccountingSummarySchema,
+  ExportAccountingSchema,
+  GetExportHistorySchema,
+  generateReportSchema,
+  reconciliationQuerySchema,
+  updateReconciliationSchema,
+} from '../dto/accounting.dto';
+import type {
+  GetAccountingSummaryDto,
+  ExportAccountingDto,
+  GetExportHistoryDto,
+  GenerateReportDto,
+  RevenueReportDto,
+  PayoutsReportDto,
+  ReconciliationQuery,
+  ReconciliationListResponseDto,
+  UpdateReconciliationDto,
+} from '../dto/accounting.dto';
+
+@Controller('admin/accounting')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
+export class AccountingController {
+  constructor(private readonly accountingService: AccountingService) {}
+
+  // ============================================================================
+  // V2 ENDPOINTS - Summary and Exports
+  // ============================================================================
+
+  @Get('summary')
+  @HttpCode(HttpStatus.OK)
+  async getSummary(@Query(new ZodValidationPipe(GetAccountingSummarySchema)) query: GetAccountingSummaryDto) {
+    return this.accountingService.getSummary(query);
+  }
+
+  @Post('export')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async exportData(
+    @Body(new ZodValidationPipe(ExportAccountingSchema)) dto: ExportAccountingDto,
+    @Req() req: any,
+  ) {
+    return this.accountingService.exportData(dto, req.user.id);
+  }
+
+  @Get('exports')
+  @HttpCode(HttpStatus.OK)
+  async getExportHistory(@Query(new ZodValidationPipe(GetExportHistorySchema)) query: GetExportHistoryDto) {
+    return this.accountingService.getExportHistory(query.cursor, query.limit);
+  }
+
+  @Get('exports/:id/download')
+  @HttpCode(HttpStatus.OK)
+  async downloadExport(@Param('id') exportId: string, @Res() res: Response) {
+    const exportRecord = await this.accountingService.getExportById(exportId);
+    return res.redirect(exportRecord.fileUrl!);
+  }
+
+  // ============================================================================
+  // V1 ENDPOINTS - Reports and Reconciliation
+  // ============================================================================
+
+  @Post('reports/revenue')
+  @HttpCode(HttpStatus.OK)
+  async generateRevenueReport(@Body() body: any): Promise<RevenueReportDto> {
+    const dto = generateReportSchema.parse(body);
+    return await this.accountingService.generateRevenueReport(dto);
+  }
+
+  @Post('reports/payouts')
+  @HttpCode(HttpStatus.OK)
+  async generatePayoutsReport(@Body() body: any): Promise<PayoutsReportDto> {
+    const dto = generateReportSchema.parse(body);
+    return await this.accountingService.generatePayoutsReport(dto);
+  }
+
+  @Get('reconciliation')
+  @HttpCode(HttpStatus.OK)
+  async getReconciliationRecords(@Query() rawQuery: any): Promise<ReconciliationListResponseDto> {
+    const query = reconciliationQuerySchema.parse({
+      page: rawQuery.page ? parseInt(rawQuery.page, 10) : 1,
+      limit: rawQuery.limit ? parseInt(rawQuery.limit, 10) : 20,
+      status: rawQuery.status,
+      startDate: rawQuery.startDate,
+      endDate: rawQuery.endDate,
+      sortBy: rawQuery.sortBy || 'createdAt',
+      sortOrder: rawQuery.sortOrder || 'desc',
+    });
+    return await this.accountingService.getReconciliationRecords(query);
+  }
+
+  @Put('reconciliation/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateReconciliation(
+    @Param('id') recordId: string,
+    @Body() body: any,
+    @CurrentUser('id') adminId: string,
+  ): Promise<void> {
+    const data = updateReconciliationSchema.parse(body);
+    await this.accountingService.updateReconciliation(recordId, data, adminId);
+  }
+}

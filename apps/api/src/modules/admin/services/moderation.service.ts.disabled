@@ -1,0 +1,292 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../../common/prisma/prisma.service';
+import { AuditService } from '../../../common/audit/audit.service';
+import { Prisma } from '@prisma/client';
+import {
+  ModerationPriority,
+  ModerationStatus,
+  type ModerationQueueQuery,
+  type ModerationQueueResponseDto,
+  type ModerationDecisionDto,
+  type ModerationStatsDto,
+  type ApproveContentDto,
+  type RejectContentDto,
+  type EscalateContentDto,
+  type BulkModerationActionDto,
+  type BulkModerationActionResponseDto,
+} from '../dto/moderation.dto';
+
+@Injectable()
+export class ModerationService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService
+  ) {}
+
+  /**
+   * Get moderation queue with filters
+   */
+  async getModerationQueue(query: ModerationQueueQuery): Promise<ModerationQueueResponseDto> {
+    const { page, limit, search, priority, status, assignedToId, contentType, sortBy, sortOrder } = query;
+
+    const where: Prisma.ModerationDecisionWhereInput = {};
+
+    if (priority) where.priority = priority;
+    if (status) where.status = status;
+    if (contentType) where.contentType = contentType;
+
+    if (assignedToId) {
+      if (assignedToId === 'unassigned') {
+        where.assignedToId = null;
+      } else {
+        where.assignedToId = assignedToId;
+      }
+    }
+
+    const total = await this.prisma.moderationDecision.count({ where });
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(total / limit);
+
+    const items = await this.prisma.moderationDecision.findMany({
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      skip,
+      take: limit,
+      include: {
+        assignedTo: { select: { id: true, username: true, email: true } },
+      },
+    });
+
+    const itemsWithContent = await Promise.all(
+      items.map(async (item) => {
+        let contentPreview = null;
+        if (item.contentType === 'POST') {
+          contentPreview = await this.prisma.post.findUnique({
+            where: { id: item.contentId },
+            select: { id: true, content: true, createdAt: true, author: { select: { username: true, avatar: true } } },
+          });
+        } else if (item.contentType === 'USER') {
+          contentPreview = await this.prisma.user.findUnique({
+            where: { id: item.contentId },
+            select: { id: true, username: true, email: true, avatar: true, bio: true },
+          });
+        }
+
+        return {
+          id: item.id,
+          contentType: item.contentType as any,
+          contentId: item.contentId,
+          priority: item.priority as any,
+          status: item.status as any,
+          assignedToId: item.assignedToId,
+          assignedTo: item.assignedTo || null,
+          reviewedById: null, // Not in schema
+          reviewedBy: null, // Not in schema
+          decision: item.decision,
+          notes: item.notes || '',
+          aiConfidence: null, // Not in schema
+          aiFlags: [], // Not in schema
+          createdAt: item.createdAt.toISOString(),
+          updatedAt: item.updatedAt.toISOString(),
+          contentPreview,
+        };
+      })
+    );
+
+    return { items: itemsWithContent, total, page, limit, totalPages };
+  }
+
+  /**
+   * Get moderation stats
+   */
+  async getModerationStats(): Promise<ModerationStatsDto> {
+    const now = new Date();
+    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    const weekStart = new Date(now.setDate(now.getDate() - 7));
+
+    const [
+      totalItems,
+      pendingItems,
+      approvedItems,
+      rejectedItems,
+      escalatedItems,
+      urgentItems,
+      highPriorityItems,
+      newItemsToday,
+      newItemsThisWeek,
+    ] = await Promise.all([
+      this.prisma.moderationDecision.count(),
+      this.prisma.moderationDecision.count({ where: { status: ModerationStatus.PENDING } }),
+      this.prisma.moderationDecision.count({ where: { status: ModerationStatus.APPROVED } }),
+      this.prisma.moderationDecision.count({ where: { status: ModerationStatus.REJECTED } }),
+      this.prisma.moderationDecision.count({ where: { status: ModerationStatus.ESCALATED } }),
+      this.prisma.moderationDecision.count({ where: { priority: ModerationPriority.CRITICAL } }),
+      this.prisma.moderationDecision.count({ where: { priority: ModerationPriority.HIGH } }),
+      this.prisma.moderationDecision.count({ where: { createdAt: { gte: todayStart } } }),
+      this.prisma.moderationDecision.count({ where: { createdAt: { gte: weekStart } } }),
+    ]);
+
+    // Average review time
+    const reviewedItems = await this.prisma.moderationDecision.findMany({
+      where: { status: { in: [ModerationStatus.APPROVED, ModerationStatus.REJECTED] } },
+      select: { createdAt: true, updatedAt: true },
+      take: 100,
+    });
+
+    let averageReviewTime = 0;
+    if (reviewedItems.length > 0) {
+      const totalTime = reviewedItems.reduce((acc, item) => {
+        return acc + (item.updatedAt.getTime() - item.createdAt.getTime());
+      }, 0);
+      averageReviewTime = totalTime / reviewedItems.length / (1000 * 60); // minutes
+    }
+
+    return {
+      totalItems,
+      pendingItems,
+      approvedItems,
+      rejectedItems,
+      escalatedItems,
+      urgentItems,
+      highPriorityItems,
+      newItemsToday,
+      newItemsThisWeek,
+      averageReviewTime: Math.round(averageReviewTime * 10) / 10,
+    };
+  }
+
+  /**
+   * Approve content
+   */
+  async approveContent(itemId: string, data: ApproveContentDto, adminId: string): Promise<void> {
+    await this.prisma.moderationDecision.update({
+      where: { id: itemId },
+      data: {
+        status: ModerationStatus.APPROVED,
+        notes: data.notes,
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_APPROVE_CONTENT',
+      resource: 'MODERATION',
+      meta: { notes: data.notes },
+    });
+  }
+
+  /**
+   * Reject content
+   */
+  async rejectContent(itemId: string, data: RejectContentDto, adminId: string): Promise<void> {
+    const item = await this.prisma.moderationDecision.findUnique({ where: { id: itemId } });
+    if (!item) throw new NotFoundException('Moderation item not found');
+
+    await this.prisma.moderationDecision.update({
+      where: { id: itemId },
+      data: {
+        status: ModerationStatus.REJECTED,
+        decision: data.action as any, // Map action to decision enum
+        updatedAt: new Date(),
+      },
+    });
+
+    // Execute action
+    if (data.action === 'DELETE_CONTENT') {
+      if (item.contentType === 'POST') {
+        await this.prisma.post.delete({ where: { id: item.contentId } });
+      }
+    } else if (data.action === 'BAN_USER') {
+      if (item.contentType === 'USER') {
+        await this.prisma.user.update({
+          where: { id: item.contentId },
+          data: { status: 'BANNED' as any },
+        });
+      }
+    }
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_REJECT_CONTENT',
+      resource: 'MODERATION',
+      meta: { event: data.action, reason: data.reason },
+    });
+  }
+
+  /**
+   * Escalate content
+   */
+  async escalateContent(itemId: string, data: EscalateContentDto, adminId: string): Promise<void> {
+    await this.prisma.moderationDecision.update({
+      where: { id: itemId },
+      data: {
+        status: ModerationStatus.ESCALATED,
+        assignedToId: data.escalateTo,
+        priority: ModerationPriority.CRITICAL,
+        notes: data.reason,
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_ESCALATE_CONTENT',
+      resource: 'MODERATION',
+      meta: { escalateTo: data.escalateTo, reason: data.reason },
+    });
+  }
+
+  /**
+   * Assign moderation item
+   */
+  async assignItem(itemId: string, assignedToId: string, adminId: string): Promise<void> {
+    await this.prisma.moderationDecision.update({
+      where: { id: itemId },
+      data: { assignedToId, updatedAt: new Date() },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_ASSIGN_MODERATION',
+      resource: 'MODERATION',
+      meta: { assignedToId },
+    });
+  }
+
+  /**
+   * Bulk action
+   */
+  async bulkAction(data: BulkModerationActionDto, adminId: string): Promise<BulkModerationActionResponseDto> {
+    const results = { success: 0, failed: 0, errors: [] as Array<{ itemId: string; error: string }> };
+
+    for (const itemId of data.itemIds) {
+      try {
+        if (data.action === 'approve') {
+          await this.approveContent(itemId, {}, adminId);
+        } else if (data.action === 'reject') {
+          await this.rejectContent(itemId, { reason: data.reason || 'Bulk reject', action: 'DELETE_CONTENT', notifyUser: false }, adminId);
+        } else if (data.action === 'assign') {
+          if (!data.assignedToId) throw new BadRequestException('assignedToId required');
+          await this.assignItem(itemId, data.assignedToId, adminId);
+        } else if (data.action === 'escalate') {
+          if (!data.assignedToId) throw new BadRequestException('escalateTo required');
+          await this.escalateContent(itemId, { reason: data.reason || 'Bulk escalate', escalateTo: data.assignedToId }, adminId);
+        }
+        results.success++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({ itemId, error: error instanceof Error ? error.message : 'Unknown error' });
+      }
+    }
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_BULK_MODERATION',
+      resource: 'MODERATION',
+      meta: { event: data.action, itemIds: data.itemIds, results },
+    });
+
+    return results;
+  }
+}

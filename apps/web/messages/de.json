@@ -1,0 +1,1229 @@
+{
+  "admin": {
+    "login": {
+      "title": "Verwaltung",
+      "subtitle": "Melden Sie sich an, um auf das Admin-Panel zuzugreifen",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "help": "Brauchen Sie Hilfe? Kontaktieren Sie den technischen Support"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Benutzer",
+      "transactions": "Transaktionen",
+      "reports": "Berichte",
+      "moderation": "Moderation",
+      "accounting": "Buchhaltung",
+      "posts": "Beiträge",
+      "support": "Support",
+      "kyc": "KYC-Verifizierung",
+      "payouts": "Auszahlungen",
+      "chargebacks": "Rückbuchungen",
+      "legal": "Rechtliches",
+      "health": "Systemzustand",
+      "settings": "Einstellungen"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Willkommen! Hier ist, was heute passiert.",
+      "totalUsers": "Benutzer Gesamt",
+      "totalRevenue": "Umsatz Gesamt",
+      "transactions": "Transaktionen",
+      "salesOverview": "Verkaufsübersicht",
+      "salesTrend": "Umsatztrend im Zeitverlauf",
+      "recentTransactions": "Neueste Transaktionen",
+      "fromLastMonth": "gegenüber letztem Monat",
+      "viewAll": "Alle anzeigen",
+      "viewReports": "Berichte anzeigen",
+      "table": {
+        "date": "Datum",
+        "description": "Beschreibung",
+        "amount": "Betrag",
+        "tag": "Markierung"
+      },
+      "chart": {
+        "revenue": "Umsatz"
+      },
+      "months": {
+        "january": "Januar",
+        "february": "Februar",
+        "march": "März",
+        "april": "April",
+        "may": "Mai",
+        "june": "Juni",
+        "july": "Juli",
+        "august": "August",
+        "september": "September",
+        "october": "Oktober",
+        "november": "November",
+        "december": "Dezember"
+      },
+      "demoTransactions": {
+        "transaction": "Transaktion",
+        "purchaseCode": "Kaufcode",
+        "invoiceDetails": "Rechnungsdetails",
+        "transactionDoc": "Transaktionsdokument",
+        "depositDetails": "Einzahlungsdetails"
+      }
+    },
+    "users": {
+      "title": "Benutzer",
+      "addNew": "Neu Hinzufügen",
+      "searchPlaceholder": "Suchen",
+      "allUsers": "Alle Benutzer",
+      "admins": "Administratoren",
+      "creators": "Ersteller",
+      "pendingKyc": "Ausstehende KYCs",
+      "suspended": "Gesperrt",
+      "selected": "Benutzer ausgewählt",
+      "suspendSelected": "Ausgewählte Sperren",
+      "resetPasswords": "Passwörter Zurücksetzen",
+      "exportCsv": "CSV Exportieren",
+      "name": "Name",
+      "email": "E-Mail",
+      "role": "Rolle",
+      "category": "Kategorie",
+      "status": "Status",
+      "accountAge": "Kontoalter",
+      "lastLogin": "Letzte Anmeldung",
+      "actions": "Aktionen",
+      "suspend": "Sperren",
+      "reset": "Zurücksetzen",
+      "view": "Ansehen",
+      "noUsers": "Keine Benutzer entsprechen Ihren Filtern.",
+      "userAdded": "Benutzer hinzugefügt",
+      "userAddedMessage": "erfolgreich erstellt.",
+      "suspendConfirm": "Sperren",
+      "suspendMessage": "Konto sofort sperren\\nAllen Inhalt verbergen\\nSperrung per E-Mail senden\\nManuelle Reaktivierung erforderlich",
+      "actionCancelled": "Aktion abgebrochen",
+      "noChanges": "Keine Änderungen vorgenommen.",
+      "userSuspended": "Benutzer gesperrt",
+      "userSuspendedMessage": "wurde gesperrt und per E-Mail benachrichtigt.",
+      "loadingProfile": "Profil wird geladen",
+      "redirecting": "Weiterleitung...",
+      "resetPasswordConfirm": "Passwort zurücksetzen für",
+      "emailWillBeSent": "Eine E-Mail wird gesendet an:",
+      "actionCancelledEmail": "Aktion abgebrochen",
+      "noEmailSent": "Keine E-Mail gesendet.",
+      "emailSent": "E-Mail gesendet",
+      "resetEmailSent": "Eine Rücksetz-E-Mail wurde gesendet an",
+      "deleteConfirm": "DAUERHAFT LÖSCHEN",
+      "deleteMessage": "Diese Aktion ist UNWIDERRUFLICH und wird:\\n• Alle Daten löschen\\n• Alle Inhalte entfernen\\n• Abonnements kündigen\\n• Transaktionsverlauf löschen",
+      "deletionCancelled": "Löschung abgebrochen",
+      "confirmName": "Geben Sie den Namen genau ein, um zu bestätigen:",
+      "invalidName": "Ungültiger Name",
+      "deletionAborted": "Die Löschung wurde abgebrochen.",
+      "userDeleted": "Benutzer gelöscht",
+      "userDeletedMessage": "wurde dauerhaft gelöscht.",
+      "bulkSuspendConfirm": "Sperren",
+      "bulkSuspendMessage": "ausgewählte(r) Benutzer?\\n\\nAlle werden sofort gesperrt.",
+      "bulkSuspendSuccess": "Massensperrung abgeschlossen",
+      "bulkSuspendSuccessMessage": "Benutzer gesperrt.",
+      "bulkResetConfirm": "Rücksetz-E-Mail senden an",
+      "bulkResetMessage": "Benutzer?",
+      "bulkResetSuccess": "E-Mails gesendet",
+      "bulkResetSuccessMessage": "Rücksetz-E-Mail(s) gesendet.",
+      "exportSuccess": "CSV-Export",
+      "exportSuccessMessage": "Benutzer exportiert.",
+      "suspendDialog": {
+        "title": "{name} sperren?",
+        "description": "Diese Aktion wird:",
+        "detail1": "Das Konto sofort sperren",
+        "detail2": "Alle Inhalte ausblenden",
+        "detail3": "Eine Sperr-E-Mail senden",
+        "detail4": "Manuelle Reaktivierung erfordern"
+      },
+      "resetPasswordDialog": {
+        "title": "Passwort für {name} zurücksetzen?",
+        "description": "Eine Zurücksetzungs-E-Mail wird gesendet an:",
+        "detail1": "E-Mail: {email}"
+      },
+      "deleteDialog": {
+        "title": "{name} dauerhaft löschen?",
+        "description": "Diese Aktion ist UNWIDERRUFLICH:",
+        "detail1": "Alle Daten löschen",
+        "detail2": "Alle Inhalte entfernen",
+        "detail3": "Abonnements kündigen",
+        "detail4": "Transaktionsverlauf löschen"
+      },
+      "bulkSuspendDialog": {
+        "title": "{count} Benutzer sperren?",
+        "description": "Alle ausgewählten Benutzer werden:",
+        "detail1": "Sofort gesperrt",
+        "detail2": "Per E-Mail benachrichtigt"
+      },
+      "bulkResetDialog": {
+        "title": "{count} Passwort/Passwörter zurücksetzen?",
+        "description": "Zurücksetzungs-E-Mails werden gesendet:",
+        "detail1": "Eine E-Mail pro ausgewähltem Benutzer",
+        "detail2": "Gültig für 24 Stunden"
+      },
+      "actions": {
+        "changeRole": "Rolle Ändern",
+        "suspend": "Sperren",
+        "unsuspend": "Reaktivieren",
+        "ban": "Bannen",
+        "delete": "Löschen",
+        "resetPassword": "Passwort Zurücksetzen",
+        "sendEmail": "E-Mail Senden",
+        "view": "Ansehen"
+      },
+      "roleDialog": {
+        "title": "Rolle ändern für {name}",
+        "save": "Speichern"
+      },
+      "unsuspendDialog": {
+        "title": "{name} reaktivieren?",
+        "description": "Das Konto wird sofort reaktiviert."
+      },
+      "emailDialog": {
+        "title": "E-Mail an {name} senden",
+        "placeholder": "Schreiben Sie Ihre Nachricht...",
+        "send": "Senden"
+      },
+      "banDialog": {
+        "title": "{name} dauerhaft sperren?",
+        "description": "Diese Aktion ist PERMANENT:",
+        "detail1": "Permanente Kontosperrung",
+        "detail2": "Sofortige Löschung aller Inhalte",
+        "detail3": "Automatische Rückerstattung von Abonnements",
+        "detail4": "E-Mail-Adresse auf schwarzer Liste"
+      },
+      "toasts": {
+        "roleChanged": "Rolle für {name} erfolgreich geändert",
+        "suspended": "{name} wurde gesperrt",
+        "unsuspended": "{name} wurde reaktiviert",
+        "passwordResetSent": "Zurücksetzungs-E-Mail an {email} gesendet",
+        "emailSent": "E-Mail an {name} gesendet",
+        "banned": "{name} wurde dauerhaft gesperrt",
+        "deleted": "{name} wurde gelöscht"
+      },
+      "roles": {
+        "admin": "Administrator",
+        "creator": "Ersteller",
+        "user": "Benutzer"
+      },
+      "statuses": {
+        "verified": "Verifiziert",
+        "pending": "Ausstehend",
+        "rejected": "Abgelehnt",
+        "suspended": "Gesperrt"
+      },
+      "time": {
+        "years": "Jahre",
+        "year": "Jahr",
+        "months": "Monate",
+        "month": "Monat",
+        "weeks": "Wochen",
+        "week": "Woche",
+        "days": "Tage",
+        "day": "Tag",
+        "hours": "Stunden",
+        "hour": "Stunde",
+        "minutes": "Minuten",
+        "minute": "Minute",
+        "ago": "vor",
+        "agoFormat": "vor {time}",
+        "never": "nie"
+      },
+      "addUser": {
+        "title": "Neuen Benutzer Hinzufügen",
+        "profilePhoto": "Profilfoto",
+        "uploadPhoto": "Foto Hochladen",
+        "changePhoto": "Foto Ändern",
+        "photoHelp": "PNG, JPG, GIF bis 5MB — oder fügen Sie eine Bild-URL ein",
+        "fullName": "Vollständiger Name",
+        "fullNamePlaceholder": "Vollständigen Namen eingeben",
+        "emailAddress": "E-Mail-Adresse",
+        "emailPlaceholder": "benutzer@beispiel.com",
+        "avatarUrlPlaceholder": "Avatar-URL (https://...)",
+        "userRole": "Benutzerrolle",
+        "selectRole": "Rolle auswählen",
+        "category": "Kategorie",
+        "selectCategory": "Kategorie auswählen",
+        "cancel": "Abbrechen",
+        "createUser": "Benutzer Erstellen",
+        "creating": "Erstellen...",
+        "validation": {
+          "nameRequired": "Name ist erforderlich",
+          "nameTooShort": "Name muss mindestens 2 Zeichen lang sein",
+          "emailRequired": "E-Mail ist erforderlich",
+          "emailInvalid": "Ungültiges E-Mail-Format",
+          "avatarUrlInvalid": "Avatar-URL muss mit http(s):// beginnen",
+          "photoTooLarge": "Foto muss kleiner als 5MB sein",
+          "invalidFileType": "Bitte laden Sie eine Bilddatei hoch",
+          "fixErrors": "Bitte korrigieren Sie die Fehler im Formular"
+        },
+        "confirmCreate": "Benutzer erstellen?\n\nName: {name}\nE-Mail: {email}\nRolle: {role}\nKategorie: {category}",
+        "unsavedChanges": "Sie haben nicht gespeicherte Änderungen. Sind Sie sicher, dass Sie schließen möchten?",
+        "userAddedTitle": "Benutzer Erfolgreich Hinzugefügt",
+        "userAddedMessage": "{name} wurde zur Plattform hinzugefügt",
+        "categories": {
+          "standard": "Standard",
+          "premium": "Premium",
+          "vip": "VIP",
+          "trial": "Testversion"
+        },
+        "roleLabels": {
+          "user": "Benutzer",
+          "creator": "Ersteller",
+          "admin": "Administrator",
+          "moderator": "Moderator",
+          "support": "Support"
+        }
+      }
+    },
+    "userDetail": {
+      "tabs": {
+        "overview": "Übersicht",
+        "finances": "Finanzen",
+        "content": "Inhalt",
+        "activity": "Aktivität",
+        "subscribers": "Abonnenten",
+        "moderation": "Moderation",
+        "security": "Sicherheit",
+        "logs": "Protokolle"
+      },
+      "actions": {
+        "sendEmail": "E-Mail Senden",
+        "changeRole": "Rolle Ändern",
+        "suspend": "Sperren",
+        "unsuspend": "Reaktivieren",
+        "ban": "Bannen",
+        "resetPassword": "Passwort Zurücksetzen",
+        "viewAs": "Ansehen Als",
+        "forceLogout": "Abmeldung Erzwingen",
+        "addNote": "Notiz Hinzufügen"
+      },
+      "stats": {
+        "totalRevenue": "Gesamtumsatz",
+        "subscribers": "Abonnenten",
+        "posts": "Veröffentlichte Beiträge",
+        "engagement": "Engagement-Rate"
+      },
+      "overview": {
+        "recentActivity": "Letzte Aktivitäten"
+      }
+    },
+    "transactions": {
+      "title": "Transaktionen",
+      "subtitle": "Vollständiger Verlauf und Verwaltung",
+      "autoRefreshOn": "Auto (30s)",
+      "autoRefreshOff": "Auto AUS",
+      "refresh": "Aktualisieren",
+      "exportCsv": "CSV Exportieren",
+      "searchLabel": "Suche",
+      "searchPlaceholder": "ID, E-Mail, Name…",
+      "searchButton": "Suchen",
+      "autoRefreshCheckbox": "Auto-Aktualisierung 30s",
+      "totalVolume": "Gesamtvolumen",
+      "loading": "Wird geladen…",
+      "vsLastMonth": "vs letzter Monat",
+      "totalCount": "Gesamtanzahl",
+      "thisMonth": "Dieser Monat",
+      "avgTransaction": "Durchschnitt",
+      "currentAverage": "Aktueller Durchschnitt",
+      "avatarManagement": "Benutzer-Avatar-Verwaltung",
+      "userIdLabel": "Benutzer-ID",
+      "userIdPlaceholder": "z.B.: 9f8a2c…",
+      "avatarUrlLabel": "Avatar-URL (optional)",
+      "avatarUrlPlaceholder": "https://…/foto.png",
+      "uploadLabel": "Hochladen (optional)",
+      "updatePhotoButton": "Foto aktualisieren",
+      "uploadInstructions": "Geben Sie <strong>entweder</strong> eine URL <strong>oder</strong> eine Datei an. Wenn beides angegeben wird, hat die Datei Vorrang.",
+      "unknownError": "Unbekannter Fehler",
+      "loadingError": "Ladefehler",
+      "networkError": "Netzwerkfehler beim Abrufen der Daten",
+      "retryButton": "Erneut versuchen",
+      "refreshed": "Aktualisiert",
+      "metricsUpdated": "Metriken aktualisiert.",
+      "refreshFailed": "Aktualisierung fehlgeschlagen",
+      "unableToRefresh": "Aktualisierung nicht möglich.",
+      "searchApplied": "Suche angewendet",
+      "exportConfirm": "Transaktionen (basierend auf aktueller Suche) als CSV exportieren?",
+      "exportCompleted": "Export abgeschlossen",
+      "csvDownloaded": "CSV-Datei wurde heruntergeladen.",
+      "exportFailed": "Export fehlgeschlagen",
+      "userIdRequired": "Benutzer-ID erforderlich",
+      "provideValidUserId": "Geben Sie eine gültige Benutzer-ID an.",
+      "avatarMissing": "Avatar fehlt",
+      "provideAvatarUrlOrFile": "Geben Sie eine Avatar-URL an oder wählen Sie eine Datei zum Hochladen.",
+      "updatePhotoConfirm": "Foto des Benutzers aktualisieren?",
+      "photoUpdated": "Foto aktualisiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen"
+    },
+    "accounting": {
+      "title": "Buchhaltung",
+      "subtitle": "Finanztransaktionen und Berichte",
+      "export": {
+        "csv": "CSV",
+        "excel": "Excel",
+        "pdfReport": "PDF-Bericht"
+      },
+      "metrics": {
+        "totalRevenue": "Umsatz Gesamt",
+        "totalRevenueDesc": "Alle eingegangenen Zahlungen",
+        "totalPayouts": "Auszahlungen Gesamt",
+        "totalPayoutsDesc": "Ersteller-Auszahlungen",
+        "totalFees": "Gebühren Gesamt",
+        "totalFeesDesc": "Transaktionskosten",
+        "pending": "Ausstehend",
+        "pendingDesc": "Wartet auf Verarbeitung"
+      },
+      "search": {
+        "placeholder": "Nach Benutzer, E-Mail, Transaktions-ID oder Beschreibung suchen..."
+      },
+      "tabs": {
+        "allTransactions": "Alle Transaktionen",
+        "payments": "Zahlungen",
+        "payouts": "Auszahlungen",
+        "refunds": "Rückerstattungen",
+        "subscriptions": "Abonnements"
+      },
+      "bulk": {
+        "selected": "ausgewählt",
+        "exportSelected": "Auswahl Exportieren (CSV)"
+      },
+      "table": {
+        "id": "ID",
+        "type": "Typ",
+        "user": "Benutzer",
+        "amount": "Betrag",
+        "fee": "Gebühr",
+        "net": "Netto",
+        "status": "Status",
+        "method": "Methode",
+        "date": "Datum",
+        "actions": "Aktionen",
+        "noTransactions": "Keine Transaktionen entsprechen Ihren Filtern."
+      },
+      "types": {
+        "payment": "Zahlung",
+        "payout": "Auszahlung",
+        "refund": "Rückerstattung",
+        "subscription": "Abonnement",
+        "tip": "Trinkgeld"
+      },
+      "statuses": {
+        "completed": "Abgeschlossen",
+        "pending": "Ausstehend",
+        "failed": "Fehlgeschlagen",
+        "processing": "In Bearbeitung"
+      },
+      "methods": {
+        "creditCard": "Kreditkarte",
+        "paypal": "PayPal",
+        "bankTransfer": "Banküberweisung",
+        "crypto": "Krypto"
+      },
+      "actions": {
+        "details": "Details",
+        "editAvatar": "Avatar Bearbeiten"
+      },
+      "avatarEditor": {
+        "title": "Benutzer-Avatar Bearbeiten",
+        "avatarUrl": "Avatar-URL",
+        "urlPlaceholder": "https://...",
+        "uploadButton": "Bild Hochladen",
+        "uploadingButton": "Hochladen…",
+        "saveButton": "Avatar Speichern",
+        "helpText": "Geben Sie eine URL an oder laden Sie eine Bilddatei hoch."
+      },
+      "toasts": {
+        "invalidAvatar": "Ungültiger Avatar",
+        "invalidAvatarMessage": "Geben Sie eine gültige Bild-URL an oder laden Sie eine Datei hoch.",
+        "avatarUpdated": "Avatar Aktualisiert",
+        "avatarUpdatedMessage": "Der Benutzer-Avatar wurde erfolgreich aktualisiert.",
+        "unsupportedFile": "Nicht Unterstützte Datei",
+        "unsupportedFileMessage": "Bitte wählen Sie eine Bilddatei aus.",
+        "imageLoaded": "Bild Geladen",
+        "imageLoadedMessage": "Vorschau des Avatars vor dem Speichern.",
+        "uploadFailed": "Upload Fehlgeschlagen",
+        "uploadFailedMessage": "Die ausgewählte Datei konnte nicht gelesen werden."
+      },
+      "confirmations": {
+        "exportSelected": "{count} {label} exportieren?"
+      },
+      "infoBox": {
+        "title": "Buchhaltungsabdeckung",
+        "description": "Finanzübersicht mit Exportoptionen (CSV, Excel, PDF), Transaktionsfiltern, Suche, Massenoperationen und vollständigem Prüfpfad."
+      }
+    },
+    "moderation": {
+      "title": "Inhaltsmoderation",
+      "subtitle": "Von Benutzern eingereichte Inhalte überprüfen und moderieren",
+      "stats": {
+        "pendingReview": "Ausstehende Überprüfung",
+        "flagged": "Markiert",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt"
+      },
+      "search": {
+        "placeholder": "Nach Titel, Ersteller oder Beschreibung suchen…"
+      },
+      "tabs": {
+        "allContent": "Alle Inhalte",
+        "pending": "Ausstehend",
+        "flagged": "Markiert",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt"
+      },
+      "bulk": {
+        "selected": "ausgewählt",
+        "approveSelected": "Auswahl Genehmigen",
+        "rejectSelected": "Auswahl Ablehnen"
+      },
+      "table": {
+        "preview": "Vorschau",
+        "creator": "Ersteller",
+        "title": "Titel",
+        "risk": "Risiko",
+        "flags": "Markierungen",
+        "status": "Status",
+        "submitted": "Eingereicht",
+        "actions": "Aktionen",
+        "noContent": "Keine Inhalte entsprechen Ihren Filtern."
+      },
+      "types": {
+        "image": "Bild",
+        "video": "Video",
+        "post": "Beitrag"
+      },
+      "actions": {
+        "editAvatar": "Avatar bearbeiten",
+        "review": "Überprüfen",
+        "approve": "Genehmigen",
+        "reject": "Ablehnen",
+        "close": "Schließen"
+      },
+      "risk": {
+        "label": "Risiko: {score}%"
+      },
+      "flags": {
+        "single": "Markierung",
+        "plural": "Markierungen"
+      },
+      "review": {
+        "title": "Inhaltsüberprüfung",
+        "submitted": "Eingereicht {time}"
+      },
+      "avatarEditor": {
+        "title": "Ersteller-Avatar Bearbeiten",
+        "avatarUrl": "Avatar-URL",
+        "urlPlaceholder": "https://...",
+        "uploadingButton": "Hochladen…",
+        "uploadButton": "Bild Hochladen",
+        "saveButton": "Avatar Speichern",
+        "helpText": "Sie können eine direkte Bild-URL einfügen oder eine Datei hochladen. Hochgeladene Bilder werden zu Demonstrationszwecken im Speicher (data URL) gespeichert."
+      },
+      "confirmations": {
+        "approveOne": "Inhalt \"{title}\" von {creator} genehmigen?\n\nDies macht ihn für alle Benutzer sichtbar.",
+        "rejectOne": "Inhalt \"{title}\" von {creator} ablehnen.\n\nGeben Sie einen kurzen Grund an (erforderlich):",
+        "approveBulk": "{count} ausgewählte{plural} Element{plural} genehmigen?\n\nSie werden für alle Benutzer sichtbar sein.",
+        "rejectBulk": "{count} ausgewählte{plural} Element{plural} ablehnen.\n\nGeben Sie einen kurzen Grund an (erforderlich):",
+        "confirmBulkReject": "Massenablehnung bestätigen?"
+      },
+      "toasts": {
+        "contentApproved": "Inhalt Genehmigt",
+        "contentApprovedMessage": "\"{title}\" ist jetzt live.",
+        "rejectionAborted": "Ablehnung Abgebrochen",
+        "rejectionAbortedMessage": "Ein Grund ist erforderlich, um Inhalte abzulehnen.",
+        "contentRejected": "Inhalt Abgelehnt",
+        "contentRejectedMessage": "Der Ersteller wird mit Ihrem Grund benachrichtigt.",
+        "bulkApprovalComplete": "Massengenehmigung Abgeschlossen",
+        "bulkApprovalMessage": "{count} Element{plural} genehmigt.",
+        "bulkRejectionAborted": "Massenablehnung Abgebrochen",
+        "bulkRejectionAbortedMessage": "Ein Grund ist erforderlich.",
+        "bulkRejectionComplete": "Massenablehnung Abgeschlossen",
+        "bulkRejectionMessage": "Die Ersteller werden mit Ihrem Grund benachrichtigt.",
+        "openingReview": "Überprüfung Öffnen",
+        "openingReviewMessage": "Inhaltsvorschau und Metadaten laden…",
+        "unsupportedFile": "Nicht Unterstützte Datei",
+        "unsupportedFileMessage": "Bitte wählen Sie eine Bilddatei aus.",
+        "imageLoaded": "Bild Geladen",
+        "imageLoadedMessage": "Vorschau des Avatars vor dem Speichern.",
+        "uploadFailed": "Upload Fehlgeschlagen",
+        "uploadFailedMessage": "Die ausgewählte Datei konnte nicht gelesen werden.",
+        "invalidAvatar": "Ungültiger Avatar",
+        "invalidAvatarMessage": "Geben Sie eine gültige Bild-URL an oder laden Sie eine Datei hoch.",
+        "avatarUpdated": "Avatar Aktualisiert",
+        "avatarUpdatedMessage": "Der Ersteller-Avatar wurde erfolgreich aktualisiert."
+      },
+      "infoBox": {
+        "title": "Moderationsabdeckung",
+        "description": "Die Seite umfasst: Suche, Tabs, Auswahl, Massen-Genehmigung/-Ablehnung mit Bestätigungen, Aktionen pro Element mit Validierungen, Überprüfungsvorschau, Toasts, robuster Zustand (Laden/Deaktiviert), Avatar-Bearbeitung (URL oder Upload) und konsistente Verläufe über from-brand-start → to-brand-end."
+      }
+    },
+    "posts": {
+      "title": "Inhaltsverwaltung",
+      "subtitle": "Plattform-Beiträge moderieren und verwalten",
+      "stats": {
+        "total": "Beiträge Gesamt",
+        "published": "Veröffentlicht",
+        "pending": "Ausstehend",
+        "flagged": "Markiert",
+        "removed": "Entfernt"
+      },
+      "search": {
+        "placeholder": "Nach Inhalt oder Ersteller suchen...",
+        "ariaLabel": "Beiträge durchsuchen"
+      },
+      "tabs": {
+        "all": "Alle Beiträge",
+        "published": "Veröffentlicht",
+        "pending": "Ausstehend",
+        "flagged": "Markiert",
+        "removed": "Entfernt"
+      },
+      "bulk": {
+        "selected": "ausgewählt",
+        "approve": "Genehmigen",
+        "remove": "Entfernen"
+      },
+      "table": {
+        "creator": "Ersteller",
+        "content": "Inhalt",
+        "type": "Typ",
+        "visibility": "Sichtbarkeit",
+        "stats": "Statistiken",
+        "status": "Status",
+        "created": "Erstellt",
+        "actions": "Aktionen",
+        "selectPost": "Beitrag von {creator} auswählen",
+        "selectAll": "Alle Beiträge auswählen"
+      },
+      "contentTypes": {
+        "image": "Bild",
+        "video": "Video",
+        "text": "Text",
+        "mixed": "Gemischt"
+      },
+      "visibility": {
+        "public": "Öffentlich",
+        "subscribers": "Abonnenten",
+        "ppv": "PPV"
+      },
+      "statuses": {
+        "published": "Veröffentlicht",
+        "pending": "Ausstehend",
+        "flagged": "Markiert",
+        "removed": "Entfernt"
+      },
+      "statsLabels": {
+        "views": "Aufrufe",
+        "likes": "Likes"
+      },
+      "actions": {
+        "view": "Ansehen"
+      },
+      "toasts": {
+        "postsApproved": "Beiträge Genehmigt",
+        "postsApprovedMessage": "{count} Beitrag{plural} erfolgreich genehmigt",
+        "postsRemoved": "Beiträge Entfernt",
+        "postsRemovedMessage": "{count} Beitrag{plural} erfolgreich entfernt"
+      },
+      "confirmations": {
+        "removeSelected": "Sind Sie sicher, dass Sie {count} Beitrag{plural} entfernen möchten?"
+      }
+    },
+    "support": {
+      "title": "Support-Tickets",
+      "subtitle": "Kundendienstanfragen verwalten",
+      "stats": {
+        "open": "Offen",
+        "inProgress": "In Bearbeitung",
+        "waiting": "Wartend",
+        "resolved": "Gelöst",
+        "avgResponse": "Durchschn. Antwort",
+        "satisfaction": "Zufriedenheit"
+      },
+      "search": {
+        "placeholder": "Tickets durchsuchen..."
+      },
+      "tabs": {
+        "all": "Alle Tickets",
+        "open": "Offen",
+        "inProgress": "In Bearbeitung",
+        "waiting": "Wartend",
+        "resolved": "Gelöst"
+      },
+      "bulk": {
+        "selected": "ausgewählt",
+        "assign": "Zuweisen",
+        "close": "Schließen"
+      },
+      "table": {
+        "ticket": "Ticket",
+        "user": "Benutzer",
+        "subject": "Betreff",
+        "category": "Kategorie",
+        "priority": "Priorität",
+        "status": "Status",
+        "assigned": "Zugewiesen",
+        "lastUpdate": "Letzte Aktualisierung",
+        "actions": "Aktionen",
+        "unassigned": "Nicht zugewiesen",
+        "messages": "Nachrichten"
+      },
+      "categories": {
+        "technical": "Technisch",
+        "billing": "Abrechnung",
+        "account": "Konto",
+        "content": "Inhalt",
+        "other": "Sonstige"
+      },
+      "priorities": {
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "urgent": "Dringend"
+      },
+      "statuses": {
+        "open": "Offen",
+        "inProgress": "In Bearbeitung",
+        "waiting": "Wartend",
+        "resolved": "Gelöst",
+        "closed": "Geschlossen"
+      },
+      "actions": {
+        "view": "Ansehen"
+      },
+      "toasts": {
+        "ticketsAssigned": "Tickets Zugewiesen",
+        "ticketsAssignedMessage": "{count} Ticket{plural} erfolgreich zugewiesen",
+        "ticketsClosed": "Tickets Geschlossen",
+        "ticketsClosedMessage": "{count} Ticket{plural} erfolgreich geschlossen"
+      }
+    },
+    "kyc": {
+      "title": "KYC-Überprüfung",
+      "subtitle": "Identitätsdokumente überprüfen und genehmigen",
+      "stats": {
+        "pending": "Ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "avgProcessing": "Durchschn. Bearbeitung",
+        "approvalRate": "Genehmigungsrate"
+      },
+      "search": {
+        "placeholder": "Nach Name oder E-Mail suchen...",
+        "ariaLabel": "KYC-Einreichungen durchsuchen"
+      },
+      "tabs": {
+        "all": "Alle Einreichungen",
+        "pending": "Ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt"
+      },
+      "bulk": {
+        "selected": "ausgewählt",
+        "approve": "Genehmigen",
+        "reject": "Ablehnen"
+      },
+      "table": {
+        "user": "Benutzer",
+        "documentType": "Dokumenttyp",
+        "riskScore": "Risikobewertung",
+        "status": "Status",
+        "submitted": "Eingereicht",
+        "reviewedBy": "Überprüft von",
+        "actions": "Aktionen",
+        "selectAll": "Alle Einreichungen auswählen",
+        "selectUser": "{name} auswählen",
+        "notReviewed": "Nicht überprüft",
+        "notAvailable": "N/V"
+      },
+      "documentTypes": {
+        "idCard": "Personalausweis",
+        "passport": "Reisepass",
+        "driverLicense": "Führerschein"
+      },
+      "statuses": {
+        "pending": "Ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt"
+      },
+      "actions": {
+        "review": "Überprüfen"
+      },
+      "confirmations": {
+        "approveSubmissions": "Sind Sie sicher, dass Sie {count} Einreichung{plural} genehmigen möchten?",
+        "rejectSubmissions": "Sind Sie sicher, dass Sie {count} Einreichung{plural} ablehnen möchten?"
+      },
+      "toasts": {
+        "kycApproved": "KYC Genehmigt",
+        "kycApprovedMessage": "{count} Einreichung{plural} erfolgreich genehmigt",
+        "kycRejected": "KYC Abgelehnt",
+        "kycRejectedMessage": "{count} Einreichung{plural} erfolgreich abgelehnt"
+      }
+    },
+    "payouts": {
+      "title": "Auszahlungsverwaltung",
+      "subtitle": "Auszahlungen von Creator-Einnahmen verarbeiten und verfolgen",
+      "stats": {
+        "pending": "Ausstehend",
+        "processing": "Verarbeitung",
+        "completed": "Abgeschlossen",
+        "failed": "Fehlgeschlagen",
+        "totalVolume": "Gesamtvolumen (7 Tage)"
+      },
+      "search": {
+        "placeholder": "Nach Name, E-Mail oder Transaktions-ID suchen...",
+        "ariaLabel": "Auszahlungen durchsuchen"
+      },
+      "tabs": {
+        "all": "Alle Auszahlungen",
+        "pending": "Ausstehend",
+        "processing": "Verarbeitung",
+        "completed": "Abgeschlossen",
+        "failed": "Fehlgeschlagen"
+      },
+      "bulkActions": {
+        "selected": "ausgewählt",
+        "approve": "Genehmigen",
+        "reject": "Ablehnen"
+      },
+      "table": {
+        "selectAll": "Alle Auszahlungen auswählen",
+        "selectPayout": "Auszahlung für {name} auswählen",
+        "creator": "Creator",
+        "amount": "Betrag",
+        "method": "Methode",
+        "status": "Status",
+        "requested": "Angefordert",
+        "processed": "Verarbeitet",
+        "transactionId": "Transaktions-ID",
+        "actions": "Aktionen",
+        "notAvailable": "N/V",
+        "view": "Ansehen"
+      },
+      "methods": {
+        "bankTransfer": "Banküberweisung",
+        "paypal": "PayPal",
+        "stripe": "Stripe",
+        "wire": "Auslandsüberweisung"
+      },
+      "statuses": {
+        "pending": "Ausstehend",
+        "processing": "Verarbeitung",
+        "completed": "Abgeschlossen",
+        "failed": "Fehlgeschlagen",
+        "cancelled": "Storniert"
+      },
+      "confirmations": {
+        "approve": "Sind Sie sicher, dass Sie {count} Auszahlung{plural} genehmigen möchten?",
+        "reject": "Sind Sie sicher, dass Sie {count} Auszahlung{plural} ablehnen möchten?"
+      },
+      "toasts": {
+        "approved": "Auszahlungen Genehmigt",
+        "approvedMessage": "{count} Auszahlung{plural} erfolgreich genehmigt",
+        "rejected": "Auszahlungen Abgelehnt",
+        "rejectedMessage": "{count} Auszahlung{plural} erfolgreich abgelehnt"
+      }
+    },
+    "chargebacks": {
+      "title": "Rückbuchungen & Streitfälle",
+      "subtitle": "Zahlungsstreitigkeiten und Rückbuchungen verwalten",
+      "stats": {
+        "open": "Offen",
+        "underReview": "In Prüfung",
+        "accepted": "Akzeptiert",
+        "rejected": "Abgelehnt",
+        "totalAtRisk": "Gesamtrisiko",
+        "winRate": "Erfolgsquote"
+      },
+      "search": {
+        "placeholder": "Nach Benutzer, Creator oder Transaktions-ID suchen...",
+        "ariaLabel": "Rückbuchungen durchsuchen"
+      },
+      "tabs": {
+        "all": "Alle Rückbuchungen",
+        "open": "Offen",
+        "underReview": "In Prüfung",
+        "accepted": "Akzeptiert",
+        "rejected": "Abgelehnt"
+      },
+      "bulkActions": {
+        "selected": "ausgewählt",
+        "accept": "Akzeptieren",
+        "reject": "Ablehnen"
+      },
+      "table": {
+        "selectAll": "Alle Rückbuchungen auswählen",
+        "selectChargeback": "Rückbuchung von {name} auswählen",
+        "user": "Benutzer",
+        "creator": "Creator",
+        "amount": "Betrag",
+        "reason": "Grund",
+        "priority": "Priorität",
+        "status": "Status",
+        "opened": "Eröffnet",
+        "actions": "Aktionen",
+        "responded": "Beantwortet:",
+        "review": "Prüfen"
+      },
+      "reasons": {
+        "fraudulent": "Betrügerisch",
+        "duplicate": "Duplikat",
+        "notReceived": "Nicht Erhalten",
+        "productNotDescribed": "Produkt Nicht Wie Beschrieben",
+        "other": "Sonstige"
+      },
+      "statuses": {
+        "open": "Offen",
+        "underReview": "In Prüfung",
+        "accepted": "Akzeptiert",
+        "rejected": "Abgelehnt",
+        "resolved": "Gelöst"
+      },
+      "priorities": {
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch"
+      },
+      "confirmations": {
+        "accept": "Sind Sie sicher, dass Sie {count} Rückbuchung{plural} akzeptieren möchten?",
+        "reject": "Sind Sie sicher, dass Sie {count} Rückbuchung{plural} ablehnen möchten?"
+      },
+      "toasts": {
+        "accepted": "Rückbuchungen Akzeptiert",
+        "acceptedMessage": "{count} Rückbuchung{plural} erfolgreich akzeptiert",
+        "rejected": "Rückbuchungen Abgelehnt",
+        "rejectedMessage": "{count} Rückbuchung{plural} erfolgreich abgelehnt"
+      }
+    },
+    "legal": {
+      "title": "Rechtliche Anfragen",
+      "subtitle": "DMCA, Gerichtsbeschlüsse und rechtliche Compliance verwalten",
+      "stats": {
+        "pending": "Ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "avgResponse": "Durchschn. Antwort",
+        "compliance": "Compliance"
+      },
+      "search": {
+        "placeholder": "Nach Absender, Ziel oder Beschreibung suchen...",
+        "ariaLabel": "Rechtliche Anfragen durchsuchen"
+      },
+      "tabs": {
+        "all": "Alle Anfragen",
+        "pending": "Ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt"
+      },
+      "bulkActions": {
+        "selected": "ausgewählt",
+        "approve": "Genehmigen",
+        "reject": "Ablehnen"
+      },
+      "table": {
+        "selectAll": "Alle Anfragen auswählen",
+        "selectRequest": "Anfrage von {name} auswählen",
+        "type": "Typ",
+        "submittedBy": "Eingereicht Von",
+        "target": "Ziel",
+        "description": "Beschreibung",
+        "priority": "Priorität",
+        "status": "Status",
+        "submitted": "Eingereicht",
+        "actions": "Aktionen",
+        "user": "Benutzer:",
+        "notAvailable": "N/V",
+        "action": "Aktion:",
+        "reviewed": "Geprüft:",
+        "review": "Prüfen"
+      },
+      "types": {
+        "dmca": "DMCA",
+        "copyright": "Urheberrecht",
+        "trademark": "Markenrecht",
+        "privacy": "Datenschutz",
+        "legalHold": "Rechtliche Aufbewahrung",
+        "courtOrder": "Gerichtsbeschluss",
+        "subpoena": "Vorladung"
+      },
+      "statuses": {
+        "pending": "Ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "resolved": "Gelöst"
+      },
+      "priorities": {
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch"
+      },
+      "confirmations": {
+        "approve": "Sind Sie sicher, dass Sie {count} rechtliche Anfrage{plural} genehmigen möchten?",
+        "reject": "Sind Sie sicher, dass Sie {count} rechtliche Anfrage{plural} ablehnen möchten?"
+      },
+      "toasts": {
+        "approved": "Anfragen Genehmigt",
+        "approvedMessage": "{count} rechtliche Anfrage{plural} erfolgreich genehmigt",
+        "rejected": "Anfragen Abgelehnt",
+        "rejectedMessage": "{count} rechtliche Anfrage{plural} erfolgreich abgelehnt"
+      }
+    },
+    "reports": {
+      "title": "Inhaltsmeldungen",
+      "subtitle": "Gemeldete Inhalte verwalten und überprüfen",
+      "newReport": "Neue Meldung",
+      "totalReports": "Gesamt Meldungen",
+      "pending": "Ausstehend",
+      "reviewing": "In Prüfung",
+      "resolved": "Gelöst",
+      "critical": "Kritisch",
+      "searchPlaceholder": "Meldungen durchsuchen...",
+      "allReports": "Alle Meldungen",
+      "rejected": "Abgelehnt",
+      "selected": "ausgewählt",
+      "approve": "Genehmigen",
+      "approving": "Genehmigung…",
+      "reject": "Ablehnen",
+      "rejecting": "Ablehnung…",
+      "delete": "Löschen",
+      "deleting": "Löschen…",
+      "reportedUser": "Gemeldeter Benutzer",
+      "reportedBy": "Gemeldet Von",
+      "reason": "Grund",
+      "category": "Kategorie",
+      "priority": "Priorität",
+      "status": "Status",
+      "evidence": "Beweise",
+      "time": "Zeit",
+      "actions": "Aktionen",
+      "files": "Dateien",
+      "review": "Prüfen",
+      "reportDetails": "Meldungsdetails",
+      "approveConfirm": "Diese Meldung genehmigen und lösen?",
+      "approved": "Genehmigt",
+      "reportResolved": "Meldung {id} gelöst.",
+      "rejectPrompt": "Geben Sie einen Grund für die Ablehnung dieser Meldung an:",
+      "reasonRequired": "Grund Erforderlich",
+      "rejectionReasonMandatory": "Der Ablehnungsgrund ist obligatorisch.",
+      "reportRejected": "Meldung {id} abgelehnt.",
+      "deleteConfirm": "⚠️ Meldung {id} dauerhaft löschen?",
+      "deleteConfirmText": "Geben Sie \"DELETE\" ein, um zu bestätigen:",
+      "cancelled": "Abgebrochen",
+      "confirmTextMismatch": "Bestätigungstext stimmt nicht überein.",
+      "deleted": "Gelöscht",
+      "reportDeleted": "Meldung {id} gelöscht.",
+      "bulkApproveConfirm": "{count} Meldung(en) genehmigen und als \"Gelöst\" markieren?",
+      "reportsApproved": "Meldungen Genehmigt",
+      "reportsResolvedMessage": "Ausgewählte Meldungen wurden gelöst.",
+      "bulkRejectPrompt": "Geben Sie einen Grund für die Ablehnung dieser Meldung(en) an:",
+      "reportsRejected": "Meldungen Abgelehnt",
+      "reportsRejectedMessage": "Ausgewählte Meldungen wurden abgelehnt.",
+      "bulkDeleteConfirm": "⚠️ {count} Meldung(en) dauerhaft löschen? Dies kann nicht rückgängig gemacht werden.",
+      "deletionCancelled": "Löschung Abgebrochen",
+      "reportsDeleted": "Ausgewählte Meldungen wurden entfernt.",
+      "invalidFile": "Ungültige Datei",
+      "avatarMustBeImage": "Avatar muss ein Bild sein.",
+      "avatarReady": "Avatar Bereit",
+      "avatarImageLoaded": "Avatar-Bild geladen.",
+      "validationError": "Validierungsfehler",
+      "reportedUserNameRequired": "Name des gemeldeten Benutzers ist erforderlich",
+      "reporterNameRequired": "Name des Melders ist erforderlich",
+      "reasonIsRequired": "Grund ist erforderlich",
+      "descriptionIsRequired": "Beschreibung ist erforderlich",
+      "provideAtLeastOneAvatar": "Geben Sie mindestens einen Avatar (URL oder Upload) für Kontext an",
+      "reportCreated": "Meldung Erstellt",
+      "reportCreatedMessage": "Meldung {id} wurde erstellt.",
+      "reportedUserName": "Gemeldeter Benutzer — Name",
+      "reportedUserAvatarUrl": "Gemeldeter Benutzer — Avatar-URL",
+      "uploadAvatar": "Avatar hochladen",
+      "reportedByName": "Gemeldet Von — Name",
+      "reportedByAvatarUrl": "Gemeldet Von — Avatar-URL",
+      "evidenceFiles": "Beweise (Dateien)",
+      "shortReason": "Kurzer Grund",
+      "description": "Beschreibung",
+      "detailedDescription": "Detaillierte Beschreibung",
+      "creating": "Erstellen…",
+      "createReport": "Meldung Erstellen",
+      "cancel": "Abbrechen"
+    },
+    "health": {
+      "title": "Systemgesundheit",
+      "subtitle": "Plattforminfrastruktur und Dienste überwachen",
+      "refreshAll": "Alle Aktualisieren",
+      "stats": {
+        "healthy": "Gesund",
+        "degraded": "Beeinträchtigt",
+        "down": "Ausgefallen",
+        "totalServices": "Dienste Gesamt",
+        "avgResponse": "Durchschn. Antw",
+        "systemUptime": "System-Betriebszeit"
+      },
+      "search": {
+        "placeholder": "Dienste suchen...",
+        "ariaLabel": "Dienste suchen"
+      },
+      "tabs": {
+        "all": "Alle Dienste",
+        "healthy": "Gesund",
+        "degraded": "Beeinträchtigt",
+        "down": "Ausgefallen"
+      },
+      "types": {
+        "database": "Datenbank",
+        "api": "API",
+        "storage": "Speicher",
+        "cache": "Cache",
+        "queue": "Warteschlange",
+        "external": "Extern"
+      },
+      "statuses": {
+        "healthy": "Gesund",
+        "degraded": "Beeinträchtigt",
+        "down": "Ausgefallen"
+      },
+      "details": {
+        "uptime": "Betriebszeit:",
+        "responseTime": "Antwortzeit:",
+        "errorRate": "Fehlerrate:",
+        "lastCheck": "Letzte Prüfung:",
+        "na": "N/V"
+      },
+      "actions": {
+        "viewLogs": "Logs Anzeigen",
+        "restart": "Neustart"
+      },
+      "confirmations": {
+        "restart": "Sind Sie sicher, dass Sie {serviceName} neu starten möchten?"
+      },
+      "toasts": {
+        "healthChecksRunning": "Zustandsprüfungen Laufen",
+        "refreshingAll": "Alle Zustandsprüfungen werden aktualisiert...",
+        "serviceRestarting": "Dienst Wird Neu Gestartet",
+        "serviceRestartingMessage": "{serviceName} wird neu gestartet..."
+      },
+      "emptyState": "Keine Dienste gefunden, die Ihrer Suche entsprechen"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "loading": "Einstellungen werden geladen…",
+      "loadingError": "Laden fehlgeschlagen",
+      "unsavedWarning": "Nicht gespeicherte Änderungen. Denken Sie daran, auf <strong>Speichern</strong> zu klicken.",
+      "actions": {
+        "reset": "Zurücksetzen",
+        "downloadBackup": "Backup herunterladen",
+        "save": "Speichern",
+        "saving": "Wird gespeichert…",
+        "update": "Aktualisieren",
+        "setViaUrl": "Via URL festlegen"
+      },
+      "core": {
+        "siteName": "Seitenname",
+        "siteNamePlaceholder": "Sichtbarer Seitenname",
+        "supportEmail": "Support-E-Mail",
+        "supportEmailPlaceholder": "support@beispiel.de",
+        "minPasswordLength": "Minimale Passwortlänge",
+        "platformFeePct": "Plattformgebühr (%)",
+        "enableRegistrations": "Registrierungen aktivieren",
+        "enableRegistrationsDesc": "Neuen Benutzern die Registrierung ermöglichen.",
+        "defaultRole": "Standardrolle",
+        "defaultRolePlaceholder": "Rolle wählen",
+        "defaultAvatar": "Standard-Avatar"
+      },
+      "security": {
+        "title": "Sicherheit",
+        "enforceAdmin2FA": "2FA für Administratoren erforderlich",
+        "enforceAdmin2FADesc": "Verhindert Admin-Zugriff ohne Zwei-Faktor-Authentifizierung.",
+        "lockoutThreshold": "Fehlversuche vor Sperrung",
+        "lockoutWindow": "Analysefenster (min)",
+        "lockoutDuration": "Sperrdauer (min)"
+      },
+      "branding": {
+        "title": "UI / Branding",
+        "primaryColor": "Primärfarbe",
+        "colorAriaLabel": "Farbe",
+        "logo": "Logo",
+        "favicon": "Favicon"
+      },
+      "emails": {
+        "title": "Benachrichtigungen / E-Mails",
+        "sendgridEnabled": "SendGrid-Versand aktivieren",
+        "sendgridEnabledDesc": "Benötigt SENDGRID_API_KEY serverseitig.",
+        "fromEmail": "Absender-E-Mail",
+        "testEmail": "Test senden (Simulation)"
+      },
+      "imageUpload": {
+        "promptTitle": "{label} aktualisieren?",
+        "promptMessage": "OK = URL eingeben\nAbbrechen = Datei hochladen",
+        "urlPrompt": "Gültige URL einfügen (https:// …)",
+        "noUrl": "Keine URL angegeben",
+        "noUrlMessage": "{label} unverändert.",
+        "invalidUrl": "Ungültige URL",
+        "invalidUrlMessage": "Geben Sie eine http(s) URL an.",
+        "updated": "{label} aktualisiert",
+        "fromUrl": "Von URL.",
+        "noFile": "Keine Datei",
+        "noFileMessage": "{label} unverändert.",
+        "fileTooLarge": "Datei zu groß",
+        "fileTooLargeMessage": "Max {maxMB} MB.",
+        "invalidFile": "Ungültige Datei",
+        "invalidFileMessage": "Wählen Sie ein Bild.",
+        "localImageApplied": "Lokales Bild angewendet."
+      },
+      "avatarPrompt": {
+        "urlPrompt": "URL für Standard-Avatar einfügen:",
+        "avatarUpdated": "Avatar aktualisiert"
+      },
+      "testEmailPrompt": {
+        "addressPrompt": "Testadresse (Empfänger):",
+        "success": "SendGrid OK",
+        "successMessage": "Test serverseitig simuliert.",
+        "error": "E-Mail-Test fehlgeschlagen"
+      },
+      "validationErrors": {
+        "siteNameTooShort": "Der Seitenname muss mindestens 2 Zeichen lang sein.",
+        "invalidSupportEmail": "Die Support-E-Mail ist ungültig.",
+        "invalidPasswordLength": "Die minimale Passwortlänge muss zwischen 8 und 128 liegen.",
+        "invalidPlatformFee": "Die Plattformgebühr muss zwischen 0 und 100% liegen.",
+        "defaultAvatarRequired": "Standard-Avatar ist erforderlich.",
+        "invalidPrimaryColor": "Ungültige Primärfarbe (hex).",
+        "logoRequired": "Logo erforderlich.",
+        "faviconRequired": "Favicon erforderlich.",
+        "invalidLockoutThreshold": "Ungültiger Sperrschwellenwert (3–20).",
+        "invalidLockoutWindow": "Ungültiges Analysefenster (1–120).",
+        "invalidLockoutDuration": "Ungültige Sperrdauer (5–1440).",
+        "invalidSendgridEmail": "Ungültige SendGrid-Absender-E-Mail."
+      },
+      "toasts": {
+        "validation": "Validierung",
+        "settingsSaved": "Einstellungen gespeichert",
+        "settingsSavedMessage": "Die Änderungen wurden angewendet.",
+        "saveFailed": "Speichern fehlgeschlagen",
+        "actionCancelled": "Aktion abgebrochen",
+        "actionCancelledMessage": "Keine Änderungen vorgenommen.",
+        "resetNotSaved": "Zurückgesetzt (nicht gespeichert)",
+        "resetNotSavedMessage": "Klicken Sie auf Speichern, um anzuwenden."
+      },
+      "confirmations": {
+        "resetAll": "Alle Einstellungen auf Standardwerte zurücksetzen?"
+      }
+    }
+  },
+  "common": {
+    "logout": "Abmelden",
+    "profile": "Profil",
+    "search": "Suchen...",
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen",
+    "back": "Zurück"
+  }
+}
+

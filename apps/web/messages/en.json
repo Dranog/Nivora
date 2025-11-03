@@ -1,0 +1,1230 @@
+{
+  "admin": {
+    "login": {
+      "title": "Administration",
+      "subtitle": "Sign in to access admin panel",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign In",
+      "help": "Need help? Contact technical support"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "transactions": "Transactions",
+      "reports": "Reports",
+      "moderation": "Moderation",
+      "accounting": "Accounting",
+      "posts": "Posts",
+      "support": "Support",
+      "kyc": "KYC",
+      "payouts": "Payouts",
+      "chargebacks": "Chargebacks",
+      "legal": "Legal",
+      "health": "Health",
+      "settings": "Settings"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Welcome! Here's what's happening today.",
+      "totalUsers": "Total Users",
+      "totalRevenue": "Total Revenue",
+      "transactions": "Transactions",
+      "salesOverview": "Sales Overview",
+      "salesTrend": "Revenue trend over time",
+      "recentTransactions": "Recent Transactions",
+      "fromLastMonth": "from last month",
+      "viewAll": "View All",
+      "viewReports": "View Reports",
+      "table": {
+        "date": "Date",
+        "description": "Description",
+        "amount": "Amount",
+        "tag": "Tag"
+      },
+      "chart": {
+        "revenue": "Revenue"
+      },
+      "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      },
+      "demoTransactions": {
+        "transaction": "Transaction",
+        "purchaseCode": "Purchase code",
+        "invoiceDetails": "Invoice details",
+        "transactionDoc": "Transaction document",
+        "depositDetails": "Deposit details"
+      }
+    },
+    "users": {
+      "title": "Users",
+      "addNew": "Add New",
+      "searchPlaceholder": "Search",
+      "allUsers": "All Users",
+      "admins": "Admins",
+      "creators": "Creators",
+      "pendingKyc": "Pending KYCs",
+      "suspended": "Suspended",
+      "selected": "user(s) selected",
+      "suspendSelected": "Suspend Selected",
+      "resetPasswords": "Reset Passwords",
+      "exportCsv": "Export CSV",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "category": "Category",
+      "status": "Status",
+      "accountAge": "Account Age",
+      "lastLogin": "Last Login",
+      "actions": "Actions",
+      "suspend": "Suspend",
+      "reset": "Reset",
+      "view": "View",
+      "noUsers": "No users match your filters.",
+      "userAdded": "User added",
+      "userAddedMessage": "created successfully.",
+      "suspendConfirm": "Suspend",
+      "suspendMessage": "Lock account immediately\nHide all content\nSend suspension email\nManual reactivation required",
+      "actionCancelled": "Action cancelled",
+      "noChanges": "No changes made.",
+      "userSuspended": "User suspended",
+      "userSuspendedMessage": "has been suspended and notified by email.",
+      "loadingProfile": "Loading profile",
+      "redirecting": "Redirecting...",
+      "resetPasswordConfirm": "Reset password for",
+      "emailWillBeSent": "An email will be sent to:",
+      "actionCancelledEmail": "Action cancelled",
+      "noEmailSent": "No email sent.",
+      "emailSent": "Email sent",
+      "resetEmailSent": "A reset email has been sent to",
+      "deleteConfirm": "DELETE PERMANENTLY",
+      "deleteMessage": "This action is IRREVERSIBLE and will:\n• Delete all data\n• Remove all content\n• Cancel subscriptions\n• Erase transaction history",
+      "deletionCancelled": "Deletion cancelled",
+      "confirmName": "Type exactly the name to confirm:",
+      "invalidName": "Invalid name",
+      "deletionAborted": "Deletion has been cancelled.",
+      "userDeleted": "User deleted",
+      "userDeletedMessage": "has been permanently deleted.",
+      "bulkSuspendConfirm": "Suspend",
+      "bulkSuspendMessage": "selected user(s)?\n\nAll will be immediately locked.",
+      "bulkSuspendSuccess": "Bulk suspension completed",
+      "bulkSuspendSuccessMessage": "user(s) suspended.",
+      "bulkResetConfirm": "Send reset email to",
+      "bulkResetMessage": "user(s)?",
+      "bulkResetSuccess": "Emails sent",
+      "bulkResetSuccessMessage": "reset email(s) sent.",
+      "exportSuccess": "CSV Export",
+      "exportSuccessMessage": "user(s) exported.",
+      "suspendDialog": {
+        "title": "Suspend {name}?",
+        "description": "This action will:",
+        "detail1": "Lock the account immediately",
+        "detail2": "Hide all content",
+        "detail3": "Send suspension email",
+        "detail4": "Require manual reactivation"
+      },
+      "resetPasswordDialog": {
+        "title": "Reset password for {name}?",
+        "description": "A reset email will be sent to:",
+        "detail1": "Email: {email}"
+      },
+      "deleteDialog": {
+        "title": "Permanently delete {name}?",
+        "description": "This action is IRREVERSIBLE:",
+        "detail1": "Delete all data",
+        "detail2": "Remove all content",
+        "detail3": "Cancel subscriptions",
+        "detail4": "Erase transaction history"
+      },
+      "bulkSuspendDialog": {
+        "title": "Suspend {count} user(s)?",
+        "description": "All selected users will be:",
+        "detail1": "Locked immediately",
+        "detail2": "Notified by email"
+      },
+      "bulkResetDialog": {
+        "title": "Reset {count} password(s)?",
+        "description": "Reset emails will be sent:",
+        "detail1": "One email per selected user",
+        "detail2": "Valid for 24 hours"
+      },
+      "actions": {
+        "changeRole": "Change Role",
+        "suspend": "Suspend",
+        "unsuspend": "Reactivate",
+        "ban": "Ban",
+        "delete": "Delete",
+        "resetPassword": "Reset Password",
+        "sendEmail": "Send Email",
+        "view": "View"
+      },
+      "roleDialog": {
+        "title": "Change role for {name}",
+        "save": "Save"
+      },
+      "unsuspendDialog": {
+        "title": "Reactivate {name}?",
+        "description": "The account will be reactivated immediately."
+      },
+      "emailDialog": {
+        "title": "Send email to {name}",
+        "placeholder": "Write your message...",
+        "send": "Send"
+      },
+      "banDialog": {
+        "title": "Permanently ban {name}?",
+        "description": "This action is PERMANENT:",
+        "detail1": "Permanent account ban",
+        "detail2": "Immediate deletion of all content",
+        "detail3": "Automatic refund of subscriptions",
+        "detail4": "Email address blacklist"
+      },
+      "toasts": {
+        "roleChanged": "Role for {name} changed successfully",
+        "suspended": "{name} has been suspended",
+        "unsuspended": "{name} has been reactivated",
+        "passwordResetSent": "Reset email sent to {email}",
+        "emailSent": "Email sent to {name}",
+        "banned": "{name} has been permanently banned",
+        "deleted": "{name} has been deleted"
+      },
+      "roles": {
+        "admin": "Admin",
+        "creator": "Creator",
+        "user": "User"
+      },
+      "statuses": {
+        "verified": "Verified",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "suspended": "Suspended"
+      },
+      "time": {
+        "years": "years",
+        "year": "year",
+        "months": "months",
+        "month": "month",
+        "weeks": "weeks",
+        "week": "week",
+        "days": "days",
+        "day": "day",
+        "hours": "hours",
+        "hour": "hour",
+        "minutes": "minutes",
+        "minute": "minute",
+        "ago": "ago",
+        "agoFormat": "{time} ago",
+        "never": "never"
+      },
+      "addUser": {
+        "title": "Add New User",
+        "profilePhoto": "Profile Photo",
+        "uploadPhoto": "Upload Photo",
+        "changePhoto": "Change Photo",
+        "photoHelp": "PNG, JPG, GIF up to 5MB — or paste a direct image URL",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Enter full name",
+        "emailAddress": "Email Address",
+        "emailPlaceholder": "user@example.com",
+        "avatarUrlPlaceholder": "Avatar URL (https://...)",
+        "userRole": "User Role",
+        "selectRole": "Select role",
+        "category": "Category",
+        "selectCategory": "Select category",
+        "cancel": "Cancel",
+        "createUser": "Create User",
+        "creating": "Creating...",
+        "validation": {
+          "nameRequired": "Name is required",
+          "nameTooShort": "Name must be at least 2 characters",
+          "emailRequired": "Email is required",
+          "emailInvalid": "Invalid email format",
+          "avatarUrlInvalid": "Avatar URL must start with http(s)://",
+          "photoTooLarge": "Photo must be less than 5MB",
+          "invalidFileType": "Please upload an image file",
+          "fixErrors": "Please fix the errors in the form"
+        },
+        "confirmCreate": "Create user?\n\nName: {name}\nEmail: {email}\nRole: {role}\nCategory: {category}",
+        "unsavedChanges": "You have unsaved changes. Are you sure you want to close?",
+        "userAddedTitle": "User Added Successfully",
+        "userAddedMessage": "{name} has been added to the platform",
+        "categories": {
+          "standard": "Standard",
+          "premium": "Premium",
+          "vip": "VIP",
+          "trial": "Trial"
+        },
+        "roleLabels": {
+          "user": "User",
+          "creator": "Creator",
+          "admin": "Admin",
+          "moderator": "Moderator",
+          "support": "Support"
+        }
+      }
+    },
+    "userDetail": {
+      "tabs": {
+        "overview": "Overview",
+        "finances": "Finances",
+        "content": "Content",
+        "activity": "Activity",
+        "subscribers": "Subscribers",
+        "moderation": "Moderation",
+        "security": "Security",
+        "logs": "Logs"
+      },
+      "actions": {
+        "sendEmail": "Send Email",
+        "changeRole": "Change Role",
+        "suspend": "Suspend",
+        "unsuspend": "Reactivate",
+        "ban": "Ban",
+        "resetPassword": "Reset Password",
+        "viewAs": "View As",
+        "forceLogout": "Force Logout",
+        "addNote": "Add Note"
+      },
+      "stats": {
+        "totalRevenue": "Total Revenue",
+        "subscribers": "Subscribers",
+        "posts": "Posts Published",
+        "engagement": "Engagement Rate"
+      },
+      "overview": {
+        "recentActivity": "Recent Activity"
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "subtitle": "Complete history and management",
+      "autoRefreshOn": "Auto (30s)",
+      "autoRefreshOff": "Auto OFF",
+      "refresh": "Refresh",
+      "exportCsv": "Export CSV",
+      "searchLabel": "Search",
+      "searchPlaceholder": "ID, email, name…",
+      "searchButton": "Search",
+      "autoRefreshCheckbox": "Auto-refresh 30s",
+      "totalVolume": "Total Volume",
+      "loading": "Loading…",
+      "vsLastMonth": "vs last month",
+      "totalCount": "Total Count",
+      "thisMonth": "This month",
+      "avgTransaction": "Avg Transaction",
+      "currentAverage": "Current average",
+      "avatarManagement": "User avatar management",
+      "userIdLabel": "User ID",
+      "userIdPlaceholder": "e.g.: 9f8a2c…",
+      "avatarUrlLabel": "Avatar URL (optional)",
+      "avatarUrlPlaceholder": "https://…/photo.png",
+      "uploadLabel": "Upload (optional)",
+      "updatePhotoButton": "Update photo",
+      "uploadInstructions": "Provide <strong>either</strong> a URL <strong>or</strong> a file. If both are provided, the file takes priority.",
+      "unknownError": "Unknown error",
+      "loadingError": "Loading error",
+      "networkError": "Network error when fetching data",
+      "retryButton": "Retry",
+      "refreshed": "Refreshed",
+      "metricsUpdated": "Metrics updated.",
+      "refreshFailed": "Refresh failed",
+      "unableToRefresh": "Unable to refresh.",
+      "searchApplied": "Search applied",
+      "exportConfirm": "Export transactions (based on current search) to CSV?",
+      "exportCompleted": "Export completed",
+      "csvDownloaded": "CSV file has been downloaded.",
+      "exportFailed": "Export failed",
+      "userIdRequired": "User ID required",
+      "provideValidUserId": "Provide a valid user ID.",
+      "avatarMissing": "Avatar missing",
+      "provideAvatarUrlOrFile": "Provide an avatar URL or choose a file to upload.",
+      "updatePhotoConfirm": "Update user's photo?",
+      "photoUpdated": "Photo updated",
+      "updateFailed": "Update failed"
+    },
+    "accounting": {
+      "title": "Accounting",
+      "subtitle": "Financial transactions and reports",
+      "export": {
+        "csv": "CSV",
+        "excel": "Excel",
+        "pdfReport": "PDF Report"
+      },
+      "metrics": {
+        "totalRevenue": "Total Revenue",
+        "totalRevenueDesc": "All payments received",
+        "totalPayouts": "Total Payouts",
+        "totalPayoutsDesc": "Creator withdrawals",
+        "totalFees": "Total Fees",
+        "totalFeesDesc": "Transaction costs",
+        "pending": "Pending",
+        "pendingDesc": "Awaiting processing"
+      },
+      "search": {
+        "placeholder": "Search by user, email, transaction ID, or description..."
+      },
+      "tabs": {
+        "allTransactions": "All Transactions",
+        "payments": "Payments",
+        "payouts": "Payouts",
+        "refunds": "Refunds",
+        "subscriptions": "Subscriptions"
+      },
+      "bulk": {
+        "selected": "selected",
+        "exportSelected": "Export Selected (CSV)"
+      },
+      "table": {
+        "id": "ID",
+        "type": "Type",
+        "user": "User",
+        "amount": "Amount",
+        "fee": "Fee",
+        "net": "Net",
+        "status": "Status",
+        "method": "Method",
+        "date": "Date",
+        "actions": "Actions",
+        "noTransactions": "No transactions match your filters."
+      },
+      "types": {
+        "payment": "Payment",
+        "payout": "Payout",
+        "refund": "Refund",
+        "subscription": "Subscription",
+        "tip": "Tip"
+      },
+      "statuses": {
+        "completed": "Completed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "processing": "Processing"
+      },
+      "methods": {
+        "creditCard": "Credit Card",
+        "paypal": "PayPal",
+        "bankTransfer": "Bank Transfer",
+        "crypto": "Crypto"
+      },
+      "actions": {
+        "details": "Details",
+        "editAvatar": "Edit Avatar"
+      },
+      "avatarEditor": {
+        "title": "Edit User Avatar",
+        "avatarUrl": "Avatar URL",
+        "urlPlaceholder": "https://...",
+        "uploadButton": "Upload Image",
+        "uploadingButton": "Uploading…",
+        "saveButton": "Save Avatar",
+        "helpText": "Provide a URL or upload an image file."
+      },
+      "toasts": {
+        "invalidAvatar": "Invalid Avatar",
+        "invalidAvatarMessage": "Provide a valid image URL or upload a file.",
+        "avatarUpdated": "Avatar Updated",
+        "avatarUpdatedMessage": "User avatar updated successfully.",
+        "unsupportedFile": "Unsupported File",
+        "unsupportedFileMessage": "Please select an image file.",
+        "imageLoaded": "Image Loaded",
+        "imageLoadedMessage": "Preview the avatar before saving.",
+        "uploadFailed": "Upload Failed",
+        "uploadFailedMessage": "Could not read the selected file."
+      },
+      "confirmations": {
+        "exportSelected": "Export {count} {label}?"
+      },
+      "infoBox": {
+        "title": "Accounting Coverage",
+        "description": "Financial overview with export options (CSV, Excel, PDF), transaction filters, search, bulk operations, and complete audit trail."
+      }
+    },
+    "moderation": {
+      "title": "Content Moderation",
+      "subtitle": "Review and moderate user-submitted content",
+      "stats": {
+        "pendingReview": "Pending Review",
+        "flagged": "Flagged",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "search": {
+        "placeholder": "Search by title, creator, or description…"
+      },
+      "tabs": {
+        "allContent": "All Content",
+        "pending": "Pending",
+        "flagged": "Flagged",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "bulk": {
+        "selected": "selected",
+        "approveSelected": "Approve Selected",
+        "rejectSelected": "Reject Selected"
+      },
+      "table": {
+        "preview": "Preview",
+        "creator": "Creator",
+        "title": "Title",
+        "risk": "Risk",
+        "flags": "Flags",
+        "status": "Status",
+        "submitted": "Submitted",
+        "actions": "Actions",
+        "noContent": "No content matches your filters."
+      },
+      "types": {
+        "image": "image",
+        "video": "video",
+        "post": "post"
+      },
+      "actions": {
+        "editAvatar": "Edit avatar",
+        "review": "Review",
+        "approve": "Approve",
+        "reject": "Reject",
+        "close": "Close"
+      },
+      "risk": {
+        "label": "Risk: {score}%"
+      },
+      "flags": {
+        "single": "flag",
+        "plural": "flags"
+      },
+      "review": {
+        "title": "Content Review",
+        "submitted": "Submitted {time}"
+      },
+      "avatarEditor": {
+        "title": "Edit Creator Avatar",
+        "avatarUrl": "Avatar URL",
+        "urlPlaceholder": "https://...",
+        "uploadingButton": "Uploading…",
+        "uploadButton": "Upload Image",
+        "saveButton": "Save Avatar",
+        "helpText": "You can paste a direct image URL or upload a file. Uploaded images are stored in-memory (data URL) for demo purposes."
+      },
+      "confirmations": {
+        "approveOne": "Approve content \"{title}\" by {creator}?\n\nThis will make it visible to all users.",
+        "rejectOne": "Reject content \"{title}\" by {creator}.\n\nProvide a short reason (required):",
+        "approveBulk": "Approve {count} selected item{plural}?\n\nThey will be visible to all users.",
+        "rejectBulk": "Reject {count} selected item{plural}.\n\nProvide a short reason (required):",
+        "confirmBulkReject": "Confirm bulk rejection?"
+      },
+      "toasts": {
+        "contentApproved": "Content Approved",
+        "contentApprovedMessage": "\"{title}\" is now live.",
+        "rejectionAborted": "Rejection Aborted",
+        "rejectionAbortedMessage": "A reason is required to reject content.",
+        "contentRejected": "Content Rejected",
+        "contentRejectedMessage": "Creator will be notified with your reason.",
+        "bulkApprovalComplete": "Bulk Approval Complete",
+        "bulkApprovalMessage": "Approved {count} item{plural}.",
+        "bulkRejectionAborted": "Bulk Rejection Aborted",
+        "bulkRejectionAbortedMessage": "A reason is required.",
+        "bulkRejectionComplete": "Bulk Rejection Complete",
+        "bulkRejectionMessage": "Creators will be notified with your reason.",
+        "openingReview": "Opening Review",
+        "openingReviewMessage": "Loading content preview and metadata…",
+        "unsupportedFile": "Unsupported File",
+        "unsupportedFileMessage": "Please select an image file.",
+        "imageLoaded": "Image Loaded",
+        "imageLoadedMessage": "Preview the avatar before saving.",
+        "uploadFailed": "Upload Failed",
+        "uploadFailedMessage": "Could not read the selected file.",
+        "invalidAvatar": "Invalid Avatar",
+        "invalidAvatarMessage": "Provide a valid image URL or upload a file.",
+        "avatarUpdated": "Avatar Updated",
+        "avatarUpdatedMessage": "Creator avatar updated successfully."
+      },
+      "infoBox": {
+        "title": "Moderation Coverage",
+        "description": "Page includes: search, tabs, selection, bulk approve/reject with confirmations, per-item actions with validations, review preview, toasts, robust state (loading/disabled), avatar editing (URL or upload), and consistent gradients via from-brand-start → to-brand-end."
+      }
+    },
+    "posts": {
+      "title": "Content Management",
+      "subtitle": "Moderate and manage platform posts",
+      "stats": {
+        "total": "Total Posts",
+        "published": "Published",
+        "pending": "Pending",
+        "flagged": "Flagged",
+        "removed": "Removed"
+      },
+      "search": {
+        "placeholder": "Search posts by content or creator...",
+        "ariaLabel": "Search posts"
+      },
+      "tabs": {
+        "all": "All Posts",
+        "published": "Published",
+        "pending": "Pending",
+        "flagged": "Flagged",
+        "removed": "Removed"
+      },
+      "bulk": {
+        "selected": "selected",
+        "approve": "Approve",
+        "remove": "Remove"
+      },
+      "table": {
+        "creator": "Creator",
+        "content": "Content",
+        "type": "Type",
+        "visibility": "Visibility",
+        "stats": "Stats",
+        "status": "Status",
+        "created": "Created",
+        "actions": "Actions",
+        "selectPost": "Select post from {creator}",
+        "selectAll": "Select all posts"
+      },
+      "contentTypes": {
+        "image": "Image",
+        "video": "Video",
+        "text": "Text",
+        "mixed": "Mixed"
+      },
+      "visibility": {
+        "public": "Public",
+        "subscribers": "Subscribers",
+        "ppv": "PPV"
+      },
+      "statuses": {
+        "published": "Published",
+        "pending": "Pending",
+        "flagged": "Flagged",
+        "removed": "Removed"
+      },
+      "statsLabels": {
+        "views": "views",
+        "likes": "likes"
+      },
+      "actions": {
+        "view": "View"
+      },
+      "toasts": {
+        "postsApproved": "Posts Approved",
+        "postsApprovedMessage": "Successfully approved {count} post{plural}",
+        "postsRemoved": "Posts Removed",
+        "postsRemovedMessage": "Successfully removed {count} post{plural}"
+      },
+      "confirmations": {
+        "removeSelected": "Are you sure you want to remove {count} post{plural}?"
+      }
+    },
+    "support": {
+      "title": "Support Tickets",
+      "subtitle": "Manage customer support requests",
+      "stats": {
+        "open": "Open",
+        "inProgress": "In Progress",
+        "waiting": "Waiting",
+        "resolved": "Resolved",
+        "avgResponse": "Avg Response",
+        "satisfaction": "Satisfaction"
+      },
+      "search": {
+        "placeholder": "Search tickets..."
+      },
+      "tabs": {
+        "all": "All Tickets",
+        "open": "Open",
+        "inProgress": "In Progress",
+        "waiting": "Waiting",
+        "resolved": "Resolved"
+      },
+      "bulk": {
+        "selected": "selected",
+        "assign": "Assign",
+        "close": "Close"
+      },
+      "table": {
+        "ticket": "Ticket",
+        "user": "User",
+        "subject": "Subject",
+        "category": "Category",
+        "priority": "Priority",
+        "status": "Status",
+        "assigned": "Assigned",
+        "lastUpdate": "Last Update",
+        "actions": "Actions",
+        "unassigned": "Unassigned",
+        "messages": "messages"
+      },
+      "categories": {
+        "technical": "Technical",
+        "billing": "Billing",
+        "account": "Account",
+        "content": "Content",
+        "other": "Other"
+      },
+      "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "statuses": {
+        "open": "Open",
+        "inProgress": "In Progress",
+        "waiting": "Waiting",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "actions": {
+        "view": "View"
+      },
+      "toasts": {
+        "ticketsAssigned": "Tickets Assigned",
+        "ticketsAssignedMessage": "Successfully assigned {count} ticket{plural}",
+        "ticketsClosed": "Tickets Closed",
+        "ticketsClosedMessage": "Successfully closed {count} ticket{plural}"
+      }
+    },
+    "kyc": {
+      "title": "KYC Verification",
+      "subtitle": "Review and approve identity documents",
+      "stats": {
+        "pending": "Pending",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "avgProcessing": "Avg Processing",
+        "approvalRate": "Approval Rate"
+      },
+      "search": {
+        "placeholder": "Search by name or email...",
+        "ariaLabel": "Search KYC submissions"
+      },
+      "tabs": {
+        "all": "All Submissions",
+        "pending": "Pending",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "bulk": {
+        "selected": "selected",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "table": {
+        "user": "User",
+        "documentType": "Document Type",
+        "riskScore": "Risk Score",
+        "status": "Status",
+        "submitted": "Submitted",
+        "reviewedBy": "Reviewed By",
+        "actions": "Actions",
+        "selectAll": "Select all submissions",
+        "selectUser": "Select {name}",
+        "notReviewed": "Not reviewed",
+        "notAvailable": "N/A",
+        "review": "Review"
+      },
+      "documentTypes": {
+        "idCard": "ID Card",
+        "passport": "Passport",
+        "driverLicense": "Driver License"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "actions": {
+        "review": "Review"
+      },
+      "confirmations": {
+        "approveSubmissions": "Are you sure you want to approve {count} submission{plural}?",
+        "rejectSubmissions": "Are you sure you want to reject {count} submission{plural}?"
+      },
+      "toasts": {
+        "kycApproved": "KYC Approved",
+        "kycApprovedMessage": "Successfully approved {count} submission{plural}",
+        "kycRejected": "KYC Rejected",
+        "kycRejectedMessage": "Successfully rejected {count} submission{plural}"
+      }
+    },
+    "payouts": {
+      "title": "Payouts Management",
+      "subtitle": "Process and track creator earnings withdrawals",
+      "stats": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed",
+        "totalVolume": "Total Volume (7 days)"
+      },
+      "search": {
+        "placeholder": "Search by name, email, or transaction ID...",
+        "ariaLabel": "Search payouts"
+      },
+      "tabs": {
+        "all": "All Payouts",
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "bulkActions": {
+        "selected": "selected",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "table": {
+        "selectAll": "Select all payouts",
+        "selectPayout": "Select payout for {name}",
+        "creator": "Creator",
+        "amount": "Amount",
+        "method": "Method",
+        "status": "Status",
+        "requested": "Requested",
+        "processed": "Processed",
+        "transactionId": "Transaction ID",
+        "actions": "Actions",
+        "notAvailable": "N/A",
+        "view": "View"
+      },
+      "methods": {
+        "bankTransfer": "Bank Transfer",
+        "paypal": "PayPal",
+        "stripe": "Stripe",
+        "wire": "Wire"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
+      },
+      "confirmations": {
+        "approve": "Are you sure you want to approve {count} payout{plural}?",
+        "reject": "Are you sure you want to reject {count} payout{plural}?"
+      },
+      "toasts": {
+        "approved": "Payouts Approved",
+        "approvedMessage": "Successfully approved {count} payout{plural}",
+        "rejected": "Payouts Rejected",
+        "rejectedMessage": "Successfully rejected {count} payout{plural}"
+      }
+    },
+    "chargebacks": {
+      "title": "Chargebacks & Disputes",
+      "subtitle": "Manage payment disputes and chargebacks",
+      "stats": {
+        "open": "Open",
+        "underReview": "Under Review",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "totalAtRisk": "Total at Risk",
+        "winRate": "Win Rate"
+      },
+      "search": {
+        "placeholder": "Search by user, creator, or transaction ID...",
+        "ariaLabel": "Search chargebacks"
+      },
+      "tabs": {
+        "all": "All Chargebacks",
+        "open": "Open",
+        "underReview": "Under Review",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "bulkActions": {
+        "selected": "selected",
+        "accept": "Accept",
+        "reject": "Reject"
+      },
+      "table": {
+        "selectAll": "Select all chargebacks",
+        "selectChargeback": "Select chargeback from {name}",
+        "user": "User",
+        "creator": "Creator",
+        "amount": "Amount",
+        "reason": "Reason",
+        "priority": "Priority",
+        "status": "Status",
+        "opened": "Opened",
+        "actions": "Actions",
+        "responded": "Responded:",
+        "review": "Review"
+      },
+      "reasons": {
+        "fraudulent": "Fraudulent",
+        "duplicate": "Duplicate",
+        "notReceived": "Not Received",
+        "productNotDescribed": "Product Not Described",
+        "other": "Other"
+      },
+      "statuses": {
+        "open": "Open",
+        "underReview": "Under Review",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "resolved": "Resolved"
+      },
+      "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "confirmations": {
+        "accept": "Are you sure you want to accept {count} chargeback{plural}?",
+        "reject": "Are you sure you want to reject {count} chargeback{plural}?"
+      },
+      "toasts": {
+        "accepted": "Chargebacks Accepted",
+        "acceptedMessage": "Successfully accepted {count} chargeback{plural}",
+        "rejected": "Chargebacks Rejected",
+        "rejectedMessage": "Successfully rejected {count} chargeback{plural}"
+      }
+    },
+    "legal": {
+      "title": "Legal Requests",
+      "subtitle": "Manage DMCA, court orders, and legal compliance",
+      "stats": {
+        "pending": "Pending",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "avgResponse": "Avg Response",
+        "compliance": "Compliance"
+      },
+      "search": {
+        "placeholder": "Search by submitter, target, or description...",
+        "ariaLabel": "Search legal requests"
+      },
+      "tabs": {
+        "all": "All Requests",
+        "pending": "Pending",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "bulkActions": {
+        "selected": "selected",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "table": {
+        "selectAll": "Select all requests",
+        "selectRequest": "Select request from {name}",
+        "type": "Type",
+        "submittedBy": "Submitted By",
+        "target": "Target",
+        "description": "Description",
+        "priority": "Priority",
+        "status": "Status",
+        "submitted": "Submitted",
+        "actions": "Actions",
+        "user": "User:",
+        "notAvailable": "N/A",
+        "action": "Action:",
+        "reviewed": "Reviewed:",
+        "review": "Review",
+        "reviewButton": "Review"
+      },
+      "types": {
+        "dmca": "DMCA",
+        "copyright": "Copyright",
+        "trademark": "Trademark",
+        "privacy": "Privacy",
+        "legalHold": "Legal Hold",
+        "courtOrder": "Court Order",
+        "subpoena": "Subpoena"
+      },
+      "statuses": {
+        "pending": "Pending",
+        "underReview": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "resolved": "Resolved"
+      },
+      "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "confirmations": {
+        "approve": "Are you sure you want to approve {count} legal request{plural}?",
+        "reject": "Are you sure you want to reject {count} legal request{plural}?"
+      },
+      "toasts": {
+        "approved": "Requests Approved",
+        "approvedMessage": "Successfully approved {count} legal request{plural}",
+        "rejected": "Requests Rejected",
+        "rejectedMessage": "Successfully rejected {count} legal request{plural}"
+      }
+    },
+    "reports": {
+      "title": "Content Reports",
+      "subtitle": "Manage and review reported content",
+      "newReport": "New Report",
+      "totalReports": "Total Reports",
+      "pending": "Pending",
+      "reviewing": "Reviewing",
+      "resolved": "Resolved",
+      "critical": "Critical",
+      "searchPlaceholder": "Search reports...",
+      "allReports": "All Reports",
+      "rejected": "Rejected",
+      "selected": "selected",
+      "approve": "Approve",
+      "approving": "Approving…",
+      "reject": "Reject",
+      "rejecting": "Rejecting…",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "reportedUser": "Reported User",
+      "reportedBy": "Reported By",
+      "reason": "Reason",
+      "category": "Category",
+      "priority": "Priority",
+      "status": "Status",
+      "evidence": "Evidence",
+      "time": "Time",
+      "actions": "Actions",
+      "files": "files",
+      "review": "Review",
+      "reportDetails": "Report Details",
+      "approveConfirm": "Approve & resolve this report?",
+      "approved": "Approved",
+      "reportResolved": "Report {id} resolved.",
+      "rejectPrompt": "Provide a reason to reject this report:",
+      "reasonRequired": "Reason Required",
+      "rejectionReasonMandatory": "Rejection reason is mandatory.",
+      "reportRejected": "Report {id} rejected.",
+      "deleteConfirm": "⚠️ Permanently delete report {id}?",
+      "deleteConfirmText": "Type \"DELETE\" to confirm:",
+      "cancelled": "Cancelled",
+      "confirmTextMismatch": "Confirmation text did not match.",
+      "deleted": "Deleted",
+      "reportDeleted": "Report {id} deleted.",
+      "bulkApproveConfirm": "Approve {count} report(s) and mark as \"Resolved\"?",
+      "reportsApproved": "Reports Approved",
+      "reportsResolvedMessage": "Selected reports have been resolved.",
+      "bulkRejectPrompt": "Provide a reason to reject these report(s):",
+      "reportsRejected": "Reports Rejected",
+      "reportsRejectedMessage": "Selected reports have been rejected.",
+      "bulkDeleteConfirm": "⚠️ Permanently delete {count} report(s)? This cannot be undone.",
+      "deletionCancelled": "Deletion Cancelled",
+      "reportsDeleted": "Selected reports have been removed.",
+      "invalidFile": "Invalid File",
+      "avatarMustBeImage": "Avatar must be an image.",
+      "avatarReady": "Avatar Ready",
+      "avatarImageLoaded": "Avatar image loaded.",
+      "validationError": "Validation Error",
+      "reportedUserNameRequired": "Reported user name is required",
+      "reporterNameRequired": "Reporter name is required",
+      "reasonIsRequired": "Reason is required",
+      "descriptionIsRequired": "Description is required",
+      "provideAtLeastOneAvatar": "Provide at least one avatar (URL or upload) for context",
+      "reportCreated": "Report Created",
+      "reportCreatedMessage": "Report {id} has been created.",
+      "reportedUserName": "Reported User — Name",
+      "reportedUserAvatarUrl": "Reported User — Avatar URL",
+      "uploadAvatar": "Upload avatar",
+      "reportedByName": "Reported By — Name",
+      "reportedByAvatarUrl": "Reported By — Avatar URL",
+      "evidenceFiles": "Evidence (files)",
+      "shortReason": "Short reason",
+      "description": "Description",
+      "detailedDescription": "Detailed description",
+      "creating": "Creating…",
+      "createReport": "Create Report",
+      "cancel": "Cancel"
+    },
+    "health": {
+      "title": "System Health",
+      "subtitle": "Monitor platform infrastructure and services",
+      "refreshAll": "Refresh All",
+      "stats": {
+        "healthy": "Healthy",
+        "degraded": "Degraded",
+        "down": "Down",
+        "totalServices": "Total Services",
+        "avgResponse": "Avg Response",
+        "systemUptime": "System Uptime"
+      },
+      "search": {
+        "placeholder": "Search services...",
+        "ariaLabel": "Search services"
+      },
+      "tabs": {
+        "all": "All Services",
+        "healthy": "Healthy",
+        "degraded": "Degraded",
+        "down": "Down"
+      },
+      "types": {
+        "database": "Database",
+        "api": "API",
+        "storage": "Storage",
+        "cache": "Cache",
+        "queue": "Queue",
+        "external": "External"
+      },
+      "statuses": {
+        "healthy": "Healthy",
+        "degraded": "Degraded",
+        "down": "Down"
+      },
+      "details": {
+        "uptime": "Uptime:",
+        "responseTime": "Response Time:",
+        "errorRate": "Error Rate:",
+        "lastCheck": "Last Check:",
+        "na": "N/A"
+      },
+      "actions": {
+        "viewLogs": "View Logs",
+        "restart": "Restart"
+      },
+      "confirmations": {
+        "restart": "Are you sure you want to restart {serviceName}?"
+      },
+      "toasts": {
+        "healthChecksRunning": "Health Checks Running",
+        "refreshingAll": "Refreshing all service health checks...",
+        "serviceRestarting": "Service Restarting",
+        "serviceRestartingMessage": "{serviceName} is being restarted..."
+      },
+      "emptyState": "No services found matching your search"
+    },
+    "settings": {
+      "title": "Settings",
+      "loading": "Loading settings…",
+      "loadingError": "Loading failed",
+      "unsavedWarning": "Unsaved changes. Remember to click <strong>Save</strong>.",
+      "actions": {
+        "reset": "Reset",
+        "downloadBackup": "Download backup",
+        "save": "Save",
+        "saving": "Saving…",
+        "update": "Update",
+        "setViaUrl": "Set via URL"
+      },
+      "core": {
+        "siteName": "Site name",
+        "siteNamePlaceholder": "Site visible name",
+        "supportEmail": "Support email",
+        "supportEmailPlaceholder": "support@example.com",
+        "minPasswordLength": "Minimum password length",
+        "platformFeePct": "Platform fee (%)",
+        "enableRegistrations": "Enable registrations",
+        "enableRegistrationsDesc": "Allow new users to register.",
+        "defaultRole": "Default role",
+        "defaultRolePlaceholder": "Choose a role",
+        "defaultAvatar": "Default avatar"
+      },
+      "security": {
+        "title": "Security",
+        "enforceAdmin2FA": "Require 2FA for administrators",
+        "enforceAdmin2FADesc": "Prevents admin access without two-factor authentication.",
+        "lockoutThreshold": "Failed attempts before lockout",
+        "lockoutWindow": "Analysis window (min)",
+        "lockoutDuration": "Lockout duration (min)"
+      },
+      "branding": {
+        "title": "UI / Branding",
+        "primaryColor": "Primary color",
+        "colorAriaLabel": "Color",
+        "logo": "Logo",
+        "favicon": "Favicon"
+      },
+      "emails": {
+        "title": "Notifications / Emails",
+        "sendgridEnabled": "Enable SendGrid sending",
+        "sendgridEnabledDesc": "Requires SENDGRID_API_KEY on server side.",
+        "fromEmail": "Sender email",
+        "testEmail": "Send test (simulation)"
+      },
+      "imageUpload": {
+        "promptTitle": "Update {label}?",
+        "promptMessage": "OK = Enter URL\nCancel = Upload file",
+        "urlPrompt": "Paste a valid URL (https:// …)",
+        "noUrl": "No URL provided",
+        "noUrlMessage": "{label} unchanged.",
+        "invalidUrl": "Invalid URL",
+        "invalidUrlMessage": "Provide an http(s) URL.",
+        "updated": "{label} updated",
+        "fromUrl": "From URL.",
+        "noFile": "No file",
+        "noFileMessage": "{label} unchanged.",
+        "fileTooLarge": "File too large",
+        "fileTooLargeMessage": "Max {maxMB} MB.",
+        "invalidFile": "Invalid file",
+        "invalidFileMessage": "Select an image.",
+        "localImageApplied": "Local image applied."
+      },
+      "avatarPrompt": {
+        "urlPrompt": "Paste URL for default avatar:",
+        "avatarUpdated": "Avatar updated"
+      },
+      "testEmailPrompt": {
+        "addressPrompt": "Test address (recipient):",
+        "success": "SendGrid OK",
+        "successMessage": "Test simulated server-side.",
+        "error": "Email test failed"
+      },
+      "validationErrors": {
+        "siteNameTooShort": "Site name must be at least 2 characters.",
+        "invalidSupportEmail": "Support email is invalid.",
+        "invalidPasswordLength": "Minimum password length must be between 8 and 128.",
+        "invalidPlatformFee": "Platform fee must be between 0 and 100%.",
+        "defaultAvatarRequired": "Default avatar is required.",
+        "invalidPrimaryColor": "Invalid primary color (hex).",
+        "logoRequired": "Logo required.",
+        "faviconRequired": "Favicon required.",
+        "invalidLockoutThreshold": "Invalid lockout threshold (3–20).",
+        "invalidLockoutWindow": "Invalid analysis window (1–120).",
+        "invalidLockoutDuration": "Invalid lockout duration (5–1440).",
+        "invalidSendgridEmail": "Invalid SendGrid sender email."
+      },
+      "toasts": {
+        "validation": "Validation",
+        "settingsSaved": "Settings saved",
+        "settingsSavedMessage": "Changes have been applied.",
+        "saveFailed": "Save failed",
+        "actionCancelled": "Action cancelled",
+        "actionCancelledMessage": "No changes made.",
+        "resetNotSaved": "Reset (not saved)",
+        "resetNotSavedMessage": "Click Save to apply."
+      },
+      "confirmations": {
+        "resetAll": "Reset all settings to default values?"
+      }
+    }
+  },
+  "common": {
+    "logout": "Logout",
+    "profile": "Profile",
+    "search": "Search...",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "back": "Back"
+  }
+}

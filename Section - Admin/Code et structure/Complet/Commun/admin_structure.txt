@@ -1,0 +1,180 @@
+C:\dev/
+├── apps/
+│   ├── web/                                    # Next.js 15 Frontend
+│   │   ├── app/
+│   │   │   ├── (admin)/                       # Admin Routes Group
+│   │   │   │   ├── layout.tsx                 # Admin Layout avec sidebar
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   └── page.tsx               # 1. Dashboard
+│   │   │   │   ├── users/
+│   │   │   │   │   ├── page.tsx               # 2. Users Management
+│   │   │   │   │   └── [id]/
+│   │   │   │   │       └── page.tsx           # User Detail Modal
+│   │   │   │   ├── reports/
+│   │   │   │   │   └── page.tsx               # 3. Reports & Flags
+│   │   │   │   ├── moderation/
+│   │   │   │   │   └── page.tsx               # 4. Moderation Queue
+│   │   │   │   ├── transactions/
+│   │   │   │   │   └── page.tsx               # 5. Transactions Overview
+│   │   │   │   ├── accounting/
+│   │   │   │   │   └── page.tsx               # 6. Accounting & Export
+│   │   │   │   ├── audit-log/
+│   │   │   │   │   └── page.tsx               # 7. Audit Log
+│   │   │   │   ├── settings/
+│   │   │   │   │   └── page.tsx               # 8. Settings
+│   │   │   │   └── kyc/
+│   │   │   │       ├── page.tsx               # KYC Queue
+│   │   │   │       └── [id]/
+│   │   │   │           └── page.tsx           # 9. KYC Validation Detail
+│   │   │   └── api/
+│   │   │       └── admin/                     # API Routes (si besoin)
+│   │   ├── components/
+│   │   │   ├── admin/                         # Admin-specific components
+│   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── MetricCard.tsx
+│   │   │   │   ├── SalesChart.tsx
+│   │   │   │   ├── TransactionsTable.tsx
+│   │   │   │   ├── UsersTable.tsx
+│   │   │   │   ├── ReportsTable.tsx
+│   │   │   │   ├── ModerationQueue.tsx
+│   │   │   │   ├── ContentReview.tsx
+│   │   │   │   ├── AIAnalysisCard.tsx
+│   │   │   │   ├── AccountingCards.tsx
+│   │   │   │   ├── ExportHistoryTable.tsx
+│   │   │   │   ├── AuditLogTable.tsx
+│   │   │   │   ├── SettingsForm.tsx
+│   │   │   │   ├── KycDocuments.tsx
+│   │   │   │   ├── KycConfidenceAnalysis.tsx
+│   │   │   │   └── UserDetailModal.tsx
+│   │   │   └── ui/                            # Existing UI components
+│   │   │       ├── button.tsx
+│   │   │       ├── card.tsx
+│   │   │       ├── input.tsx
+│   │   │       ├── table.tsx
+│   │   │       ├── dialog.tsx
+│   │   │       ├── dropdown-menu.tsx
+│   │   │       ├── tabs.tsx
+│   │   │       └── ...
+│   │   ├── hooks/
+│   │   │   └── admin/
+│   │   │       ├── useDashboardMetrics.ts
+│   │   │       ├── useSalesOverview.ts
+│   │   │       ├── useUsers.ts
+│   │   │       ├── useReports.ts
+│   │   │       ├── useModerationQueue.ts
+│   │   │       ├── useTransactions.ts
+│   │   │       ├── useAccounting.ts
+│   │   │       ├── useAuditLog.ts
+│   │   │       ├── useSettings.ts
+│   │   │       └── useKyc.ts
+│   │   ├── lib/
+│   │   │   ├── admin/
+│   │   │   │   ├── api-client.ts              # Admin API client
+│   │   │   │   ├── permissions.ts             # Permission checks
+│   │   │   │   └── constants.ts
+│   │   │   └── utils.ts
+│   │   └── store/
+│   │       └── admin/
+│   │           ├── dashboardStore.ts          # Zustand store
+│   │           ├── usersStore.ts
+│   │           └── moderationStore.ts
+│   │
+│   └── api/                                    # NestJS Backend
+│       ├── src/
+│       │   ├── modules/
+│       │   │   ├── admin/
+│       │   │   │   ├── admin.module.ts
+│       │   │   │   ├── controllers/
+│       │   │   │   │   ├── dashboard.controller.ts
+│       │   │   │   │   ├── users.controller.ts
+│       │   │   │   │   ├── reports.controller.ts
+│       │   │   │   │   ├── moderation.controller.ts
+│       │   │   │   │   ├── transactions.controller.ts
+│       │   │   │   │   ├── accounting.controller.ts
+│       │   │   │   │   ├── audit-log.controller.ts
+│       │   │   │   │   ├── settings.controller.ts
+│       │   │   │   │   └── kyc.controller.ts
+│       │   │   │   ├── services/
+│       │   │   │   │   ├── dashboard.service.ts
+│       │   │   │   │   ├── users.service.ts
+│       │   │   │   │   ├── reports.service.ts
+│       │   │   │   │   ├── moderation.service.ts
+│       │   │   │   │   ├── transactions.service.ts
+│       │   │   │   │   ├── accounting.service.ts
+│       │   │   │   │   ├── audit-log.service.ts
+│       │   │   │   │   ├── settings.service.ts
+│       │   │   │   │   └── kyc.service.ts
+│       │   │   │   ├── dto/
+│       │   │   │   │   ├── dashboard.dto.ts
+│       │   │   │   │   ├── users.dto.ts
+│       │   │   │   │   ├── reports.dto.ts
+│       │   │   │   │   ├── moderation.dto.ts
+│       │   │   │   │   ├── transactions.dto.ts
+│       │   │   │   │   ├── accounting.dto.ts
+│       │   │   │   │   ├── settings.dto.ts
+│       │   │   │   │   └── kyc.dto.ts
+│       │   │   │   ├── guards/
+│       │   │   │   │   ├── admin-role.guard.ts
+│       │   │   │   │   └── permissions.guard.ts
+│       │   │   │   └── decorators/
+│       │   │   │       ├── admin.decorator.ts
+│       │   │   │       └── audit-log.decorator.ts
+│       │   │   ├── ai-moderation/              # AI Services
+│       │   │   │   ├── ai-moderation.module.ts
+│       │   │   │   ├── ai-moderation.service.ts
+│       │   │   │   ├── google-vision.service.ts
+│       │   │   │   └── aws-rekognition.service.ts
+│       │   │   └── kyc-provider/               # KYC Integration
+│       │   │       ├── kyc-provider.module.ts
+│       │   │       ├── kyc-provider.service.ts
+│       │   │       ├── yoti.service.ts
+│       │   │       └── jumio.service.ts
+│       │   └── common/
+│       │       ├── guards/
+│       │       │   ├── jwt-auth.guard.ts       # Existing
+│       │       │   └── rate-limit.guard.ts     # New
+│       │       └── interceptors/
+│       │           └── logging.interceptor.ts
+│       └── test/
+│           └── admin/
+│               ├── dashboard.e2e-spec.ts
+│               ├── users.e2e-spec.ts
+│               └── ...
+│
+├── packages/
+│   ├── database/
+│   │   └── prisma/
+│   │       ├── schema.prisma                   # Updated with admin models
+│   │       ├── migrations/
+│   │       │   └── [timestamp]_add_admin_models/
+│   │       │       └── migration.sql
+│   │       └── seed.ts                         # Admin seed data
+│   └── shared/
+│       └── types/
+│           └── admin/
+│               ├── dashboard.types.ts
+│               ├── users.types.ts
+│               ├── reports.types.ts
+│               ├── moderation.types.ts
+│               ├── transactions.types.ts
+│               ├── accounting.types.ts
+│               ├── audit-log.types.ts
+│               ├── settings.types.ts
+│               └── kyc.types.ts
+│
+└── docs/
+    └── admin/
+        ├── README.md
+        ├── API.md
+        ├── PERMISSIONS.md
+        └── DEPLOYMENT.md
+
+TOTAL FILES TO CREATE:
+├── Frontend: ~35 files (pages, components, hooks, stores)
+├── Backend: ~30 files (controllers, services, DTOs, guards)
+├── Database: ~3 files (schema, migration, seed)
+├── Shared: ~9 files (types)
+└── Tests: ~10 files
+
+TOTAL: ~87 fichiers pour la Phase 1 (9 écrans de base)

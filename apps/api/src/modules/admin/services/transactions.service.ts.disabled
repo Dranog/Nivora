@@ -1,0 +1,544 @@
+import { Injectable, InternalServerErrorException, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../../common/prisma/prisma.service';
+import { Prisma, TransactionCategory } from '@prisma/client';
+import { Parser } from 'json2csv';
+import dayjs from 'dayjs';
+import {
+  type TransactionsQuery,
+  type TransactionsListResponseDto,
+  type TransactionDetailDto,
+  type TransactionStatsDto,
+  type RefundTransactionDto,
+  type CancelTransactionDto,
+} from '../dto/transactions.dto';
+
+export enum TransactionType {
+  PURCHASE = 'PURCHASE',
+  SUBSCRIPTION = 'SUBSCRIPTION',
+  TIP = 'TIP',
+  PPV = 'PPV',
+  PAYOUT = 'PAYOUT',
+  REFUND = 'REFUND',
+  CHARGEBACK = 'CHARGEBACK',
+  OTHER = 'OTHER',
+}
+
+export enum TransactionStatus {
+  PENDING = 'PENDING',
+  SUCCEEDED = 'SUCCEEDED',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+  DISPUTED = 'DISPUTED',
+}
+
+export enum PaymentMethod {
+  CARD = 'CARD',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  WALLET = 'WALLET',
+  CRYPTO = 'CRYPTO',
+}
+
+type TrendsParams = {
+  dateFrom?: string;
+  dateTo?: string;
+  type?: TransactionType;
+};
+
+@Injectable()
+export class TransactionsService {
+  private readonly logger = new Logger(TransactionsService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * GET /admin/transactions
+   * Liste paginée des transactions avec filtres avancés
+   */
+  async getTransactions(query: TransactionsQuery): Promise<TransactionsListResponseDto> {
+    const {
+      search,
+      type,
+      status,
+      paymentMethod,
+      userId,
+      authorId,
+      dateFrom,
+      dateTo,
+      minAmount,
+      maxAmount,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    } = query;
+
+    const where: Prisma.TransactionWhereInput = {};
+
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: 'insensitive' } },
+        { user: { username: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    if (type) where.type = type as any;
+    if (status) where.status = status as any;
+    if (paymentMethod) where.paymentMethod = paymentMethod as any;
+    if (userId) where.userId = userId;
+    if (authorId) where.creatorId = authorId;
+
+    if (dateFrom || dateTo) {
+      where.createdAt = {};
+      if (dateFrom) where.createdAt.gte = new Date(dateFrom);
+      if (dateTo) where.createdAt.lte = new Date(dateTo);
+    }
+
+    if (minAmount != null || maxAmount != null) {
+      where.amount = {};
+      if (minAmount != null) where.amount.gte = Math.round(Number(minAmount) * 100);
+      if (maxAmount != null) where.amount.lte = Math.round(Number(maxAmount) * 100);
+    }
+
+    try {
+      const [items, total] = await this.prisma.$transaction([
+        this.prisma.transaction.findMany({
+          where,
+          orderBy: { [sortBy]: sortOrder },
+          skip: (page - 1) * limit,
+          take: limit,
+          select: {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            completedAt: true,
+            amount: true,
+            currency: true,
+            type: true,
+            status: true,
+            paymentMethod: true,
+            stripeChargeId: true,
+            paymentProvider: true,
+            processingFee: true,
+            netAmount: true,
+            description: true,
+            metadata: true,
+            notes: true,
+            userId: true,
+            creatorId: true,
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+                avatar: true,
+              },
+            },
+            creator: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+                avatar: true,
+              },
+            },
+          },
+        }),
+        this.prisma.transaction.count({ where }),
+      ]);
+
+      const normalized = items.map((t) => ({
+        id: t.id,
+        type: t.type as any,
+        status: t.status as any,
+        amount: t.amount / 100,
+        currency: t.currency || 'USD',
+        fee: (t.processingFee || 0) / 100,
+        netAmount: (t.netAmount || t.amount) / 100,
+        userId: t.userId,
+        user: {
+          id: t.user?.id || '',
+          username: t.user?.username || 'Unknown',
+          email: t.user?.email || '',
+          avatar: t.user?.avatar || null,
+        },
+        authorId: t.creatorId,
+        creator: t.creator ? {
+          id: t.creator.id,
+          username: t.creator.username,
+          email: t.creator.email,
+          avatar: t.creator.avatar,
+        } : null,
+        paymentMethod: t.paymentMethod as any,
+        paymentIntentId: t.stripeChargeId,
+        paymentProvider: t.paymentProvider,
+        last4: null, // Not in schema
+        description: t.description,
+        metadata: t.metadata as any,
+        failureReason: t.notes, // Using notes field for failure reason
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+        completedAt: t.completedAt?.toISOString() || null,
+      }));
+
+      const totalPages = Math.ceil(total / limit);
+
+      return { items: normalized, total, page, limit, totalPages };
+    } catch (e) {
+      this.logger.error(`Error in getTransactions(): ${(e as Error).message}`);
+      throw new InternalServerErrorException('Error fetching transactions');
+    }
+  }
+
+  /**
+   * GET /admin/transactions/stats
+   * Statistics for dashboard
+   */
+  async getTransactionStats(): Promise<TransactionStatsDto> {
+    try {
+      const now = new Date();
+      const startOfDay = dayjs().startOf('day').toDate();
+      const startOfWeek = dayjs().startOf('week').toDate();
+      const startOfMonth = dayjs().startOf('month').toDate();
+
+      const [allStats, statusCounts, typeVolumes, todayVol, weekVol, monthVol] = await Promise.all([
+        this.prisma.transaction.aggregate({
+          _count: true,
+          _sum: { amount: true, processingFee: true },
+          _avg: { amount: true },
+        }),
+        this.prisma.transaction.groupBy({
+          by: ['status'],
+          _count: true,
+        }),
+        this.prisma.transaction.groupBy({
+          by: ['category'],
+          where: { status: 'COMPLETED' },
+          _sum: { amount: true },
+        }),
+        this.prisma.transaction.aggregate({
+          where: { createdAt: { gte: startOfDay }, status: 'COMPLETED' },
+          _sum: { amount: true },
+        }),
+        this.prisma.transaction.aggregate({
+          where: { createdAt: { gte: startOfWeek }, status: 'COMPLETED' },
+          _sum: { amount: true },
+        }),
+        this.prisma.transaction.aggregate({
+          where: { createdAt: { gte: startOfMonth }, status: 'COMPLETED' },
+          _sum: { amount: true },
+        }),
+      ]);
+
+      const statusMap = new Map(statusCounts.map((s) => [s.status, s._count]));
+      const typeVolMap = new Map(typeVolumes.map((t) => [t.category, t._sum.amount || 0]));
+
+      return {
+        totalTransactions: allStats._count || 0,
+        totalVolume: (allStats._sum.amount || 0) / 100,
+        totalFees: (allStats._sum.processingFee || 0) / 100,
+        pendingCount: statusMap.get('PENDING') || 0,
+        completedCount: statusMap.get('COMPLETED') || 0,
+        failedCount: statusMap.get('FAILED') || 0,
+        refundedCount: statusMap.get('REFUNDED') || 0,
+        disputedCount: statusMap.get('DISPUTED') || 0,
+        purchaseVolume: (typeVolMap.get('PPV_PURCHASE') || 0) / 100,
+        subscriptionVolume: (typeVolMap.get('SUBSCRIPTION') || 0) / 100,
+        tipVolume: (typeVolMap.get('TIP') || 0) / 100,
+        todayVolume: (todayVol._sum.amount || 0) / 100,
+        weekVolume: (weekVol._sum.amount || 0) / 100,
+        monthVolume: (monthVol._sum.amount || 0) / 100,
+        averageTransactionAmount: (allStats._avg.amount || 0) / 100,
+        averageProcessingTime: 0, // TODO: implement if needed
+      };
+    } catch (e) {
+      this.logger.error(`Error in getTransactionStats(): ${(e as Error).message}`);
+      throw new InternalServerErrorException('Error calculating stats');
+    }
+  }
+
+  /**
+   * GET /admin/transactions/trends
+   * Migrated from V2 - temporal analysis
+   */
+  async getTrends(period: string, metric: string) {
+    const dateRange = this.getDateRange(period);
+    const groupBy = period === '30d' ? 'day' : 'week';
+
+    try {
+      const data = await this.prisma.$queryRaw<Array<{ date: Date; value: bigint }>>`
+        SELECT
+          DATE_TRUNC(${groupBy}, created_at) as date,
+          SUM(amount) as value
+        FROM "Transaction"
+        WHERE
+          status = 'COMPLETED'
+          AND created_at >= ${dateRange.start}
+          AND created_at <= ${dateRange.end}
+        GROUP BY DATE_TRUNC(${groupBy}, created_at)
+        ORDER BY date ASC
+      `;
+
+      return data.map((row) => ({
+        date: row.date,
+        value: Number(row.value) / 100,
+      }));
+    } catch (e) {
+      this.logger.error(`Error in getTrends(): ${(e as Error).message}`);
+      throw new InternalServerErrorException('Error calculating trends');
+    }
+  }
+
+  /**
+   * GET /admin/transactions/:id
+   * Get transaction detail with audit log and related transactions
+   */
+  async getTransactionDetail(transactionId: string): Promise<TransactionDetailDto> {
+    try {
+      const transaction = await this.prisma.transaction.findUnique({
+        where: { id: transactionId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              avatar: true,
+            },
+          },
+          creator: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              avatar: true,
+            },
+          },
+        },
+      });
+
+      if (!transaction) {
+        throw new NotFoundException('Transaction not found');
+      }
+
+      // Find related transactions (refunds, chargebacks)
+      const relatedTransactions = await this.prisma.transaction.findMany({
+        where: {
+          OR: [
+            { metadata: { path: ['originalTransactionId'], equals: transactionId } },
+            { id: transactionId },
+          ],
+          NOT: { id: transactionId },
+        },
+        select: {
+          id: true,
+          type: true,
+          status: true,
+          amount: true,
+          createdAt: true,
+        },
+      });
+
+      // Get audit log
+      const auditLog = await this.prisma.auditLog.findMany({
+        where: {
+          event: { contains: 'TRANSACTION' },
+          resource: 'TRANSACTION',
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+        take: 50, // Limit to last 50 audit entries
+      });
+
+      return {
+        id: transaction.id,
+        type: transaction.type as any,
+        status: transaction.status as any,
+        amount: transaction.amount / 100,
+        currency: transaction.currency || 'USD',
+        fee: (transaction.processingFee || 0) / 100,
+        netAmount: (transaction.netAmount || transaction.amount) / 100,
+        userId: transaction.userId,
+        user: {
+          id: transaction.user?.id || '',
+          username: transaction.user?.username || 'Unknown',
+          email: transaction.user?.email || '',
+          avatar: transaction.user?.avatar || null,
+        },
+        authorId: transaction.creatorId,
+        creator: transaction.creator ? {
+          id: transaction.creator.id,
+          username: transaction.creator.username,
+          email: transaction.creator.email,
+          avatar: transaction.creator.avatar,
+        } : null,
+        paymentMethod: transaction.paymentMethod as any,
+        paymentIntentId: transaction.stripeChargeId,
+        paymentProvider: transaction.paymentProvider,
+        last4: null, // Not in schema
+        description: transaction.description,
+        metadata: transaction.metadata as any,
+        failureReason: transaction.notes, // Using notes field
+        createdAt: transaction.createdAt.toISOString(),
+        updatedAt: transaction.updatedAt.toISOString(),
+        completedAt: transaction.completedAt?.toISOString() || null,
+        relatedTransactions: relatedTransactions.map((rt) => ({
+          id: rt.id,
+          type: rt.type as any,
+          status: rt.status as any,
+          amount: rt.amount / 100,
+          createdAt: rt.createdAt.toISOString(),
+        })),
+        providerDetails: transaction.metadata,
+        auditLog: auditLog.map((log) => ({
+          id: log.id,
+          action: log.event,
+          performedBy: {
+            id: log.user?.id || 'system',
+            username: log.user?.username || 'System',
+          },
+          timestamp: log.createdAt.toISOString(),
+          metadata: log.meta,
+        })),
+      };
+    } catch (e) {
+      if (e instanceof NotFoundException) throw e;
+      this.logger.error(`Error in getTransactionDetail(): ${(e as Error).message}`);
+      throw new InternalServerErrorException('Error fetching transaction detail');
+    }
+  }
+
+  /**
+   * POST /admin/transactions/:id/refund
+   * Refund a completed transaction
+   */
+  async refundTransaction(transactionId: string, data: RefundTransactionDto, adminId: string): Promise<void> {
+    try {
+      const transaction = await this.prisma.transaction.findUnique({ where: { id: transactionId } });
+
+      if (!transaction) {
+        throw new NotFoundException('Transaction not found');
+      }
+
+      if (transaction.status !== 'COMPLETED') {
+        throw new BadRequestException('Only completed transactions can be refunded');
+      }
+
+      const refundAmount = data.amount ? Math.round(data.amount * 100) : transaction.amount;
+
+      if (refundAmount > transaction.amount) {
+        throw new BadRequestException('Refund amount cannot exceed transaction amount');
+      }
+
+      // Create refund transaction
+      await this.prisma.transaction.create({
+        data: {
+          userId: transaction.userId,
+          amount: -refundAmount,
+          amountCents: -refundAmount,
+          type: 'REFUND',
+          category: 'OTHER',
+          status: 'COMPLETED',
+          paymentMethod: transaction.paymentMethod,
+          metadata: {
+            originalTransactionId: transactionId,
+            reason: data.reason,
+            refundedBy: adminId,
+          } as any,
+        },
+      });
+
+      // Update original transaction status
+      await this.prisma.transaction.update({
+        where: { id: transactionId },
+        data: { status: 'REFUNDED' },
+      });
+
+      // Audit log
+      await this.prisma.auditLog.create({
+        data: {
+          userId: adminId,
+          event: 'ADMIN_REFUND_TRANSACTION',
+          resource: 'TRANSACTION',
+          meta: {
+            transactionId,
+            amount: refundAmount / 100,
+            reason: data.reason,
+          },
+        },
+      });
+
+      this.logger.log(`Transaction ${transactionId} refunded by admin ${adminId}`);
+    } catch (e) {
+      if (e instanceof NotFoundException || e instanceof BadRequestException) throw e;
+      this.logger.error(`Error in refundTransaction(): ${(e as Error).message}`);
+      throw new InternalServerErrorException('Error processing refund');
+    }
+  }
+
+  /**
+   * POST /admin/transactions/:id/cancel
+   * Cancel a pending transaction
+   */
+  async cancelTransaction(transactionId: string, data: CancelTransactionDto, adminId: string): Promise<void> {
+    try {
+      const transaction = await this.prisma.transaction.findUnique({ where: { id: transactionId } });
+
+      if (!transaction) {
+        throw new NotFoundException('Transaction not found');
+      }
+
+      if (transaction.status !== 'PENDING') {
+        throw new BadRequestException('Only pending transactions can be cancelled');
+      }
+
+      await this.prisma.transaction.update({
+        where: { id: transactionId },
+        data: {
+          status: 'FAILED',
+          notes: `Cancelled by admin: ${data.reason}`,
+        },
+      });
+
+      // Audit log
+      await this.prisma.auditLog.create({
+        data: {
+          userId: adminId,
+          event: 'ADMIN_CANCEL_TRANSACTION',
+          resource: 'TRANSACTION',
+          meta: {
+            transactionId,
+            reason: data.reason,
+          },
+        },
+      });
+
+      this.logger.log(`Transaction ${transactionId} cancelled by admin ${adminId}`);
+    } catch (e) {
+      if (e instanceof NotFoundException || e instanceof BadRequestException) throw e;
+      this.logger.error(`Error in cancelTransaction(): ${(e as Error).message}`);
+      throw new InternalServerErrorException('Error cancelling transaction');
+    }
+  }
+
+  // ============================================================================
+  // PRIVATE HELPERS
+  // ============================================================================
+
+  private getDateRange(period: string) {
+    const end = new Date();
+    const start = new Date();
+    if (period === '30d') start.setDate(start.getDate() - 30);
+    else if (period === '3m') start.setMonth(start.getMonth() - 3);
+    else if (period === '7d') start.setDate(start.getDate() - 7);
+    return { start, end };
+  }
+}

@@ -1,0 +1,69 @@
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { AdminLevel } from '@prisma/client';
+import { PrismaService } from '../../../common/prisma/prisma.service';
+import { ADMIN_LEVEL_KEY } from '../decorators/admin-level.decorator';
+
+@Injectable()
+export class AdminLevelGuard implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+    private prisma: PrismaService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredLevels = this.reflector.getAllAndOverride<AdminLevel[]>(
+      ADMIN_LEVEL_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!requiredLevels || requiredLevels.length === 0) {
+      return true; // No admin level required
+    }
+
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    if (!user) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    // Fetch admin profile with level
+    const adminProfile = await this.prisma.admin.findUnique({
+      where: { userId: user.id },
+      select: {
+        level: true,
+        permissions: true,
+      },
+    });
+
+    if (!adminProfile) {
+      throw new ForbiddenException(
+        'Access denied: Admin privileges required',
+      );
+    }
+
+    // SUPER_ADMIN has access to everything
+    if (adminProfile.level === 'SUPER_ADMIN') {
+      return true;
+    }
+
+    // Check if user's admin level is in the required levels
+    if (!requiredLevels.includes(adminProfile.level)) {
+      throw new ForbiddenException(
+        `Access denied: Required admin level(s): ${requiredLevels.join(', ')}`,
+      );
+    }
+
+    // Attach admin profile to request for later use
+    request.adminProfile = adminProfile;
+
+    return true;
+  }
+}

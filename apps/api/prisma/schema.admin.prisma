@@ -1,0 +1,620 @@
+// ==========================================
+// OLIVER ADMIN SECTION - SCHEMA EXTENSIONS
+// ==========================================
+// Ce fichier contient tous les modèles additionnels pour la section admin
+// À fusionner avec schema.prisma principal
+
+// ==========================================
+// ADMIN - REPORTS & MODERATION
+// ==========================================
+
+enum ReportType {
+  USER
+  POST
+  MESSAGE
+  PROFILE
+  COPYRIGHT
+  HARASSMENT
+  SPAM
+  ILLEGAL_CONTENT
+  UNDERAGE
+  OTHER
+}
+
+enum ReportSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+  ESCALATED
+}
+
+model Report {
+  id              String         @id @default(cuid())
+  reporterId      String
+  reporter        User           @relation("ReportsCreated", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetType      ReportType
+  targetId        String
+  targetUserId    String?
+  targetUser      User?          @relation("ReportsReceived", fields: [targetUserId], references: [id], onDelete: SetNull)
+  reason          String
+  description     String?        @db.Text
+  severity        ReportSeverity @default(MEDIUM)
+  status          ReportStatus   @default(PENDING)
+  assignedToId    String?
+  assignedTo      User?          @relation("ReportsAssigned", fields: [assignedToId], references: [id], onDelete: SetNull)
+  reviewedById    String?
+  reviewedBy      User?          @relation("ReportsReviewed", fields: [reviewedById], references: [id], onDelete: SetNull)
+  resolution      String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  reviewedAt      DateTime?
+  resolvedAt      DateTime?
+
+  @@index([status, severity])
+  @@index([reporterId])
+  @@index([targetUserId])
+  @@index([assignedToId])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+enum ModerationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REQUIRES_REVIEW
+}
+
+model ModerationDecision {
+  id            String             @id @default(cuid())
+  contentType   String             // POST, MESSAGE, PROFILE
+  contentId     String
+  userId        String
+  user          User               @relation("ContentModerated", fields: [userId], references: [id], onDelete: Cascade)
+  priority      ModerationPriority @default(MEDIUM)
+  status        ModerationStatus   @default(PENDING)
+  aiScore       Json?              // { violence: 0.12, adult: 0.02, hate: 0.56, spam: 0.08 }
+  moderatorId   String?
+  moderator     User?              @relation("ModeratorDecisions", fields: [moderatorId], references: [id], onDelete: SetNull)
+  decision      String?            // APPROVE, REJECT, REQUEST_REVIEW
+  reason        String?            @db.Text
+  createdAt     DateTime           @default(now())
+  reviewedAt    DateTime?
+
+  @@index([status, priority])
+  @@index([userId])
+  @@index([moderatorId])
+  @@index([createdAt])
+  @@map("moderation_decisions")
+}
+
+// ==========================================
+// KYC VERIFICATION
+// ==========================================
+
+enum KycStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  REQUIRES_RESUBMISSION
+}
+
+model KycVerification {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation("UserKyc", fields: [userId], references: [id], onDelete: Cascade)
+  fullName             String
+  dateOfBirth          DateTime
+  nationality          String
+  idNumber             String?
+  expirationDate       DateTime?
+  submissionDate       DateTime  @default(now())
+  kycId                String?   @unique
+  status               KycStatus @default(PENDING)
+  frontIdUrl           String?
+  backIdUrl            String?
+  proofOfAddressUrl    String?
+  aiConfidence         Json?     // { identityMatch: 0.82, liveness: 0.65, documentAuth: 0.95 }
+  reviewedById         String?
+  reviewedBy           User?     @relation("KycReviewed", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt           DateTime?
+  approvedAt           DateTime?
+  rejectedAt           DateTime?
+  rejectionReason      String?   @db.Text
+  requestedCorrections String[]  @default([])
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([status])
+  @@index([userId])
+  @@index([reviewedById])
+  @@map("kyc_verifications")
+}
+
+// ==========================================
+// EXPORT HISTORY
+// ==========================================
+
+enum ExportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ExportFormat {
+  CSV
+  PDF
+  JSON
+  EXCEL
+}
+
+enum ExportType {
+  USERS
+  TRANSACTIONS
+  POSTS
+  REVENUE
+  ACCOUNTING
+  AUDIT_LOG
+  KYC
+  PAYOUTS
+  TAX_FORMS
+  SUPPORT_TICKETS
+  REPORTS
+}
+
+model ExportHistory {
+  id           String       @id @default(cuid())
+  type         ExportType
+  format       ExportFormat
+  status       ExportStatus @default(PENDING)
+  initiatedBy  String
+  initiator    User         @relation("ExportsInitiated", fields: [initiatedBy], references: [id], onDelete: Cascade)
+  filters      Json?
+  fileUrl      String?
+  fileSize     Int?
+  rowCount     Int?
+  errorMessage String?
+  createdAt    DateTime     @default(now())
+  completedAt  DateTime?
+
+  @@index([status])
+  @@index([initiatedBy])
+  @@index([createdAt])
+  @@map("export_history")
+}
+
+// ==========================================
+// ADMIN SETTINGS
+// ==========================================
+
+model AdminSettings {
+  id                String   @id @default(cuid())
+  platformName      String   @default("OLIVER")
+  contactEmail      String
+  enableDarkMode    Boolean  @default(false)
+  autoBackup        Boolean  @default(true)
+  showTooltips      Boolean  @default(true)
+  passwordMinLength Int      @default(12)
+  require2FA        Boolean  @default(false)
+  allowedIPs        String[] @default([])
+  apiKey            String?  @unique
+  updatedAt         DateTime @updatedAt
+  updatedById       String?
+  updatedBy         User?    @relation("SettingsUpdated", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("admin_settings")
+}
+
+// ==========================================
+// PHASE 2: TAX FORMS
+// ==========================================
+
+enum TaxFormType {
+  W9
+  W8BEN
+  W8BENE
+  OTHER
+}
+
+enum TaxFormStatus {
+  NOT_REQUIRED
+  REQUIRED
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model TaxForm {
+  id               String        @id @default(cuid())
+  creatorId        String        @unique
+  creator          User          @relation("CreatorTaxForm", fields: [creatorId], references: [id], onDelete: Cascade)
+  country          String
+  formType         TaxFormType
+  ytdEarnings      Int           @default(0) // cents
+  status           TaxFormStatus @default(NOT_REQUIRED)
+  documentUrl      String?
+  documentKey      String?
+  tin              String?       // encrypted
+  submittedAt      DateTime?
+  reviewedById     String?
+  reviewedBy       User?         @relation("TaxFormsReviewed", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt       DateTime?
+  approvedAt       DateTime?
+  rejectedAt       DateTime?
+  rejectionReason  String?       @db.Text
+  corrections      String[]      @default([])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status])
+  @@index([country, status])
+  @@index([reviewedById])
+  @@map("tax_forms")
+}
+
+// ==========================================
+// PHASE 2: SUPPORT TICKETS
+// ==========================================
+
+enum TicketCategory {
+  ACCOUNT
+  PAYMENT
+  TECHNICAL
+  CONTENT
+  VERIFICATION
+  LEGAL
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatusEnum {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  RESOLVED
+  CLOSED
+}
+
+model Ticket {
+  id                  String            @id @default(cuid())
+  ticketNumber        String            @unique
+  userId              String
+  user                User              @relation("UserTickets", fields: [userId], references: [id], onDelete: Cascade)
+  subject             String
+  category            TicketCategory
+  priority            TicketPriority    @default(MEDIUM)
+  status              TicketStatusEnum  @default(OPEN)
+  source              String            @default("in-app")
+  assignedToId        String?
+  assignedTo          User?             @relation("TicketsAssigned", fields: [assignedToId], references: [id], onDelete: SetNull)
+  slaDeadline         DateTime?
+  tags                String[]          @default([])
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  closedAt            DateTime?
+  closedById          String?
+  closedBy            User?             @relation("TicketsClosed", fields: [closedById], references: [id], onDelete: SetNull)
+  resolution          String?           @db.Text
+  satisfactionScore   Int?
+  satisfactionComment String?           @db.Text
+  messages            TicketMessage[]
+
+  @@index([status, priority])
+  @@index([assignedToId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id          String   @id @default(cuid())
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User     @relation("TicketMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  content     String   @db.Text
+  isInternal  Boolean  @default(false)
+  attachments String[] @default([])
+  createdAt   DateTime @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_messages")
+}
+
+model CannedResponse {
+  id         String         @id @default(cuid())
+  title      String
+  content    String         @db.Text
+  category   TicketCategory
+  variables  String[]       @default([])
+  usageCount Int            @default(0)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@index([category])
+  @@map("canned_responses")
+}
+
+// ==========================================
+// PHASE 2: LEGAL & DMCA
+// ==========================================
+
+enum DmcaStatus {
+  RECEIVED
+  UNDER_REVIEW
+  TAKEDOWN
+  COUNTER_NOTICE_PERIOD
+  RESTORED
+  RESOLVED
+}
+
+model DmcaRequest {
+  id                  String     @id @default(cuid())
+  copyrightHolder     String
+  contactEmail        String
+  contactAddress      String
+  workDescription     String     @db.Text
+  infringingUrl       String
+  goodFaithStatement  Boolean
+  accuracyStatement   Boolean
+  signature           String
+  signatureDate       DateTime
+  status              DmcaStatus @default(RECEIVED)
+  contentId           String?
+  contentType         String?
+  contentDisabledAt   DateTime?
+  counterNotice       Boolean    @default(false)
+  counterNoticeAt     DateTime?
+  counterNoticeBy     String?
+  counterNoticeReason String?    @db.Text
+  restoredAt          DateTime?
+  notes               String?    @db.Text
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@index([status])
+  @@index([contentId])
+  @@index([createdAt])
+  @@map("dmca_requests")
+}
+
+model LegalHold {
+  id            String    @id @default(cuid())
+  caseNumber    String    @unique
+  jurisdiction  String
+  reason        String    @db.Text
+  userId        String
+  user          User      @relation("LegalHolds", fields: [userId], references: [id], onDelete: Cascade)
+  dataTypes     String[]
+  dataSnapshot  Json?
+  createdAt     DateTime  @default(now())
+  createdById   String
+  createdBy     User      @relation("LegalHoldsCreated", fields: [createdById], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  extendedUntil DateTime?
+  releasedAt    DateTime?
+  releasedById  String?
+  releasedBy    User?     @relation("LegalHoldsReleased", fields: [releasedById], references: [id], onDelete: SetNull)
+  releaseReason String?   @db.Text
+  exportUrl     String?
+  notes         String?   @db.Text
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([createdById])
+  @@map("legal_holds")
+}
+
+enum SubpoenaStatus {
+  RECEIVED
+  UNDER_REVIEW
+  DATA_COLLECTED
+  RESPONSE_SENT
+  COMPLETED
+}
+
+model Subpoena {
+  id              String         @id @default(cuid())
+  caseNumber      String         @unique
+  authority       String
+  jurisdiction    String
+  documentUrl     String
+  userIds         String[]
+  dataScope       String[]
+  deadline        DateTime
+  status          SubpoenaStatus @default(RECEIVED)
+  assignedToId    String?
+  assignedTo      User?          @relation("SubpoenasAssigned", fields: [assignedToId], references: [id], onDelete: SetNull)
+  dataCollectedAt DateTime?
+  collectionId    String?
+  responseUrl     String?
+  sentAt          DateTime?
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+
+  @@index([status, deadline])
+  @@index([assignedToId])
+  @@map("subpoenas")
+}
+
+// ==========================================
+// PHASE 3: CHARGEBACKS
+// ==========================================
+
+enum ChargebackReason {
+  FRAUDULENT
+  UNRECOGNIZED
+  DUPLICATE
+  NOT_RECEIVED
+  CANCELED
+  NOT_AS_DESCRIBED
+  OTHER
+}
+
+enum ChargebackStatus {
+  PENDING
+  EVIDENCE_REQUIRED
+  SUBMITTED
+  UNDER_REVIEW
+  WON
+  LOST
+}
+
+model Chargeback {
+  id             String           @id @default(cuid())
+  transactionId  String
+  userId         String
+  user           User             @relation("UserChargebacks", fields: [userId], references: [id], onDelete: Cascade)
+  amount         Int              // cents
+  currency       Currency         @default(EUR)
+  reason         ChargebackReason
+  reasonCode     String?
+  status         ChargebackStatus @default(PENDING)
+  receivedAt     DateTime         @default(now())
+  dueDate        DateTime
+  evidenceUrl    String?
+  additionalDocs String[]         @default([])
+  submittedAt    DateTime?
+  outcome        String?
+  outcomeFee     Int?
+  resolvedAt     DateTime?
+  notes          String?          @db.Text
+
+  @@index([status, dueDate])
+  @@index([userId])
+  @@index([transactionId])
+  @@map("chargebacks")
+}
+
+// ==========================================
+// PHASE 3: SYSTEM MONITORING
+// ==========================================
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+model SystemAlert {
+  id               String        @id @default(cuid())
+  type             String
+  severity         AlertSeverity
+  message          String
+  metadata         Json
+  status           AlertStatus   @default(ACTIVE)
+  triggeredAt      DateTime      @default(now())
+  acknowledgedAt   DateTime?
+  acknowledgedById String?
+  acknowledgedBy   User?         @relation("AlertsAcknowledged", fields: [acknowledgedById], references: [id], onDelete: SetNull)
+  resolvedAt       DateTime?
+  resolvedById     String?
+  resolvedBy       User?         @relation("AlertsResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, triggeredAt])
+  @@index([severity, status])
+  @@map("system_alerts")
+}
+
+enum DataRequestType {
+  EXPORT
+  DELETE
+  RECTIFY
+}
+
+enum DataRequestStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model DataRequest {
+  id          String            @id @default(cuid())
+  userId      String
+  user        User              @relation("DataRequests", fields: [userId], references: [id], onDelete: Cascade)
+  type        DataRequestType
+  status      DataRequestStatus @default(PENDING)
+  requestedAt DateTime          @default(now())
+  dueDate     DateTime
+  processedAt DateTime?
+  completedAt DateTime?
+  downloadUrl String?
+  deletedAt   DateTime?
+  notes       String?           @db.Text
+
+  @@index([userId])
+  @@index([status, dueDate])
+  @@map("data_requests")
+}
+
+// ==========================================
+// USER MODEL EXTENSIONS
+// ==========================================
+// Add these relations to the existing User model:
+/*
+model User {
+  // ... existing fields ...
+
+  // Admin relations
+  reportsCreated       Report[]             @relation("ReportsCreated")
+  reportsReceived      Report[]             @relation("ReportsReceived")
+  reportsAssigned      Report[]             @relation("ReportsAssigned")
+  reportsReviewed      Report[]             @relation("ReportsReviewed")
+  contentModerated     ModerationDecision[] @relation("ContentModerated")
+  moderatorDecisions   ModerationDecision[] @relation("ModeratorDecisions")
+  userKyc              KycVerification?     @relation("UserKyc")
+  kycReviewed          KycVerification[]    @relation("KycReviewed")
+  exportsInitiated     ExportHistory[]      @relation("ExportsInitiated")
+  settingsUpdated      AdminSettings[]      @relation("SettingsUpdated")
+
+  // Phase 2 relations
+  creatorTaxForm       TaxForm?             @relation("CreatorTaxForm")
+  taxFormsReviewed     TaxForm[]            @relation("TaxFormsReviewed")
+  userTickets          Ticket[]             @relation("UserTickets")
+  ticketsAssigned      Ticket[]             @relation("TicketsAssigned")
+  ticketsClosed        Ticket[]             @relation("TicketsClosed")
+  ticketMessages       TicketMessage[]      @relation("TicketMessages")
+  legalHolds           LegalHold[]          @relation("LegalHolds")
+  legalHoldsCreated    LegalHold[]          @relation("LegalHoldsCreated")
+  legalHoldsReleased   LegalHold[]          @relation("LegalHoldsReleased")
+  subpoenasAssigned    Subpoena[]           @relation("SubpoenasAssigned")
+
+  // Phase 3 relations
+  userChargebacks      Chargeback[]         @relation("UserChargebacks")
+  alertsAcknowledged   SystemAlert[]        @relation("AlertsAcknowledged")
+  alertsResolved       SystemAlert[]        @relation("AlertsResolved")
+  dataRequests         DataRequest[]        @relation("DataRequests")
+}
+*/

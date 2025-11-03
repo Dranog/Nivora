@@ -1,0 +1,1382 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CreatorWallet {
+  id           String   @id
+  creatorId    String   @unique
+  currency     Currency @default(EUR)
+  available    Int      @default(0)
+  inReserve    Int      @default(0)
+  pendingClear Int      @default(0)
+  cryptoAddr   String?
+  updatedAt    DateTime
+  user         User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@map("creator_wallets")
+}
+
+model FanEmail {
+  id               String    @id
+  creatorId        String
+  email            String
+  source           String?
+  optIn            Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  confirmToken     String?
+  confirmedAt      DateTime?
+  consentIp        String?
+  consentTimestamp DateTime  @default(now())
+  unsubscribedAt   DateTime?
+  updatedAt        DateTime
+  user             User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, email])
+  @@index([creatorId, optIn])
+  @@map("fan_emails")
+}
+
+model LedgerEntry {
+  id                                 String    @id
+  creatorId                          String?
+  userId                             String?
+  kind                               TxKind
+  side                               TxSide
+  amount                             Int
+  currency                           Currency  @default(EUR)
+  status                             TxStatus  @default(PENDING)
+  reservePct                         Int?
+  clearsAt                           DateTime?
+  referenceId                        String?
+  meta                               Json?
+  createdAt                          DateTime  @default(now())
+  updatedAt                          DateTime
+  users_LedgerEntry_creatorIdTousers User?     @relation("LedgerEntry_creatorIdTousers", fields: [creatorId], references: [id])
+  users_LedgerEntry_userIdTousers    User?     @relation("LedgerEntry_userIdTousers", fields: [userId], references: [id])
+
+  @@index([clearsAt])
+  @@index([creatorId, status])
+  @@index([kind])
+  @@map("ledger_entries")
+}
+
+model Media {
+  id          String       @id
+  ownerId     String
+  postId      String?
+  objectKey   String       @unique
+  contentType String
+  bytes       Int
+  hash        String?
+  status      MediaStatus  @default(PROCESSING)
+  watermarked Boolean      @default(false)
+  purpose     MediaPurpose
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime
+  user        User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  post        Post?        @relation(fields: [postId], references: [id])
+
+  @@index([ownerId])
+  @@index([postId])
+  @@index([status])
+  @@map("media")
+}
+
+model Payout {
+  id                    String       @id
+  creatorId             String
+  currency              Currency     @default(EUR)
+  amountRequested       Int
+  amountGross           Int
+  mode                  PayoutMode
+  feeAmount             Int          @default(0)
+  reserveImpact         Int          @default(0)
+  amountNet             Int
+  status                PayoutStatus @default(PENDING)
+  availableAt           DateTime
+  holdReason            String?
+  providerRef           String?
+  cryptoTxHash          String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime
+  amount                Int?
+  completedAt           DateTime?
+  estimatedCompletionAt DateTime?
+  failureReason         String?
+  fee                   Int?
+  requestedAt           DateTime?
+  user                  User         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([availableAt])
+  @@index([creatorId, status])
+  @@map("payout")
+}
+
+model Post {
+  id             String      @id
+  creatorId      String
+  caption        String?
+  isPaid         Boolean     @default(false)
+  price          Int?
+  status         PostStatus  @default(DRAFT)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime
+  isPPV          Boolean     @default(false)
+  boostExpiresAt DateTime?
+  categoryId     String?
+  isBoosted      Boolean     @default(false)
+  media          Media[]
+  category       Category?   @relation(fields: [categoryId], references: [id])
+  user           User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  purchases      Purchase[]
+  reactions      Reaction[]
+
+  @@index([categoryId])
+  @@index([creatorId, createdAt(sort: Desc)])
+  @@index([isBoosted, boostExpiresAt])
+  @@index([status])
+  @@map("post")
+}
+
+model Purchase {
+  id                    String   @id
+  fanId                 String
+  postId                String
+  amount                Int
+  currency              Currency @default(EUR)
+  status                String   @default("PAID")
+  createdAt             DateTime @default(now())
+  stripePaymentIntentId String?
+  user                  User     @relation(fields: [fanId], references: [id], onDelete: Cascade)
+  post                  Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([fanId, postId])
+  @@index([fanId])
+  @@index([postId])
+  @@map("purchases")
+}
+
+model Reaction {
+  id        String       @id
+  userId    String
+  postId    String
+  type      ReactionType
+  createdAt DateTime     @default(now())
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId, type])
+  @@index([postId])
+  @@map("reactions")
+}
+
+model StripeEvent {
+  id            String    @id
+  stripeEventId String    @unique
+  type          String
+  data          Json
+  processed     Boolean   @default(false)
+  processedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([processed])
+  @@index([stripeEventId])
+  @@index([type])
+  @@map("stripe_events")
+}
+
+model Subscription {
+  id                                  String             @id
+  fanId                               String
+  creatorId                           String
+  planId                              String?
+  status                              SubscriptionStatus @default(ACTIVE)
+  startedAt                           DateTime           @default(now())
+  expiresAt                           DateTime
+  autoRenew                           Boolean            @default(true)
+  canceledAt                          DateTime?
+  createdAt                           DateTime           @default(now())
+  updatedAt                           DateTime
+  stripePaymentIntentId               String?
+  users_Subscription_creatorIdTousers User               @relation("Subscription_creatorIdTousers", fields: [creatorId], references: [id], onDelete: Cascade)
+  users_Subscription_fanIdTousers     User               @relation("Subscription_fanIdTousers", fields: [fanId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@index([expiresAt])
+  @@index([fanId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Ticket {
+  id         String       @id
+  userId     String
+  subject    String
+  message    String
+  status     TicketStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  assignedTo String?
+  priority   String       @default("MEDIUM")
+  resolution String?
+  resolvedAt DateTime?
+  resolvedBy String?
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, priority])
+  @@index([userId, status])
+  @@map("tickets")
+}
+
+model Tip {
+  id                         String   @id
+  fanId                      String
+  creatorId                  String
+  amount                     Int
+  currency                   Currency @default(EUR)
+  message                    String?
+  createdAt                  DateTime @default(now())
+  status                     String   @default("PAID")
+  stripePaymentIntentId      String?
+  users_Tip_creatorIdTousers User     @relation("Tip_creatorIdTousers", fields: [creatorId], references: [id], onDelete: Cascade)
+  users_Tip_fanIdTousers     User     @relation("Tip_fanIdTousers", fields: [fanId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([creatorId])
+  @@index([fanId])
+  @@map("tips")
+}
+
+model AuditLog {
+  id        String   @id
+  userId    String?
+  event     String
+  resource  String?
+  meta      Json?
+  ipHash    String?
+  ua        String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([event])
+  @@index([userId])
+  @@map("audit_logs")
+}
+
+model Boost {
+  id            String        @id
+  userId        String
+  listingId     String
+  duration      Int
+  amount        Int
+  currency      Currency      @default(EUR)
+  expiresAt     DateTime
+  createdAt     DateTime      @default(now())
+  marketListing MarketListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([listingId])
+  @@index([userId])
+  @@map("boosts")
+}
+
+model Category {
+  id             String          @id
+  name           String          @unique
+  slug           String          @unique
+  description    String?
+  icon           String?
+  orderIndex     Int             @default(0)
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  posts          Post[]
+  marketListings MarketListing[]
+
+  @@index([isActive, orderIndex])
+  @@index([slug])
+  @@map("categories")
+}
+
+model Content {
+  id          String            @id @default(dbgenerated("(gen_random_uuid())::text"))
+  contentType ContentType
+  postId      String?           @unique
+  videoId     String?           @unique
+  title       String?
+  description String?
+  status      ModerationStatus? @default(PENDING)
+  views       Int?              @default(0)
+  likes       Int?              @default(0)
+  comments    Int?              @default(0)
+  revenue     Int?              @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime?         @default(now())
+  updatedAt   DateTime?         @default(now())
+  post        Posts?            @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  video       Video?            @relation(fields: [videoId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([contentType])
+  @@index([createdAt(sort: Desc)])
+  @@index([publishedAt(sort: Desc)])
+  @@index([status])
+  @@map("content")
+}
+
+model Conversation {
+  id                                 String    @id
+  user1Id                            String
+  user2Id                            String
+  lastMsgAt                          DateTime  @default(now())
+  createdAt                          DateTime  @default(now())
+  updatedAt                          DateTime
+  users_conversations_user1IdTousers User      @relation("conversations_user1IdTousers", fields: [user1Id], references: [id], onDelete: Cascade)
+  users_conversations_user2IdTousers User      @relation("conversations_user2IdTousers", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages                           Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id, lastMsgAt(sort: Desc)])
+  @@index([user2Id, lastMsgAt(sort: Desc)])
+  @@map("conversations")
+}
+
+model CreatorProfile {
+  id              String    @id
+  userId          String    @unique
+  username        String    @unique
+  bio             String?
+  avatar          String?
+  kycLevel        KycLevel  @default(NONE)
+  createdAt       DateTime  @default(now())
+  displayName     String?
+  coverImage      String?
+  stripeAccountId String?   @unique
+  stripeOnboarded Boolean?  @default(false)
+  updatedAt       DateTime? @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeAccountId])
+  @@index([username])
+  @@map("creator_profiles")
+}
+
+model EcritureComptable {
+  id             String            @id
+  numeroEcriture String            @unique
+  journal        JournalComptable  @default(BANQUE)
+  dateEcriture   DateTime
+  dateComptable  DateTime
+  libelle        String
+  reference      String?
+  transactionId  String?
+  validated      Boolean           @default(false)
+  validatedBy    String?
+  validatedAt    DateTime?
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime
+  lignesEcriture LigneEcriture[]
+
+  @@index([dateComptable(sort: Desc)])
+  @@index([dateEcriture(sort: Desc)])
+  @@index([journal])
+  @@index([transactionId])
+  @@index([validated])
+  @@map("ecritures_comptables")
+}
+
+model Immobilisation {
+  id                    String               @id
+  nature                NatureImmobilisation
+  libelle               String
+  dateAcquisition       DateTime
+  valeurAcquisition     Int
+  comptePCG             String
+  compteAmortissement   String
+  dureeAmortissement    Int
+  methode               MethodeAmortissement @default(LINEAIRE)
+  tauxAmortissement     Float
+  amortissementsCumules Int                  @default(0)
+  vnc                   Int
+  dateCession           DateTime?
+  valeurCession         Int?
+  statut                StatutImmobilisation @default(EN_COURS)
+  notes                 String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime
+
+  @@index([dateAcquisition(sort: Desc)])
+  @@index([nature])
+  @@index([statut])
+  @@map("immobilisations")
+}
+
+model IpWhitelist {
+  id          String    @id
+  ipAddress   String    @unique
+  description String?
+  adminId     String
+  enabled     Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  user        User      @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([enabled])
+  @@index([expiresAt])
+  @@map("ip_whitelist")
+}
+
+model KycVerification {
+  id                                          String      @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId                                      String      @unique
+  provider                                    KycProvider
+  externalId                                  String?
+  status                                      KycStatus
+  level                                       KycLevel?   @default(NONE)
+  documents                                   Json?       @default("{}")
+  documentKeys                                Json?       @default("{}")
+  personalData                                Json?       @default("{}")
+  piiEncrypted                                Boolean?    @default(true)
+  aiScores                                    Json?       @default("{}")
+  riskScore                                   Int?
+  selfieMatchScore                            Int?
+  livenessResult                              String?
+  country                                     String?
+  dateOfBirth                                 DateTime?
+  reviewedById                                String?
+  reviewedAt                                  DateTime?
+  approvedAt                                  DateTime?
+  rejectedAt                                  DateTime?
+  rejectionReason                             String?
+  expiresAt                                   DateTime
+  recheckAt                                   DateTime?
+  webhookEvents                               Json?       @default("[]")
+  createdAt                                   DateTime?   @default(now())
+  updatedAt                                   DateTime?   @default(now())
+  users_kyc_verifications_reviewedByIdTousers User?       @relation("kyc_verifications_reviewedByIdTousers", fields: [reviewedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_kyc_verifications_userIdTousers       User        @relation("kyc_verifications_userIdTousers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status])
+  @@index([userId])
+  @@map("kyc_verifications")
+}
+
+model Lettrage {
+  id                    String                @id
+  code                  String                @unique
+  type                  LettrageType          @default(AUTO)
+  statut                LettrageStatut        @default(LETTRE)
+  montantTotal          Int
+  dateLettrage          DateTime              @default(now())
+  createdBy             String?
+  notes                 String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime
+  transactionLettrages  TransactionLettrage[]
+
+  @@index([code])
+  @@index([dateLettrage(sort: Desc)])
+  @@index([statut])
+  @@index([type])
+  @@map("lettrages")
+}
+
+model LigneEcriture {
+  id               String            @id
+  ecritureId       String
+  comptePCG        String
+  libelleCompte    String
+  debit            Int               @default(0)
+  credit           Int               @default(0)
+  lettrage         String?
+  analytique       String?
+  createdAt        DateTime          @default(now())
+  ecritureComptable EcritureComptable @relation(fields: [ecritureId], references: [id], onDelete: Cascade)
+
+  @@index([comptePCG])
+  @@index([ecritureId])
+  @@index([lettrage])
+  @@map("lignes_ecriture")
+}
+
+model MarketListing {
+  id          String        @id
+  creatorId   String
+  categoryId  String?
+  title       String
+  description String
+  price       Int
+  currency    Currency      @default(EUR)
+  mediaUrls   String[]
+  status      ListingStatus @default(DRAFT)
+  viewCount   Int           @default(0)
+  isBoosted   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime
+  boosts      Boost[]
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  user        User          @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  requests    Request[]
+
+  @@index([categoryId])
+  @@index([creatorId])
+  @@index([isBoosted])
+  @@index([status])
+  @@map("market_listings")
+}
+
+model Message {
+  id           String       @id
+  conversationId String
+  senderId     String
+  content      String?
+  isRead       Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  mediaUrl     String?
+  priceCents   Int?
+  type         MessageType  @default(TEXT)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([conversationId, senderId, isRead])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model ParametreComptable {
+  id                   String   @id
+  exerciceEnCours      Int
+  dateDebutExercice    DateTime
+  dateFinExercice      DateTime
+  numeroEcritureActuel Int      @default(1)
+  numeroJournalActuel  Int      @default(1)
+  compteBanque         String   @default("512000")
+  compteClientCreateur String   @default("411000")
+  compteFournisseur    String   @default("401000")
+  compteCA             String   @default("706000")
+  compteTVACollectee   String   @default("445710")
+  compteTVADeductible  String   @default("445660")
+  compteCharges        String   @default("628000")
+  compteCommission     String   @default("628500")
+  tauxTVA              Float    @default(20.0)
+  tauxCommission       Float    @default(20.0)
+  updatedAt            DateTime
+  updatedBy            String?
+
+  @@map("parametres_comptables")
+}
+
+model Payment {
+  id                    String         @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId                String
+  amount                Int            @default(0)
+  currency              Currency?      @default(EUR)
+  type                  PaymentType
+  status                PaymentStatus? @default(PENDING)
+  paymentMethod         String?
+  stripePaymentIntentId String?        @unique
+  stripeChargeId        String?
+  processingFee         Int?
+  platformFee           Int?
+  netAmount             Int?
+  metadata              Json?          @default("{}")
+  description           String?
+  paidAt                DateTime?
+  createdAt             DateTime?      @default(now())
+  updatedAt             DateTime?      @default(now())
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status])
+  @@index([userId])
+  @@map("payments")
+}
+
+model Payouts {
+  id                                String         @id @default(dbgenerated("(gen_random_uuid())::text"))
+  creatorId                         String
+  amount                            Int
+  currency                          Currency?      @default(EUR)
+  fee                               Int?
+  feeAmount                         Int?
+  status                            PayoutStatus?  @default(PENDING)
+  method                            PayoutMethod
+  bankDetails                       Json?
+  paypalEmail                       String?
+  cryptoAddress                     String?
+  requestedAt                       DateTime?      @default(now())
+  approvedAt                        DateTime?
+  approvedById                      String?
+  rejectedAt                        DateTime?
+  rejectionReason                   String?
+  processedAt                       DateTime?
+  completedAt                       DateTime?
+  failedAt                          DateTime?
+  failureReason                     String?
+  estimatedCompletionAt             DateTime?
+  retryCount                        Int?           @default(0)
+  maxRetries                        Int?           @default(3)
+  nextRetryAt                       DateTime?
+  externalId                        String?
+  stripeTransferId                  String?
+  taxFormStatus                     TaxFormStatus? @default(NOT_REQUIRED)
+  notes                             String?
+  metadata                          Json?          @default("{}")
+  createdAt                         DateTime?      @default(now())
+  updatedAt                         DateTime?      @default(now())
+  users_payouts_approvedByIdTousers User?          @relation("payouts_approvedByIdTousers", fields: [approvedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_payouts_creatorIdTousers    User           @relation("payouts_creatorIdTousers", fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([creatorId])
+  @@index([status])
+  @@map("payouts")
+}
+
+model Posts {
+  id              String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  authorId        String
+  title           String?
+  content         String?
+  visibility      String?   @default("PUBLIC")
+  isPaid          Boolean?  @default(false)
+  price           Int?
+  status          String?   @default("PUBLISHED")
+  views           Int?      @default(0)
+  likes           Int?      @default(0)
+  createdAt       DateTime? @default(now())
+  updatedAt       DateTime? @default(now())
+  contentRelation Content?
+  user            User      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([authorId])
+  @@map("posts")
+}
+
+model RateLimit {
+  id           String   @id
+  identifier   String
+  endpoint     String
+  windowStart  DateTime
+  requestCount Int      @default(1)
+  blocked      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+
+  @@unique([identifier, endpoint, windowStart])
+  @@index([identifier, endpoint])
+  @@index([windowStart])
+  @@map("rate_limits")
+}
+
+model Report {
+  id           String          @id @default(dbgenerated("(gen_random_uuid())::text"))
+  reporterId   String
+  targetType   String
+  targetId     String
+  reason       String
+  description  String?
+  status       ReportStatus?   @default(PENDING)
+  priority     ReportPriority? @default(MEDIUM)
+  assignedToId String?
+  resolution   String?
+  resolvedAt   DateTime?
+  createdAt    DateTime?       @default(now())
+  updatedAt    DateTime?       @default(now())
+  user         User            @relation(fields: [reporterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([reporterId])
+  @@index([status])
+  @@map("reports")
+}
+
+model Request {
+  id                              String          @id
+  fanId                           String
+  creatorId                       String?
+  listingId                       String?
+  title                           String
+  description                     String
+  budget                          Int?
+  currency                        Currency        @default(EUR)
+  status                          RequestStatus   @default(OPEN)
+  response                        String?
+  createdAt                       DateTime        @default(now())
+  updatedAt                       DateTime
+  users_requests_creatorIdTousers User?           @relation("requests_creatorIdTousers", fields: [creatorId], references: [id])
+  users_requests_fanIdTousers     User            @relation("requests_fanIdTousers", fields: [fanId], references: [id], onDelete: Cascade)
+  marketListing                   MarketListing?  @relation(fields: [listingId], references: [id])
+
+  @@index([creatorId])
+  @@index([fanId])
+  @@index([listingId])
+  @@index([status])
+  @@map("requests")
+}
+
+model SessionLog {
+  id            String   @id
+  userId        String
+  sessionId     String
+  ipAddress     String
+  userAgent     String?
+  country       String?
+  city          String?
+  deviceType    String?
+  action        String
+  success       Boolean  @default(true)
+  failureReason String?
+  metadata      Json?    @default("{}")
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([action, createdAt(sort: Desc)])
+  @@index([ipAddress])
+  @@index([sessionId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("session_logs")
+}
+
+model Session {
+  id           String    @id
+  userId       String
+  jti          String    @unique
+  ua           String?
+  ipHash       String?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  token        String?   @unique
+  refreshToken String?   @unique
+  ipAddress    String?
+  userAgent    String?
+  device       String?
+  lastActiveAt DateTime? @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([jti])
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+model TransactionLettrage {
+  id            String   @id
+  transactionId String
+  lettrageId    String
+  createdAt     DateTime @default(now())
+  lettrage      Lettrage @relation(fields: [lettrageId], references: [id], onDelete: Cascade)
+
+  @@unique([transactionId, lettrageId])
+  @@index([lettrageId])
+  @@index([transactionId])
+  @@map("transaction_lettrages")
+}
+
+model User {
+  id                                                      String             @id
+  email                                                   String             @unique
+  passwordHash                                            String
+  role                                                    Role               @default(FAN)
+  createdAt                                               DateTime           @default(now())
+  updatedAt                                               DateTime
+  kycLevel                                                KycLevel           @default(NONE)
+  failedLoginAttempts                                     Int                @default(0)
+  lockedUntil                                             DateTime?
+  status                                                  UserStatus         @default(ACTIVE)
+  username                                                String             @unique
+  displayName                                             String?
+  bio                                                     String?
+  avatar                                                  String?
+  coverImage                                              String?
+  location                                                String?
+  website                                                 String?
+  socialLinks                                             Json?              @default("{}")
+  lastActivityAt                                          DateTime?
+  metadata                                                Json?              @default("{}")
+  preferences                                             Json?              @default("{}")
+  permissions                                             Json?              @default("[]")
+  emailVerified                                           Boolean?           @default(false)
+  verified                                                Boolean?           @default(false)
+  emailVerifiedAt                                         DateTime?
+  ageVerified                                             Boolean?           @default(false)
+  kycStatus                                               String?            @default("NOT_STARTED")
+  lastLoginAt                                             DateTime?
+  lastLoginIp                                             String?
+  twoFactorEnabled                                        Boolean?           @default(false)
+  twoFactorSecret                                         String?
+  suspended                                               Boolean?           @default(false)
+  suspendedUntil                                          DateTime?
+  suspensionReason                                        String?
+  suspendedAt                                             DateTime?
+  suspendedById                                           String?
+  bannedReason                                            String?
+  stripeCustomerId                                        String?            @unique
+  stripeAccountId                                         String?            @unique
+  deletedAt                                               DateTime?
+  creatorWallet                                           CreatorWallet?
+  fanEmails                                               FanEmail[]
+  LedgerEntry_LedgerEntry_creatorIdTousers                LedgerEntry[]      @relation("LedgerEntry_creatorIdTousers")
+  LedgerEntry_LedgerEntry_userIdTousers                   LedgerEntry[]      @relation("LedgerEntry_userIdTousers")
+  media                                                   Media[]
+  payouts                                                 Payout[]
+  postsCreated                                            Post[]
+  purchases                                               Purchase[]
+  reactions                                               Reaction[]
+  Subscription_Subscription_creatorIdTousers              Subscription[]     @relation("Subscription_creatorIdTousers")
+  Subscription_Subscription_fanIdTousers                  Subscription[]     @relation("Subscription_fanIdTousers")
+  tickets                                                 Ticket[]
+  Tip_Tip_creatorIdTousers                                Tip[]              @relation("Tip_creatorIdTousers")
+  Tip_Tip_fanIdTousers                                    Tip[]              @relation("Tip_fanIdTousers")
+  auditLogs                                               AuditLog[]
+  boosts                                                  Boost[]
+  conversations_conversations_user1IdTousers              Conversation[]     @relation("conversations_user1IdTousers")
+  conversations_conversations_user2IdTousers              Conversation[]     @relation("conversations_user2IdTousers")
+  creatorProfile                                          CreatorProfile?
+  ipWhitelists                                            IpWhitelist[]
+  kyc_verifications_kyc_verifications_reviewedByIdTousers KycVerification[]  @relation("kyc_verifications_reviewedByIdTousers")
+  kyc_verifications_kyc_verifications_userIdTousers       KycVerification?   @relation("kyc_verifications_userIdTousers")
+  marketListings                                          MarketListing[]
+  messages                                                Message[]
+  payments                                                Payment[]
+  payouts_payouts_approvedByIdTousers                     Payouts[]          @relation("payouts_approvedByIdTousers")
+  payouts_payouts_creatorIdTousers                        Payouts[]          @relation("payouts_creatorIdTousers")
+  posts                                                   Posts[]
+  reports                                                 Report[]
+  requests_requests_creatorIdTousers                      Request[]          @relation("requests_creatorIdTousers")
+  requests_requests_fanIdTousers                          Request[]          @relation("requests_fanIdTousers")
+  sessionLogs                                             SessionLog[]
+  sessions                                                Session[]
+  videos                                                  Video[]
+
+  @@index([email])
+  @@index([status])
+  @@map("users")
+}
+
+model Video {
+  id          String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  userId      String
+  title       String
+  description String?
+  duration    Int?
+  thumbnail   String?
+  url         String?
+  storageKey  String?
+  status      String?   @default("PROCESSING")
+  visibility  String?   @default("PUBLIC")
+  views       Int?      @default(0)
+  likes       Int?      @default(0)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @default(now())
+  content     Content?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId])
+  @@map("videos")
+}
+
+enum AdminLevel {
+  SUPER_ADMIN
+  ADMIN_FULL
+  ADMIN_FINANCE
+  ADMIN_MODERATION
+  ADMIN_SUPPORT
+  ADMIN_CUSTOM
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum BoostStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELED
+  REJECTED
+}
+
+enum BoostTargetType {
+  POST
+  VIDEO
+  PROFILE
+  PRODUCT
+}
+
+enum ChargebackReason {
+  FRAUDULENT
+  UNRECOGNIZED
+  DUPLICATE
+  NOT_RECEIVED
+  CANCELED
+  NOT_AS_DESCRIBED
+  OTHER
+}
+
+enum ChargebackStatus {
+  PENDING
+  EVIDENCE_REQUIRED
+  SUBMITTED
+  UNDER_REVIEW
+  WON
+  LOST
+}
+
+enum ContentType {
+  POST
+  VIDEO
+  STORY
+  LIVE
+  MESSAGE
+  PRODUCT
+}
+
+enum Currency {
+  EUR
+  USD
+  GBP
+  USDC
+  USDT
+}
+
+enum DataRequestStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+  CANCELED
+}
+
+enum DataRequestType {
+  EXPORT
+  DELETION
+  RECTIFICATION
+  RESTRICTION
+  OBJECTION
+  PORTABILITY
+}
+
+enum DmcaStatus {
+  RECEIVED
+  UNDER_REVIEW
+  TAKEDOWN
+  COUNTER_NOTICE_PERIOD
+  RESTORED
+  RESOLVED
+}
+
+enum ExportFormat {
+  CSV
+  PDF
+  XLSX
+  JSON
+}
+
+enum ExportStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+  EXPIRED
+  CANCELED
+}
+
+enum ExportType {
+  ACCOUNTING
+  TRANSACTIONS
+  USERS
+  AUDIT_LOG
+  PAYMENTS
+  PAYOUTS
+  REPORTS
+  ANALYTICS
+}
+
+enum JournalComptable {
+  BANQUE
+  CAISSE
+  VENTES
+  ACHATS
+  OD
+  AN
+}
+
+enum KycLevel {
+  NONE
+  BASIC
+  ENHANCED
+}
+
+enum KycProvider {
+  YOTI
+  JUMIO
+  STRIPE_IDENTITY
+  VERIFF
+  ONFIDO
+  OTHER
+}
+
+enum KycStatus {
+  NOT_STARTED
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum LettrageStatut {
+  LETTRE
+  PARTIEL
+}
+
+enum LettrageType {
+  AUTO
+  MANUEL
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  SOLD
+  EXPIRED
+  ARCHIVED
+}
+
+enum MediaPurpose {
+  POST
+  AVATAR
+  TEASER
+  PAID
+}
+
+enum MediaStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+  PPV_LOCKED
+  PPV_UNLOCKED
+}
+
+enum MethodeAmortissement {
+  LINEAIRE
+  DEGRESSIF
+}
+
+enum ModerationDecision_Type {
+  APPROVE
+  REJECT
+  ESCALATE
+  REQUEST_CHANGES
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ESCALATED
+  FLAGGED
+}
+
+enum NatureImmobilisation {
+  LOGICIEL
+  MATERIEL_INFO
+  MOBILIER
+  VEHICULE
+  AGENCEMENT
+  CONSTRUCTION
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  PPV
+  TIP
+  PURCHASE
+  MARKETPLACE
+  BOOST
+  REFUND
+}
+
+enum PayoutMethod {
+  BANK_TRANSFER
+  PAYPAL
+  CRYPTO
+  WIRE_TRANSFER
+  STRIPE
+}
+
+enum PayoutMode {
+  STANDARD
+  EXPRESS_CRYPTO
+  EXPRESS_FIAT
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PAID
+  BLOCKED
+  FAILED
+  CANCELED
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ReactionType {
+  LIKE
+  FIRE
+  HEART
+  STAR
+}
+
+enum ReconciliationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  DISCREPANCY
+  RESOLVED
+}
+
+enum ReconciliationType {
+  MANUAL
+  AUTOMATIC
+  STRIPE
+  BANK
+  PAYPAL
+}
+
+enum ReportPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+  ESCALATED
+}
+
+enum ReportTargetType {
+  USER
+  POST
+  VIDEO
+  MESSAGE
+  COMMENT
+  PROFILE
+}
+
+enum RequestStatus {
+  OPEN
+  ACCEPTED
+  COMPLETED
+  DECLINED
+  CANCELED
+}
+
+enum Role {
+  FAN
+  CREATOR
+  ADMIN
+  SUPPORT
+}
+
+enum StatutImmobilisation {
+  EN_COURS
+  TOTALEMENT_AMORTI
+  CEDE
+}
+
+enum StorageProvider {
+  S3
+  GCS
+  AZURE_BLOB
+  LOCAL
+}
+
+enum SubpoenaStatus {
+  RECEIVED
+  UNDER_REVIEW
+  DATA_COLLECTED
+  RESPONSE_SENT
+  COMPLETED
+}
+
+enum SubscriptionInterval {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
+
+enum TaxFormStatus {
+  NOT_REQUIRED
+  REQUIRED
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum TicketCategory {
+  ACCOUNT
+  PAYMENT
+  TECHNICAL
+  CONTENT
+  VERIFICATION
+  LEGAL
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TransactionCategory {
+  SUBSCRIPTION
+  PPV_PURCHASE
+  TIP
+  PAYOUT
+  MARKETPLACE
+  BOOST
+  REFUND
+  FEE
+  WITHDRAWAL
+  DEPOSIT
+  OTHER
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+  DISPUTED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  REVERSED
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+  REFUND
+  CHARGEBACK
+  FEE
+  ADJUSTMENT
+  TRANSFER
+}
+
+enum TxKind {
+  SUBSCRIPTION
+  PPV
+  TIP
+  REFUND
+  CHARGEBACK
+  FEE
+  CRYPTO_IN
+  CRYPTO_OUT
+}
+
+enum TxSide {
+  DEBIT
+  CREDIT
+}
+
+enum TxStatus {
+  PENDING
+  CLEARED
+  REFUNDED
+  DISPUTED
+}
+
+enum UserRole {
+  USER
+  CREATOR
+  MODERATOR
+  SUPPORT
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+  PENDING_VERIFICATION
+}
+
+enum VideoProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum Visibility {
+  PUBLIC
+  SUBSCRIBERS_ONLY
+  PRIVATE
+  UNLISTED
+}

@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist",
+    "**/*spec.ts",
+    "prisma/**",
+    "scripts/**",
+    "**/*.ts.disabled",
+    "src/modules/posts/**",
+    "src/modules/storage/**",
+    "src/modules/payments/**",
+    "src/modules/payouts/**",
+    "src/modules/crm/**",
+    "src/modules/reactions/**",
+    "src/modules/tickets/**",
+    "src/modules/analytics/**",
+    "src/modules/public/**",
+    "src/modules/messages/**",
+    "src/modules/marketplace/**",
+    "src/modules/boost/**",
+    "src/modules/security/**"
+  ]
+}

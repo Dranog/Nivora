@@ -1,0 +1,1 @@
+{"statusCode":400,"error":"Bad Request","message":"Bad escaped character in JSON at position 49 (line 1 column 50)","timestamp":"2025-11-01T11:00:28.514Z","path":"/api/auth/login"}

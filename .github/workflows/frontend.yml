@@ -1,0 +1,282 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+
+env:
+  NODE_VERSION: '20.x'
+  PNPM_VERSION: '9.7.0'
+
+jobs:
+  # Job 1: Lint & Type Check
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm --filter web run lint
+        continue-on-error: false
+
+      - name: TypeScript type check
+        run: pnpm --filter web run typecheck
+        continue-on-error: false
+
+  # Job 2: Build
+  build:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm --filter web run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:4000' }}
+
+      - name: Check build output
+        run: |
+          if [ ! -d "apps/web/.next" ]; then
+            echo "Build failed: .next directory not found"
+            exit 1
+          fi
+          echo "Build successful!"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: apps/web/.next
+          retention-days: 7
+
+  # Job 3: Bundle Size Analysis
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: apps/web/.next
+
+      - name: Analyze bundle size
+        run: |
+          echo "Bundle size analysis:"
+          du -sh apps/web/.next
+          du -sh apps/web/.next/static
+
+      - name: Comment PR with bundle size
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            const bundleSize = execSync('du -sh apps/web/.next').toString().trim();
+            const staticSize = execSync('du -sh apps/web/.next/static').toString().trim();
+
+            const comment = `## 📦 Bundle Size Analysis\n\n` +
+              `- Total build: \`${bundleSize}\`\n` +
+              `- Static assets: \`${staticSize}\`\n`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Job 4: Accessibility Check
+  a11y:
+    name: Accessibility Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run accessibility checks
+        run: |
+          echo "Running accessibility checks..."
+          echo "⚠️  Manual a11y testing required"
+          echo "TODO: Add automated a11y tests with @axe-core/react or pa11y"
+
+  # Job 5: Security Scan (Frontend specific)
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run npm audit (frontend)
+        run: pnpm --filter web audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check for known vulnerabilities
+        run: |
+          echo "Checking for security vulnerabilities..."
+          pnpm --filter web audit --json > audit-results.json || true
+          cat audit-results.json
+
+  # Job 6: Performance Budget Check
+  performance:
+    name: Performance Budget
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: apps/web/.next
+
+      - name: Check bundle size limits
+        run: |
+          echo "Checking performance budgets..."
+
+          # Check total bundle size (example: max 5MB)
+          TOTAL_SIZE=$(du -sm apps/web/.next | cut -f1)
+          MAX_SIZE=5
+
+          if [ $TOTAL_SIZE -gt $MAX_SIZE ]; then
+            echo "❌ Bundle size ($TOTAL_SIZE MB) exceeds limit ($MAX_SIZE MB)"
+            exit 1
+          else
+            echo "✅ Bundle size ($TOTAL_SIZE MB) within limit ($MAX_SIZE MB)"
+          fi
+
+  # Job 7: Preview Comment (for PRs)
+  preview-comment:
+    name: Preview Comment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [lint, build]
+
+    steps:
+      - name: Comment PR with preview info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `## 🚀 Frontend CI Results\n\n` +
+              `✅ Lint & Type Check passed\n` +
+              `✅ Build successful\n\n` +
+              `### Preview Deployment\n\n` +
+              `Vercel will automatically deploy a preview for this PR.\n` +
+              `Check the Vercel bot comment below for the preview URL.\n\n` +
+              `---\n` +
+              `*CI Pipeline completed at ${new Date().toISOString()}*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

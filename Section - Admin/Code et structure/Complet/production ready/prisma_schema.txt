@@ -1,0 +1,1554 @@
+// ==========================================
+// OLIVER PLATFORM - COMPLETE PRISMA SCHEMA
+// ==========================================
+// packages/database/prisma/schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// CORE MODELS
+// ==========================================
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  username      String   @unique
+  passwordHash  String
+  role          UserRole @default(USER)
+  status        UserStatus @default(ACTIVE)
+  
+  // Profile
+  displayName   String?
+  bio           String?   @db.Text
+  avatar        String?
+  coverImage    String?
+  location      String?
+  website       String?
+  socialLinks   Json?     @default("{}")
+  
+  // Verification
+  emailVerified     Boolean   @default(false)
+  emailVerifiedAt   DateTime?
+  ageVerified       Boolean   @default(false)
+  kycStatus         KycStatus @default(NOT_STARTED)
+  
+  // Security
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+  lastActiveAt      DateTime?
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
+  
+  // Suspension
+  suspendedUntil    DateTime?
+  suspensionReason  String?
+  suspendedAt       DateTime?
+  suspendedById     String?
+  
+  // Metadata
+  metadata          Json?     @default("{}")
+  preferences       Json?     @default("{}")
+  permissions       Json?     @default("[]")
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+  
+  // ==========================================
+  // RELATIONS - User Content
+  // ==========================================
+  posts             Post[]              @relation("UserPosts")
+  videos            Video[]             @relation("UserVideos")
+  comments          Comment[]           @relation("UserComments")
+  likes             Like[]              @relation("UserLikes")
+  bookmarks         Bookmark[]          @relation("UserBookmarks")
+  
+  // ==========================================
+  // RELATIONS - Subscriptions & Payments
+  // ==========================================
+  subscriptionsAsFan      Subscription[]   @relation("FanSubscriptions")
+  subscriptionsAsCreator  Subscription[]   @relation("CreatorSubscriptions")
+  
+  paymentsAsUser    Payment[]           @relation("UserPayments")
+  payoutsAsCreator  Payout[]            @relation("CreatorPayouts")
+  purchases         Purchase[]          @relation("UserPurchases")
+  tips              Tip[]               @relation("UserTips")
+  
+  // ==========================================
+  // RELATIONS - Messaging
+  // ==========================================
+  messagesSent      Message[]           @relation("MessagesSent")
+  conversationsAsUser1  Conversation[]  @relation("ConversationUser1")
+  conversationsAsUser2  Conversation[]  @relation("ConversationUser2")
+  
+  // ==========================================
+  // RELATIONS - Admin Features
+  // ==========================================
+  auditLogsAsActor         AuditLog[]            @relation("AuditLogActor")
+  reportsMade              Report[]              @relation("ReportsMade")
+  reportsAssigned          Report[]              @relation("ReportsAssigned")
+  reportsReviewed          Report[]              @relation("ReportsReviewed")
+  moderationDecisions      ModerationDecision[]  @relation("ModerationDecisions")
+  exportsInitiated         ExportHistory[]       @relation("ExportsInitiated")
+  moderatorSessions        ModeratorSession[]    @relation("ModeratorSessions")
+  
+  kycVerification          KycVerification?      @relation("UserKyc")
+  kycReviewed              KycVerification[]     @relation("KycReviewedBy")
+  
+  payoutsApprover          Payout[]              @relation("PayoutsApprovedBy")
+  taxForm                  TaxForm?              @relation("CreatorTaxForm")
+  taxFormsReviewed         TaxForm[]             @relation("TaxFormsReviewed")
+  
+  ticketsAsUser            Ticket[]              @relation("UserTickets")
+  ticketsAssigned          Ticket[]              @relation("TicketsAssigned")
+  ticketsClosed            Ticket[]              @relation("TicketsClosed")
+  ticketMessages           TicketMessage[]       @relation("TicketMessages")
+  
+  legalHolds               LegalHold[]           @relation("LegalHolds")
+  legalHoldsCreated        LegalHold[]           @relation("LegalHoldsCreated")
+  legalHoldsReleased       LegalHold[]           @relation("LegalHoldsReleased")
+  subpoenasAssigned        Subpoena[]            @relation("SubpoenasAssigned")
+  chargebacks              Chargeback[]          @relation("UserChargebacks")
+  
+  alertsAcknowledged       SystemAlert[]         @relation("AlertsAcknowledged")
+  alertsResolved           SystemAlert[]         @relation("AlertsResolved")
+  dataRequests             DataRequest[]         @relation("DataRequests")
+  
+  // Sessions
+  sessions                 Session[]             @relation("UserSessions")
+  
+  @@index([email])
+  @@index([username])
+  @@index([role])
+  @@index([status])
+  @@index([kycStatus])
+  @@index([createdAt(sort: Desc)])
+  @@index([lastActiveAt(sort: Desc)])
+  @@index([emailVerified])
+  @@fulltext([username, displayName, bio])
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  CREATOR
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+  PENDING_VERIFICATION
+}
+
+enum KycStatus {
+  NOT_STARTED
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+// ==========================================
+// AUTHENTICATION & SESSIONS
+// ==========================================
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  refreshToken String?  @unique
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  device       String?
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ==========================================
+// CONTENT MODELS
+// ==========================================
+
+model Post {
+  id          String      @id @default(cuid())
+  authorId    String
+  author      User        @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Content
+  content     String      @db.Text
+  mediaUrls   Json?       @default("[]")
+  mediaKeys   Json?       @default("[]") // S3 keys
+  mediaTypes  Json?       @default("[]")
+  
+  // Visibility
+  visibility  Visibility  @default(PUBLIC)
+  isPinned    Boolean     @default(false)
+  isPPV       Boolean     @default(false)
+  ppvPrice    Int?        // in cents
+  
+  // Moderation
+  moderationStatus  ModerationStatus @default(PENDING)
+  aiScores          Json?            @default("{}")
+  moderatedAt       DateTime?
+  moderatedById     String?
+  
+  // Stats
+  likesCount     Int @default(0)
+  commentsCount  Int @default(0)
+  viewsCount     Int @default(0)
+  sharesCount    Int @default(0)
+  
+  // Timestamps
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  
+  // Relations
+  comments    Comment[]  @relation("PostComments")
+  likes       Like[]     @relation("PostLikes")
+  purchases   Purchase[] @relation("PostPurchases")
+  bookmarks   Bookmark[] @relation("PostBookmarks")
+  
+  @@index([authorId])
+  @@index([createdAt(sort: Desc)])
+  @@index([publishedAt(sort: Desc)])
+  @@index([moderationStatus])
+  @@index([visibility])
+  @@index([isPPV])
+  @@fulltext([content])
+  @@map("posts")
+}
+
+model Video {
+  id          String      @id @default(cuid())
+  authorId    String
+  author      User        @relation("UserVideos", fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Content
+  title       String
+  description String?     @db.Text
+  thumbnailUrl String?
+  videoUrl    String
+  videoKey    String      // S3 key
+  duration    Int?        // seconds
+  
+  // Visibility
+  visibility  Visibility  @default(PUBLIC)
+  isPinned    Boolean     @default(false)
+  isPPV       Boolean     @default(false)
+  ppvPrice    Int?        // in cents
+  
+  // Moderation
+  moderationStatus  ModerationStatus @default(PENDING)
+  aiScores          Json?            @default("{}")
+  moderatedAt       DateTime?
+  moderatedById     String?
+  
+  // Processing
+  processingStatus  VideoProcessingStatus @default(PENDING)
+  resolutions       Json?                 @default("[]")
+  
+  // Stats
+  likesCount     Int @default(0)
+  commentsCount  Int @default(0)
+  viewsCount     Int @default(0)
+  sharesCount    Int @default(0)
+  
+  // Timestamps
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  
+  // Relations
+  comments    Comment[]  @relation("VideoComments")
+  likes       Like[]     @relation("VideoLikes")
+  purchases   Purchase[] @relation("VideoPurchases")
+  bookmarks   Bookmark[] @relation("VideoBookmarks")
+  
+  @@index([authorId])
+  @@index([createdAt(sort: Desc)])
+  @@index([publishedAt(sort: Desc)])
+  @@index([moderationStatus])
+  @@index([visibility])
+  @@index([isPPV])
+  @@fulltext([title, description])
+  @@map("videos")
+}
+
+enum Visibility {
+  PUBLIC
+  SUBSCRIBERS_ONLY
+  PRIVATE
+  UNLISTED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ESCALATED
+  FLAGGED
+}
+
+enum VideoProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    User     @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Target
+  postId    String?
+  post      Post?    @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+  videoId   String?
+  video     Video?   @relation("VideoComments", fields: [videoId], references: [id], onDelete: Cascade)
+  
+  // Content
+  content   String   @db.Text
+  
+  // Moderation
+  moderationStatus  ModerationStatus @default(APPROVED)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  
+  @@index([postId])
+  @@index([videoId])
+  @@index([authorId])
+  @@index([createdAt(sort: Desc)])
+  @@map("comments")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Target
+  postId    String?
+  post      Post?    @relation("PostLikes", fields: [postId], references: [id], onDelete: Cascade)
+  videoId   String?
+  video     Video?   @relation("VideoLikes", fields: [videoId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, postId])
+  @@unique([userId, videoId])
+  @@index([userId])
+  @@index([postId])
+  @@index([videoId])
+  @@map("likes")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Target
+  postId    String?
+  post      Post?    @relation("PostBookmarks", fields: [postId], references: [id], onDelete: Cascade)
+  videoId   String?
+  video     Video?   @relation("VideoBookmarks", fields: [videoId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, postId])
+  @@unique([userId, videoId])
+  @@index([userId])
+  @@map("bookmarks")
+}
+
+// ==========================================
+// SUBSCRIPTIONS
+// ==========================================
+
+model Subscription {
+  id           String             @id @default(cuid())
+  fanId        String
+  fan          User               @relation("FanSubscriptions", fields: [fanId], references: [id], onDelete: Cascade)
+  creatorId    String
+  creator      User               @relation("CreatorSubscriptions", fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  // Pricing
+  amount       Int                // in cents
+  currency     String             @default("EUR")
+  interval     SubscriptionInterval @default(MONTHLY)
+  
+  // Status
+  status       SubscriptionStatus @default(ACTIVE)
+  
+  // Stripe
+  stripeSubscriptionId String? @unique
+  stripeCustomerId     String?
+  stripePriceId        String?
+  
+  // Dates
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAt           DateTime?
+  canceledAt         DateTime?
+  endedAt            DateTime?
+  trialStart         DateTime?
+  trialEnd           DateTime?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@unique([fanId, creatorId])
+  @@index([fanId])
+  @@index([creatorId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+enum SubscriptionInterval {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  PAUSED
+}
+
+// ==========================================
+// PAYMENTS & TRANSACTIONS
+// ==========================================
+
+model Payment {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Amount
+  amount        Int           // in cents
+  currency      String        @default("EUR")
+  
+  // Type
+  type          PaymentType
+  status        PaymentStatus @default(PENDING)
+  
+  // Payment method
+  paymentMethod String?       // card, bank_transfer, paypal, etc.
+  
+  // Stripe
+  stripePaymentIntentId String? @unique
+  stripeChargeId        String?
+  
+  // Fees
+  processingFee Int?          // in cents
+  platformFee   Int?          // in cents
+  netAmount     Int?          // in cents
+  
+  // Metadata
+  metadata      Json?         @default("{}")
+  description   String?
+  
+  // Timestamps
+  paidAt        DateTime?
+  refundedAt    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  // Relations
+  chargebacks   Chargeback[]
+  
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([paidAt(sort: Desc)])
+  @@map("payments")
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  PPV
+  TIP
+  PURCHASE
+  MARKETPLACE
+  REFUND
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserPurchases", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Target
+  postId    String?
+  post      Post?    @relation("PostPurchases", fields: [postId], references: [id], onDelete: SetNull)
+  videoId   String?
+  video     Video?   @relation("VideoPurchases", fields: [videoId], references: [id], onDelete: SetNull)
+  
+  // Payment
+  amount    Int      // in cents
+  currency  String   @default("EUR")
+  
+  // Access
+  expiresAt DateTime?
+  accessGranted Boolean @default(true)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([postId])
+  @@index([videoId])
+  @@index([createdAt(sort: Desc)])
+  @@map("purchases")
+}
+
+model Tip {
+  id         String   @id @default(cuid())
+  fromUserId String
+  fromUser   User     @relation("UserTips", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   String
+  
+  // Payment
+  amount     Int      // in cents
+  currency   String   @default("EUR")
+  message    String?  @db.Text
+  
+  // Status
+  status     PaymentStatus @default(SUCCESS)
+  
+  createdAt  DateTime @default(now())
+  
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([createdAt(sort: Desc)])
+  @@map("tips")
+}
+
+// ==========================================
+// PAYOUTS (TO CREATORS)
+// ==========================================
+
+model Payout {
+  id          String       @id @default(cuid())
+  creatorId   String
+  creator     User         @relation("CreatorPayouts", fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  // Amount
+  amount      Int          // in cents
+  currency    String       @default("EUR")
+  
+  // Status
+  status      PayoutStatus @default(PENDING)
+  method      PayoutMethod
+  
+  // Bank details (encrypted)
+  bankDetails Json?
+  paypalEmail String?
+  cryptoAddress String?
+  
+  // Processing
+  requestedAt  DateTime     @default(now())
+  approvedAt   DateTime?
+  approvedById String?
+  approvedBy   User?        @relation("PayoutsApprovedBy", fields: [approvedById], references: [id])
+  rejectedAt   DateTime?
+  rejectionReason String?
+  processedAt  DateTime?
+  completedAt  DateTime?
+  failedAt     DateTime?
+  failureReason String?
+  
+  // Retry logic
+  retryCount   Int          @default(0)
+  maxRetries   Int          @default(3)
+  nextRetryAt  DateTime?
+  
+  // External reference
+  externalId   String?      // From payment processor
+  
+  // Tax
+  taxFormStatus TaxFormStatus @default(NOT_REQUIRED)
+  
+  // Metadata
+  notes        String?
+  metadata     Json?        @default("{}")
+  
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  @@index([creatorId])
+  @@index([status])
+  @@index([requestedAt(sort: Desc)])
+  @@index([nextRetryAt])
+  @@index([approvedAt(sort: Desc)])
+  @@index([completedAt(sort: Desc)])
+  @@map("payouts")
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  COMPLETED
+  FAILED
+  REJECTED
+  ON_HOLD
+}
+
+enum PayoutMethod {
+  BANK_TRANSFER
+  PAYPAL
+  CRYPTO
+  WIRE_TRANSFER
+}
+
+enum TaxFormStatus {
+  NOT_REQUIRED
+  REQUIRED
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model TaxForm {
+  id            String        @id @default(cuid())
+  creatorId     String        @unique
+  creator       User          @relation("CreatorTaxForm", fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  // Form details
+  country       String
+  formType      String        // W-9, W-8BEN, W-8BEN-E
+  ytdEarnings   Int           // Year-to-date earnings in cents
+  
+  // Status
+  status        TaxFormStatus @default(NOT_REQUIRED)
+  
+  // Documents
+  documentUrl   String?
+  documentKey   String?       // S3 key (encrypted)
+  
+  // Processing
+  submittedAt   DateTime?
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewedBy    User?         @relation("TaxFormsReviewed", fields: [reviewedById], references: [id])
+  approvedAt    DateTime?
+  rejectedAt    DateTime?
+  rejectionReason String?
+  corrections   String[]      @default([])
+  
+  // Tax data (encrypted)
+  tin           String?       // Tax Identification Number
+  
+  // Timestamps
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@index([status])
+  @@index([country, status])
+  @@index([submittedAt(sort: Desc)])
+  @@map("tax_forms")
+}
+
+// ==========================================
+// MESSAGING
+// ==========================================
+
+model Conversation {
+  id          String    @id @default(cuid())
+  user1Id     String
+  user1       User      @relation("ConversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id     String
+  user2       User      @relation("ConversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  
+  // Last message
+  lastMessageAt DateTime?
+  lastMessage   String?
+  
+  // Unread counts
+  unreadCountUser1 Int @default(0)
+  unreadCountUser2 Int @default(0)
+  
+  // Status
+  isBlockedByUser1 Boolean @default(false)
+  isBlockedByUser2 Boolean @default(false)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  messages    Message[]
+  
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([lastMessageAt(sort: Desc)])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Content
+  content        String       @db.Text
+  mediaUrls      Json?        @default("[]")
+  mediaKeys      Json?        @default("[]")
+  
+  // Status
+  isRead         Boolean      @default(false)
+  readAt         DateTime?
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?
+  
+  // PPV
+  isPPV          Boolean      @default(false)
+  ppvPrice       Int?         // in cents
+  isPurchased    Boolean      @default(false)
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt(sort: Desc)])
+  @@index([isRead])
+  @@map("messages")
+}
+
+// ==========================================
+// ADMIN - AUDIT LOG
+// ==========================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  timestamp  DateTime @default(now())
+  
+  // Actor
+  actorId    String
+  actor      User     @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: Cascade)
+  
+  // Action
+  action     String   // Format: "resource.action" (e.g., "user.suspend")
+  targetType String   // "user", "post", "transaction", "setting"
+  targetId   String?
+  
+  // Details
+  metadata   Json     @default("{}")
+  
+  // Request context
+  ip         String
+  userAgent  String
+  device     String
+  
+  // Blockchain-style chaining for immutability
+  hash       String
+  prevHash   String?
+  
+  @@index([actorId, timestamp(sort: Desc)])
+  @@index([action, timestamp(sort: Desc)])
+  @@index([targetType, targetId])
+  @@index([timestamp(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ==========================================
+// ADMIN - REPORTS & MODERATION
+// ==========================================
+
+model Report {
+  id            String        @id @default(cuid())
+  reporterId    String
+  reporter      User          @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  
+  // Target
+  targetId      String
+  targetType    ReportTargetType
+  
+  // Details
+  reason        String
+  description   String?       @db.Text
+  priority      ReportPriority @default(MEDIUM)
+  status        ReportStatus  @default(PENDING)
+  
+  // Assignment
+  assignedToId  String?
+  assignedTo    User?         @relation("ReportsAssigned", fields: [assignedToId], references: [id])
+  
+  // Review
+  reviewedById  String?
+  reviewedBy    User?         @relation("ReportsReviewed", fields: [reviewedById], references: [id])
+  reviewedAt    DateTime?
+  resolution    String?
+  
+  // AI Analysis
+  aiAnalysis    Json?         @default("{}")
+  aiScores      Json?         @default("{}")
+  
+  // Escalation
+  escalationLog Json[]        @default([])
+  
+  // Timestamps
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@index([status, priority(sort: Desc)])
+  @@index([assignedToId])
+  @@index([targetId, targetType])
+  @@index([createdAt(sort: Desc)])
+  @@index([priority(sort: Desc), createdAt(sort: Desc)])
+  @@index([reporterId])
+  @@map("reports")
+}
+
+enum ReportTargetType {
+  USER
+  POST
+  VIDEO
+  MESSAGE
+  COMMENT
+  PROFILE
+}
+
+enum ReportPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+  ESCALATED
+}
+
+model ModerationDecision {
+  id          String          @id @default(cuid())
+  contentId   String
+  contentType String          // POST, VIDEO, MESSAGE, COMMENT
+  
+  // Moderator
+  moderatorId String
+  moderator   User            @relation("ModerationDecisions", fields: [moderatorId], references: [id], onDelete: Cascade)
+  
+  // Decision
+  decision    ModerationDecision_Type
+  reason      String
+  notes       String?         @db.Text
+  
+  // AI context
+  aiScorePre  Json?           @default("{}")
+  
+  createdAt   DateTime        @default(now())
+  
+  @@index([contentId, contentType])
+  @@index([moderatorId])
+  @@index([createdAt(sort: Desc)])
+  @@index([decision])
+  @@map("moderation_decisions")
+}
+
+enum ModerationDecision_Type {
+  APPROVE
+  REJECT
+  ESCALATE
+  REQUEST_CHANGES
+}
+
+model ModeratorSession {
+  id            String   @id @default(cuid())
+  moderatorId   String
+  moderator     User     @relation("ModeratorSessions", fields: [moderatorId], references: [id], onDelete: Cascade)
+  
+  // Session
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  
+  // Activity
+  itemsReviewed Int      @default(0)
+  breaksT taken   Int      @default(0)
+  lastBreakAt   DateTime?
+  
+  // Status
+  status        String   // ACTIVE, BREAK, ENDED
+  
+  @@index([moderatorId, startedAt(sort: Desc)])
+  @@map("moderator_sessions")
+}
+
+// ==========================================
+// ADMIN - KYC VERIFICATION
+// ==========================================
+
+model KycVerification {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation("UserKyc", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Provider
+  provider      String    // yoti, jumio
+  externalId    String?   // ID from provider
+  
+  // Status
+  status        KycStatus
+  
+  // Documents
+  documents     Json      @default("{}")
+  documentKeys  Json      @default("{}") // S3 keys (encrypted)
+  
+  // Personal data
+  personalData  Json      @default("{}")
+  
+  // AI Scores
+  aiScores      Json      @default("{}")
+  
+  // Review
+  reviewedById  String?
+  reviewedBy    User?     @relation("KycReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt    DateTime?
+  approvedAt    DateTime?
+  rejectedAt    DateTime?
+  rejectionReason String?
+  
+  // Expiration
+  expiresAt     DateTime
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([createdAt(sort: Desc)])
+  @@index([provider])
+  @@map("kyc_verifications")
+}
+
+// ==========================================
+// ADMIN - EXPORTS
+// ==========================================
+
+model ExportHistory {
+  id            String       @id @default(cuid())
+  type          String       // accounting, transactions, users, audit-log
+  format        String       // csv, pdf, xlsx
+  
+  // Initiator
+  initiatedById String
+  initiatedBy   User         @relation("ExportsInitiated", fields: [initiatedById], references: [id], onDelete: Cascade)
+  
+  // Status
+  status        ExportStatus @default(PROCESSING)
+  
+  // File
+  fileUrl       String?      // S3 signed URL (expires 7 days)
+  fileKey       String?      // S3 key
+  fileSize      Int?         // bytes
+  rowCount      Int?
+  
+  // Error
+  errorMessage  String?
+  
+  // Filters applied
+  filters       Json?        @default("{}")
+  
+  // Timestamps
+  createdAt     DateTime     @default(now())
+  completedAt   DateTime?
+  expiresAt     DateTime?    // Auto-delete after 7 days
+  
+  @@index([initiatedById])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("export_history")
+}
+
+enum ExportStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+// ==========================================
+// ADMIN - SETTINGS
+// ==========================================
+
+model Settings {
+  id              String   @id @default("singleton")
+  
+  // Platform
+  platformName    String   @default("Oliver")
+  contactEmail    String
+  
+  // Preferences
+  darkMode        Boolean  @default(false)
+  autoBackup      Boolean  @default(true)
+  showTooltips    Boolean  @default(true)
+  
+  // Security
+  passwordLength  Int      @default(8)
+  require2FA      Boolean  @default(false)
+  allowedIPs      String[] @default([])
+  apiKey          String   @unique
+  
+  // Metadata
+  updatedAt       DateTime @updatedAt
+  updatedById     String?
+  
+  @@map("settings")
+}
+
+// ==========================================
+// SUPPORT TICKETS
+// ==========================================
+
+model Ticket {
+  id            String         @id @default(cuid())
+  ticketNumber  String         @unique // #12345
+  
+  // User
+  userId        String
+  user          User           @relation("UserTickets", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Details
+  subject       String
+  category      TicketCategory
+  priority      TicketPriority @default(MEDIUM)
+  status        TicketStatus   @default(OPEN)
+  source        String         // email, in-app, chat
+  
+  // Assignment
+  assignedToId  String?
+  assignedTo    User?          @relation("TicketsAssigned", fields: [assignedToId], references: [id])
+  
+  // SLA
+  slaDeadline   DateTime?
+  
+  // Tags
+  tags          String[]       @default([])
+  
+  // Closure
+  closedAt      DateTime?
+  closedById    String?
+  closedBy      User?          @relation("TicketsClosed", fields: [closedById], references: [id])
+  resolution    String?
+  
+  // Satisfaction
+  satisfactionScore   Int?     // 1-5
+  satisfactionComment String?
+  
+  // Timestamps
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  // Relations
+  messages      TicketMessage[]
+  
+  @@index([status, priority(sort: Desc)])
+  @@index([assignedToId])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@index([slaDeadline])
+  @@map("tickets")
+}
+
+enum TicketCategory {
+  ACCOUNT
+  PAYMENT
+  TECHNICAL
+  CONTENT
+  VERIFICATION
+  LEGAL
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_USER
+  RESOLVED
+  CLOSED
+}
+
+model TicketMessage {
+  id          String   @id @default(cuid())
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  // Sender
+  senderId    String
+  sender      User     @relation("TicketMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Content
+  content     String   @db.Text
+  isInternal  Boolean  @default(false) // Internal notes
+  attachments String[] @default([])
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([ticketId, createdAt(sort: Desc)])
+  @@index([senderId])
+  @@map("ticket_messages")
+}
+
+model CannedResponse {
+  id         String         @id @default(cuid())
+  title      String
+  content    String         @db.Text
+  category   TicketCategory
+  variables  String[]       @default([]) // {{user.name}}, {{ticket.id}}
+  usageCount Int            @default(0)
+  
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  
+  @@index([category])
+  @@map("canned_responses")
+}
+
+// ==========================================
+// LEGAL & COMPLIANCE
+// ==========================================
+
+model DmcaRequest {
+  id                    String      @id @default(cuid())
+  
+  // Copyright holder
+  copyrightHolder       String
+  contactEmail          String
+  contactAddress        String
+  
+  // Work details
+  workDescription       String      @db.Text
+  infringingUrl         String
+  
+  // Statements
+  goodFaithStatement    Boolean
+  accuracyStatement     Boolean
+  signature             String
+  signatureDate         DateTime
+  
+  // Status
+  status                DmcaStatus  @default(RECEIVED)
+  
+  // Content
+  contentId             String?
+  contentType           String?     // POST, VIDEO, MESSAGE
+  contentDisabledAt     DateTime?
+  
+  // Counter notice
+  counterNotice         Boolean     @default(false)
+  counterNoticeAt       DateTime?
+  counterNoticeBy       String?
+  counterNoticeReason   String?
+  restoredAt            DateTime?
+  
+  // Notes
+  notes                 String?
+  
+  // Timestamps
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  @@index([status])
+  @@index([contentId])
+  @@index([createdAt(sort: Desc)])
+  @@map("dmca_requests")
+}
+
+enum DmcaStatus {
+  RECEIVED
+  UNDER_REVIEW
+  TAKEDOWN
+  COUNTER_NOTICE_PERIOD
+  RESTORED
+  RESOLVED
+}
+
+model LegalHold {
+  id           String   @id @default(cuid())
+  caseNumber   String   @unique
+  jurisdiction String
+  reason       String   @db.Text
+  
+  // User
+  userId       String
+  user         User     @relation("LegalHolds", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Data
+  dataTypes    String[] // posts, messages, transactions, profile, all
+  dataSnapshot Json?    // Snapshot at time of hold
+  
+  // Creator
+  createdAt    DateTime @default(now())
+  createdById  String
+  createdBy    User     @relation("LegalHoldsCreated", fields: [createdById], references: [id])
+  
+  // Expiration
+  expiresAt    DateTime
+  extendedUntil DateTime?
+  
+  // Release
+  releasedAt   DateTime?
+  releasedById String?
+  releasedBy   User?    @relation("LegalHoldsReleased", fields: [releasedById], references: [id])
+  releaseReason String?
+  
+  // Export
+  exportUrl    String?  // Signed URL to data export
+  
+  // Notes
+  notes        String?
+  
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([createdAt(sort: Desc)])
+  @@map("legal_holds")
+}
+
+model Subpoena {
+  id            String         @id @default(cuid())
+  caseNumber    String         @unique
+  authority     String         // FBI, Court, etc.
+  jurisdiction  String
+  
+  // Document
+  documentUrl   String         // Uploaded subpoena PDF
+  
+  // Scope
+  userIds       String[]
+  dataScope     String[]       // What data is requested
+  
+  // Deadline
+  deadline      DateTime
+  
+  // Status
+  status        SubpoenaStatus @default(RECEIVED)
+  
+  // Assignment
+  assignedToId  String?
+  assignedTo    User?          @relation("SubpoenasAssigned", fields: [assignedToId], references: [id])
+  
+  // Processing
+  dataCollectedAt DateTime?
+  collectionId    String?
+  
+  // Response
+  responseUrl   String?        // Response document
+  sentAt        DateTime?
+  
+  // Notes
+  notes         String?
+  
+  createdAt     DateTime       @default(now())
+  
+  @@index([status, deadline(sort: Asc)])
+  @@index([assignedToId])
+  @@index([createdAt(sort: Desc)])
+  @@map("subpoenas")
+}
+
+enum SubpoenaStatus {
+  RECEIVED
+  UNDER_REVIEW
+  DATA_COLLECTED
+  RESPONSE_SENT
+  COMPLETED
+}
+
+// ==========================================
+// CHARGEBACKS
+// ==========================================
+
+model Chargeback {
+  id           String             @id @default(cuid())
+  
+  // Payment
+  paymentId    String
+  payment      Payment            @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  transactionId String            // From processor
+  
+  // User
+  userId       String
+  user         User               @relation("UserChargebacks", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Amount
+  amount       Int                // in cents
+  currency     String             @default("EUR")
+  
+  // Reason
+  reason       ChargebackReason
+  reasonCode   String?
+  
+  // Status
+  status       ChargebackStatus   @default(PENDING)
+  
+  // Timeline
+  receivedAt   DateTime           @default(now())
+  dueDate      DateTime           // Deadline to respond
+  submittedAt  DateTime?
+  resolvedAt   DateTime?
+  
+  // Evidence
+  evidenceUrl  String?            // Auto-collected evidence
+  additionalDocs String[]         @default([])
+  
+  // Outcome
+  outcome      String?            // WON, LOST
+  outcomeFee   Int?               // in cents
+  
+  // Notes
+  notes        String?
+  
+  @@index([status, dueDate(sort: Asc)])
+  @@index([userId])
+  @@index([paymentId])
+  @@index([receivedAt(sort: Desc)])
+  @@map("chargebacks")
+}
+
+enum ChargebackReason {
+  FRAUDULENT
+  UNRECOGNIZED
+  DUPLICATE
+  NOT_RECEIVED
+  CANCELED
+  NOT_AS_DESCRIBED
+  OTHER
+}
+
+enum ChargebackStatus {
+  PENDING
+  EVIDENCE_REQUIRED
+  SUBMITTED
+  UNDER_REVIEW
+  WON
+  LOST
+}
+
+// ==========================================
+// SYSTEM MONITORING
+// ==========================================
+
+model SystemAlert {
+  id            String        @id @default(cuid())
+  type          String        // cpu_high, error_rate, slow_response
+  severity      AlertSeverity
+  message       String
+  metadata      Json          @default("{}")
+  
+  // Status
+  status        AlertStatus   @default(ACTIVE)
+  
+  // Timestamps
+  triggeredAt   DateTime      @default(now())
+  
+  // Acknowledgment
+  acknowledgedAt DateTime?
+  acknowledgedById String?
+  acknowledgedBy User?       @relation("AlertsAcknowledged", fields: [acknowledgedById], references: [id])
+  
+  // Resolution
+  resolvedAt    DateTime?
+  resolvedById  String?
+  resolvedBy    User?         @relation("AlertsResolved", fields: [resolvedById], references: [id])
+  
+  @@index([status, triggeredAt(sort: Desc)])
+  @@index([severity, status])
+  @@index([acknowledgedById])
+  @@index([resolvedById])
+  @@map("system_alerts")
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+// ==========================================
+// GDPR DATA REQUESTS
+// ==========================================
+
+model DataRequest {
+  id          String            @id @default(cuid())
+  
+  // User
+  userId      String
+  user        User              @relation("DataRequests", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Type
+  type        DataRequestType
+  
+  // Status
+  status      DataRequestStatus @default(PENDING)
+  
+  // Timeline
+  requestedAt DateTime          @default(now())
+  dueDate     DateTime          // 30 days from request
+  processedAt DateTime?
+  completedAt DateTime?
+  
+  // For export requests
+  downloadUrl String?           // Signed URL, expires 7 days
+  
+  // For deletion requests
+  deletedAt   DateTime?
+  
+  // Notes
+  notes       String?
+  
+  @@index([userId])
+  @@index([status, dueDate(sort: Asc)])
+  @@index([type])
+  @@index([requestedAt(sort: Desc)])
+  @@map("data_requests")
+}
+
+enum DataRequestType {
+  EXPORT
+  DELETION
+  RECTIFICATION
+  RESTRICTION
+  OBJECTION
+}
+
+enum DataRequestStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
+
+model Notification {
+  id         String   @id @default(cuid())
+  userId     String
+  
+  // Type
+  type       String   // like, comment, subscription, payment, etc.
+  
+  // Content
+  title      String
+  message    String
+  
+  // Target
+  targetType String?
+  targetId   String?
+  
+  // Status
+  isRead     Boolean  @default(false)
+  readAt     DateTime?
+  
+  // Metadata
+  metadata   Json?    @default("{}")
+  
+  createdAt  DateTime @default(now())
+  
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+// ==========================================
+// ANALYTICS (Optional)
+// ==========================================
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  
+  // Event
+  eventType  String   // page_view, click, purchase, etc.
+  eventName  String
+  
+  // User
+  userId     String?
+  sessionId  String?
+  
+  // Context
+  page       String?
+  referrer   String?
+  userAgent  String?
+  ipAddress  String?
+  
+  // Data
+  properties Json     @default("{}")
+  
+  timestamp  DateTime @default(now())
+  
+  @@index([eventType, timestamp(sort: Desc)])
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([sessionId])
+  @@map("analytics_events")
+}

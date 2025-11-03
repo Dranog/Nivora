@@ -1,0 +1,124 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { UserRole as Role } from '@prisma/client';
+import { TransactionsService } from '../services/transactions.service';
+import {
+  transactionsQuerySchema,
+  refundTransactionSchema,
+  cancelTransactionSchema,
+  type TransactionsQuery,
+  type TransactionsListResponseDto,
+  type TransactionDetailDto,
+  type TransactionStatsDto,
+  type RefundTransactionDto,
+  type CancelTransactionDto,
+} from '../dto/transactions.dto';
+
+@Controller('admin/transactions')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.SUPPORT)
+export class TransactionsController {
+  constructor(private readonly transactionsService: TransactionsService) {}
+
+  /**
+   * GET /admin/transactions - Get transactions list
+   */
+  @Get()
+  async getTransactions(
+    @Query() rawQuery: any
+  ): Promise<TransactionsListResponseDto> {
+    const query = transactionsQuerySchema.parse({
+      page: rawQuery.page ? parseInt(rawQuery.page, 10) : 1,
+      limit: rawQuery.limit ? parseInt(rawQuery.limit, 10) : 20,
+      search: rawQuery.search,
+      type: rawQuery.type,
+      status: rawQuery.status,
+      paymentMethod: rawQuery.paymentMethod,
+      userId: rawQuery.userId,
+      authorId: rawQuery.authorId,
+      dateFrom: rawQuery.dateFrom,
+      dateTo: rawQuery.dateTo,
+      minAmount: rawQuery.minAmount ? parseFloat(rawQuery.minAmount) : undefined,
+      maxAmount: rawQuery.maxAmount ? parseFloat(rawQuery.maxAmount) : undefined,
+      sortBy: rawQuery.sortBy || 'createdAt',
+      sortOrder: rawQuery.sortOrder || 'desc',
+    });
+
+    return await this.transactionsService.getTransactions(query);
+  }
+
+  /**
+   * GET /admin/transactions/stats - Get transaction statistics
+   */
+  @Get('stats')
+  async getTransactionStats(): Promise<TransactionStatsDto> {
+    return await this.transactionsService.getTransactionStats();
+  }
+
+  /**
+   * GET /admin/transactions/trends - Get temporal trends (migrated from V2)
+   */
+  @Get('trends')
+  async getTrends(@Query('period') period: string, @Query('metric') metric: string) {
+    return await this.transactionsService.getTrends(period, metric);
+  }
+
+  /**
+   * GET /admin/transactions/:id - Get transaction detail
+   */
+  @Get(':id')
+  async getTransactionDetail(
+    @Param('id') transactionId: string
+  ): Promise<TransactionDetailDto> {
+    return await this.transactionsService.getTransactionDetail(transactionId);
+  }
+
+  /**
+   * POST /admin/transactions/:id/refund - Refund transaction
+   */
+  @Post(':id/refund')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async refundTransaction(
+    @Param('id') transactionId: string,
+    @Body() body: any,
+    @CurrentUser('id') adminId: string
+  ): Promise<void> {
+    const data = refundTransactionSchema.parse(body);
+    await this.transactionsService.refundTransaction(
+      transactionId,
+      data,
+      adminId
+    );
+  }
+
+  /**
+   * POST /admin/transactions/:id/cancel - Cancel pending transaction
+   */
+  @Post(':id/cancel')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async cancelTransaction(
+    @Param('id') transactionId: string,
+    @Body() body: any,
+    @CurrentUser('id') adminId: string
+  ): Promise<void> {
+    const data = cancelTransactionSchema.parse(body);
+    await this.transactionsService.cancelTransaction(
+      transactionId,
+      data,
+      adminId
+    );
+  }
+}

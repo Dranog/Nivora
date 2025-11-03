@@ -1,0 +1,1020 @@
+### 6.12 Charts (Recharts Styling)
+
+```css
+.chart-container {
+  width: 100%;
+  height: 300px;
+  padding: 16px;
+}
+
+/* Override Recharts default styles */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #F3F4F6;
+}
+
+.recharts-text {
+  fill: #6B7280;
+  font-size: 12px;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.recharts-default-tooltip {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  padding: 12px !important;
+}
+
+.recharts-tooltip-label {
+  color: #1A1A1A;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.recharts-tooltip-item {
+  color: #6B7280 !important;
+}
+```
+
+### 6.13 Progress Bars
+
+```css
+.progress {
+  width: 100%;
+  height: 8px;
+  background: #F3F4F6;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background: #00B8A9;
+  border-radius: 9999px;
+  transition: width 300ms ease;
+}
+
+/* Progress variants */
+.progress__bar--success {
+  background: #22C55E;
+}
+
+.progress__bar--warning {
+  background: #F59E0B;
+}
+
+.progress__bar--error {
+  background: #EF4444;
+}
+
+.progress__bar--info {
+  background: #3B82F6;
+}
+
+/* Progress sizes */
+.progress--sm {
+  height: 4px;
+}
+
+.progress--md {
+  height: 8px;
+}
+
+.progress--lg {
+  height: 12px;
+}
+
+/* Progress with label */
+.progress-with-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-with-label__bar {
+  flex: 1;
+}
+
+.progress-with-label__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1A1A;
+  min-width: 45px;
+  text-align: right;
+}
+```
+
+#### Progress Bar Example (React)
+```tsx
+interface ProgressProps {
+  value: number
+  max?: number
+  variant?: 'primary' | 'success' | 'warning' | 'error' | 'info'
+  size?: 'sm' | 'md' | 'lg'
+  showLabel?: boolean
+  label?: string
+}
+
+export function Progress({ 
+  value, 
+  max = 100, 
+  variant = 'primary', 
+  size = 'md',
+  showLabel = false,
+  label
+}: ProgressProps) {
+  const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+  
+  const content = (
+    <div className={`progress progress--${size}`}>
+      <div 
+        className={`progress__bar progress__bar--${variant}`}
+        style={{ width: `${percentage}%` }}
+        role="progressbar"
+        aria-valuenow={value}
+        aria-valuemin={0}
+        aria-valuemax={max}
+      />
+    </div>
+  )
+  
+  if (showLabel) {
+    return (
+      <div className="progress-with-label">
+        <span className="text-sm text-gray-600">{label}</span>
+        <div className="progress-with-label__bar">{content}</div>
+        <span className="progress-with-label__label">{Math.round(percentage)}%</span>
+      </div>
+    )
+  }
+  
+  return content
+}
+```
+
+### 6.14 File Upload
+
+```css
+.file-upload {
+  position: relative;
+}
+
+.file-upload__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.file-upload__dropzone {
+  border: 2px dashed #E5E7EB;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+  background: #F8FAFB;
+}
+
+.file-upload__dropzone:hover {
+  border-color: #00B8A9;
+  background: #E0F7F5;
+}
+
+.file-upload__dropzone--active {
+  border-color: #00B8A9;
+  background: #E0F7F5;
+}
+
+.file-upload__icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  color: #6B7280;
+}
+
+.file-upload__text {
+  font-size: 14px;
+  color: #1A1A1A;
+  margin-bottom: 4px;
+}
+
+.file-upload__subtext {
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.file-upload__link {
+  color: #00B8A9;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+/* File list */
+.file-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #F8FAFB;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+}
+
+.file-item__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #E0F7F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00B8A9;
+  flex-shrink: 0;
+}
+
+.file-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item__name {
+  font-size: 14px;
+  color: #1A1A1A;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-item__size {
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.file-item__remove {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+
+.file-item__remove:hover {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+```
+
+### 6.15 Avatar
+
+```css
+.avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #E5E7EB;
+  color: #6B7280;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Avatar sizes */
+.avatar--xs {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+}
+
+.avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.avatar--md {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+}
+
+.avatar--lg {
+  width: 48px;
+  height: 48px;
+  font-size: 18px;
+}
+
+.avatar--xl {
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+}
+
+.avatar--2xl {
+  width: 96px;
+  height: 96px;
+  font-size: 36px;
+}
+
+.avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Avatar with status indicator */
+.avatar--with-status {
+  position: relative;
+}
+
+.avatar__status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25%;
+  height: 25%;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+}
+
+.avatar__status--online {
+  background: #22C55E;
+}
+
+.avatar__status--offline {
+  background: #9CA3AF;
+}
+
+.avatar__status--busy {
+  background: #EF4444;
+}
+
+.avatar__status--away {
+  background: #F59E0B;
+}
+
+/* Avatar group */
+.avatar-group {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-group .avatar {
+  margin-left: -8px;
+  border: 2px solid #FFFFFF;
+}
+
+.avatar-group .avatar:first-child {
+  margin-left: 0;
+}
+
+.avatar-group__more {
+  margin-left: -8px;
+  background: #F3F4F6;
+  color: #6B7280;
+  border: 2px solid #FFFFFF;
+  font-size: 12px;
+  font-weight: 500;
+}
+```
+
+#### Avatar Example (React)
+```tsx
+interface AvatarProps {
+  src?: string
+  alt?: string
+  initials?: string
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+  status?: 'online' | 'offline' | 'busy' | 'away'
+  className?: string
+}
+
+export function Avatar({ 
+  src, 
+  alt, 
+  initials, 
+  size = 'md', 
+  status,
+  className 
+}: AvatarProps) {
+  return (
+    <div className={cn(
+      'avatar',
+      `avatar--${size}`,
+      status && 'avatar--with-status',
+      className
+    )}>
+      {src ? (
+        <img src={src} alt={alt} className="avatar__img" />
+      ) : (
+        <span>{initials || '?'}</span>
+      )}
+      {status && (
+        <span className={`avatar__status avatar__status--${status}`} />
+      )}
+    </div>
+  )
+}
+```
+
+### 6.16 Checkbox & Radio
+
+```css
+/* Checkbox */
+.checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.checkbox__box {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #D1D5DB;
+  border-radius: 4px;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+}
+
+.checkbox__input:checked + .checkbox__box {
+  background: #00B8A9;
+  border-color: #00B8A9;
+}
+
+.checkbox__input:focus-visible + .checkbox__box {
+  outline: 2px solid #00B8A9;
+  outline-offset: 2px;
+}
+
+.checkbox__input:disabled + .checkbox__box {
+  background: #F3F4F6;
+  border-color: #E5E7EB;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox__icon {
+  width: 12px;
+  height: 12px;
+  color: #FFFFFF;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 150ms ease;
+}
+
+.checkbox__input:checked + .checkbox__box .checkbox__icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.checkbox__label {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #1A1A1A;
+  user-select: none;
+}
+
+/* Radio */
+.radio {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.radio__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.radio__circle {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #D1D5DB;
+  border-radius: 50%;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+}
+
+.radio__input:checked + .radio__circle {
+  border-color: #00B8A9;
+}
+
+.radio__input:focus-visible + .radio__circle {
+  outline: 2px solid #00B8A9;
+  outline-offset: 2px;
+}
+
+.radio__input:disabled + .radio__circle {
+  background: #F3F4F6;
+  border-color: #E5E7EB;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.radio__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00B8A9;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 150ms ease;
+}
+
+.radio__input:checked + .radio__circle .radio__dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.radio__label {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #1A1A1A;
+  user-select: none;
+}
+```
+
+### 6.17 Toggle/Switch
+
+```css
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.toggle__switch {
+  width: 44px;
+  height: 24px;
+  background: #E5E7EB;
+  border-radius: 9999px;
+  position: relative;
+  transition: background 200ms ease;
+}
+
+.toggle__input:checked + .toggle__switch {
+  background: #00B8A9;
+}
+
+.toggle__input:focus-visible + .toggle__switch {
+  outline: 2px solid #00B8A9;
+  outline-offset: 2px;
+}
+
+.toggle__input:disabled + .toggle__switch {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle__slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  transition: transform 200ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle__input:checked + .toggle__switch .toggle__slider {
+  transform: translateX(20px);
+}
+
+.toggle__label {
+  margin-left: 12px;
+  font-size: 14px;
+  color: #1A1A1A;
+  user-select: none;
+}
+
+/* Toggle sizes */
+.toggle--sm .toggle__switch {
+  width: 36px;
+  height: 20px;
+}
+
+.toggle--sm .toggle__slider {
+  width: 16px;
+  height: 16px;
+}
+
+.toggle--sm .toggle__input:checked + .toggle__switch .toggle__slider {
+  transform: translateX(16px);
+}
+
+.toggle--lg .toggle__switch {
+  width: 52px;
+  height: 28px;
+}
+
+.toggle--lg .toggle__slider {
+  width: 24px;
+  height: 24px;
+}
+
+.toggle--lg .toggle__input:checked + .toggle__switch .toggle__slider {
+  transform: translateX(24px);
+}
+```
+
+### 6.18 Breadcrumb
+
+```css
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.breadcrumb__link {
+  color: #6B7280;
+  text-decoration: none;
+  transition: color 150ms ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb__link:hover {
+  color: #00B8A9;
+}
+
+.breadcrumb__link--active {
+  color: #1A1A1A;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.breadcrumb__separator {
+  color: #D1D5DB;
+  font-size: 16px;
+  user-select: none;
+}
+
+.breadcrumb__icon {
+  width: 16px;
+  height: 16px;
+}
+```
+
+#### Breadcrumb Example (React)
+```tsx
+interface BreadcrumbItem {
+  label: string
+  href?: string
+  icon?: React.ReactNode
+}
+
+interface BreadcrumbProps {
+  items: BreadcrumbItem[]
+  separator?: React.ReactNode
+}
+
+export function Breadcrumb({ items, separator = '/' }: BreadcrumbProps) {
+  return (
+    <nav className="breadcrumb" aria-label="Breadcrumb">
+      {items.map((item, index) => (
+        <div key={index} className="breadcrumb__item">
+          {index > 0 && (
+            <span className="breadcrumb__separator">{separator}</span>
+          )}
+          {item.href && index < items.length - 1 ? (
+            <a href={item.href} className="breadcrumb__link">
+              {item.icon && <span className="breadcrumb__icon">{item.icon}</span>}
+              {item.label}
+            </a>
+          ) : (
+            <span className="breadcrumb__link breadcrumb__link--active">
+              {item.icon && <span className="breadcrumb__icon">{item.icon}</span>}
+              {item.label}
+            </span>
+          )}
+        </div>
+      ))}
+    </nav>
+  )
+}
+```
+
+### 6.19 Empty States
+
+```css
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-state__icon {
+  width: 64px;
+  height: 64px;
+  color: #D1D5DB;
+  margin-bottom: 16px;
+}
+
+.empty-state__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+}
+
+.empty-state__description {
+  font-size: 14px;
+  color: #6B7280;
+  max-width: 400px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.empty-state__action {
+  /* Use existing button styles */
+}
+
+/* Empty state variants */
+.empty-state--compact {
+  padding: 32px 16px;
+}
+
+.empty-state--compact .empty-state__icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state--compact .empty-state__title {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.empty-state--compact .empty-state__description {
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+```
+
+### 6.20 Loading States
+
+```css
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #E5E7EB;
+  border-top-color: #00B8A9;
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Spinner sizes */
+.spinner--xs {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.spinner--sm {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.spinner--md {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+.spinner--lg {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+.spinner--xl {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(2px);
+}
+
+.loading-overlay--fullscreen {
+  position: fixed;
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #F3F4F6 0%,
+    #E5E7EB 50%,
+    #F3F4F6 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton--text {
+  height: 14px;
+  margin-bottom: 8px;
+}
+
+.skeleton--title {
+  height: 20px;
+  width: 60%;
+  margin-bottom: 12px;
+}
+
+.skeleton--avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton--button {
+  height: 40px;
+  width: 120px;
+  border-radius: 8px;
+}
+
+.skeleton--card {
+  height: 200px;
+  border-radius: 12px;
+}
+
+/* Pulse animation for loading states */
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+```
+
+#### Loading Components (React)
+```tsx
+// Spinner Component
+interface SpinnerProps {
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  className?: string
+}
+
+export function Spinner({ size = 'md', className }: SpinnerProps) {
+  return (
+    <div 
+      className={cn('spinner', `spinner--${size}`, className)}
+      role="status"
+      aria-label="Loading"
+    >
+      <span className="sr-only">Loading...</span>
+    </div>
+  )
+}
+
+// Loading Overlay Component
+interface LoadingOverlayProps {
+  fullscreen?: boolean
+  message?: string
+}
+
+export function LoadingOverlay({ fullscreen, message }: LoadingOverlayProps) {
+  return (
+    <div className={cn(
+      'loading-overlay',
+      fullscreen && 'loading-overlay--fullscreen'
+    )}>
+      <div className="flex flex-col items-center gap-3">
+        <Spinner size="lg" />
+        {message && (
+          <p className="text-sm text-gray-600">{message}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Skeleton Component
+interface SkeletonProps {
+  variant?: 'text' | 'title' | 'avatar' | 'button' | 'card'
+  width?: string
+  height?: string
+  className?: string
+}
+
+export function Skeleton({ 
+  variant = 'text', 
+  width, 
+  height, 
+  className 
+}: SkeletonProps) {
+  return (
+    <div 
+      className={cn('skeleton', `skeleton--${variant}`, className)}
+      style={{ width, height }}
+      aria-hidden="true"
+    />
+  )
+}
+```

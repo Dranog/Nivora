@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git status)",
+      "Bash(git diff)"
+    ],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(git reset --hard)"
+    ],
+    "ask": [
+      "Edit(apps/web/src/app/admin/**)",
+      "Edit(apps/web/src/components/admin/**)",
+      "Bash(git *)"
+    ]
+  },
+  "autoApprove": false,
+  "alwaysAllowWrite": false,
+  "alwaysAllowRead": true,
+  "requireConfirmation": [
+    "apps/web/src/app/admin/**/*.tsx",
+    "apps/web/src/components/admin/**/*.tsx"
+  ]
+}

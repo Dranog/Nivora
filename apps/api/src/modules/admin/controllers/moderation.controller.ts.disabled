@@ -1,0 +1,136 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/roles.guard';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { UserRole as Role } from '@prisma/client';
+import { ModerationService } from '../services/moderation.service';
+import {
+  moderationQueueQuerySchema,
+  approveContentSchema,
+  rejectContentSchema,
+  escalateContentSchema,
+  bulkModerationActionSchema,
+  type ModerationQueueQuery,
+  type ModerationQueueResponseDto,
+  type ModerationStatsDto,
+  type ApproveContentDto,
+  type RejectContentDto,
+  type EscalateContentDto,
+  type BulkModerationActionDto,
+  type BulkModerationActionResponseDto,
+} from '../dto/moderation.dto';
+
+@Controller('admin/moderation')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN, Role.SUPPORT)
+export class ModerationController {
+  constructor(private readonly moderationService: ModerationService) {}
+
+  /**
+   * GET /admin/moderation - Get moderation queue
+   */
+  @Get()
+  async getModerationQueue(
+    @Query() rawQuery: any
+  ): Promise<ModerationQueueResponseDto> {
+    const query = moderationQueueQuerySchema.parse({
+      page: rawQuery.page ? parseInt(rawQuery.page, 10) : 1,
+      limit: rawQuery.limit ? parseInt(rawQuery.limit, 10) : 20,
+      search: rawQuery.search,
+      priority: rawQuery.priority,
+      status: rawQuery.status,
+      assignedToId: rawQuery.assignedToId,
+      contentType: rawQuery.contentType,
+      sortBy: rawQuery.sortBy || 'createdAt',
+      sortOrder: rawQuery.sortOrder || 'desc',
+    });
+
+    return await this.moderationService.getModerationQueue(query);
+  }
+
+  /**
+   * GET /admin/moderation/stats - Get moderation statistics
+   */
+  @Get('stats')
+  async getModerationStats(): Promise<ModerationStatsDto> {
+    return await this.moderationService.getModerationStats();
+  }
+
+  /**
+   * POST /admin/moderation/:id/approve - Approve content
+   */
+  @Post(':id/approve')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async approveContent(
+    @Param('id') itemId: string,
+    @Body() body: any,
+    @CurrentUser('id') adminId: string
+  ): Promise<void> {
+    const data = approveContentSchema.parse(body);
+    await this.moderationService.approveContent(itemId, data, adminId);
+  }
+
+  /**
+   * POST /admin/moderation/:id/reject - Reject content
+   */
+  @Post(':id/reject')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async rejectContent(
+    @Param('id') itemId: string,
+    @Body() body: any,
+    @CurrentUser('id') adminId: string
+  ): Promise<void> {
+    const data = rejectContentSchema.parse(body);
+    await this.moderationService.rejectContent(itemId, data, adminId);
+  }
+
+  /**
+   * POST /admin/moderation/:id/escalate - Escalate content
+   */
+  @Post(':id/escalate')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async escalateContent(
+    @Param('id') itemId: string,
+    @Body() body: any,
+    @CurrentUser('id') adminId: string
+  ): Promise<void> {
+    const data = escalateContentSchema.parse(body);
+    await this.moderationService.escalateContent(itemId, data, adminId);
+  }
+
+  /**
+   * POST /admin/moderation/:id/assign - Assign item to moderator
+   */
+  @Post(':id/assign')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async assignItem(
+    @Param('id') itemId: string,
+    @Body('assignedToId') assignedToId: string,
+    @CurrentUser('id') adminId: string
+  ): Promise<void> {
+    await this.moderationService.assignItem(itemId, assignedToId, adminId);
+  }
+
+  /**
+   * POST /admin/moderation/bulk - Bulk moderation action
+   */
+  @Post('bulk')
+  async bulkAction(
+    @Body() body: any,
+    @CurrentUser('id') adminId: string
+  ): Promise<BulkModerationActionResponseDto> {
+    const data = bulkModerationActionSchema.parse(body);
+    return await this.moderationService.bulkAction(data, adminId);
+  }
+}

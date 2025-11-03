@@ -1,0 +1,20 @@
+{
+  "name": "oliver-platform",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:all": "pnpm --parallel --filter web --filter api dev",
+    "build": "pnpm --filter api build && pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "build:web": "pnpm --filter web build",
+    "start": "pnpm --parallel --filter web --filter api start",
+    "lint": "pnpm --filter web lint && pnpm --filter api lint",
+    "test": "pnpm --filter web test && pnpm --filter api test",
+    "clean": "pnpm -r exec rm -rf dist .next node_modules",
+    "install:all": "pnpm install"
+  }
+}

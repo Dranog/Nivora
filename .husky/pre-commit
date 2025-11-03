@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged if configured
+if command -v pnpm &> /dev/null; then
+  pnpm exec lint-staged
+fi
+
+# Quick type check on staged files
+echo "📝 Type checking..."
+pnpm --filter web run typecheck || {
+  echo "❌ Type check failed. Commit aborted."
+  exit 1
+}
+
+echo "✅ Pre-commit checks passed!"

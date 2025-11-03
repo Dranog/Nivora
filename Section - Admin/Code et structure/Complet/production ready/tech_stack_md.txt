@@ -1,0 +1,877 @@
+# TECH_STACK.md - Oliver Platform Technical Stack
+
+## Architecture Globale
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    OLIVER PLATFORM                       │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
+│  │   Frontend   │  │   Backend    │  │   Database   │ │
+│  │  (Next.js)   │←→│   (NestJS)   │←→│ (PostgreSQL) │ │
+│  └──────────────┘  └──────────────┘  └──────────────┘ │
+│         ↓                  ↓                  ↓         │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │              External Services                    │  │
+│  │  Redis | S3 | Yoti | SendGrid | Stripe | AI     │  │
+│  └──────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 1. FRONTEND
+
+### Next.js 15 (App Router)
+**Version**: `^15.0.0`  
+**Raison**: 
+- App Router pour architecture moderne
+- Server Components pour performance
+- Server Actions pour mutations
+- Streaming SSR
+- Built-in optimizations (images, fonts, etc.)
+
+```json
+{
+  "next": "^15.0.0",
+  "react": "^19.0.0",
+  "react-dom": "^19.0.0"
+}
+```
+
+### TypeScript
+**Version**: `^5.6.0`  
+**Config**: Strict mode activé
+```json
+{
+  "typescript": "^5.6.0"
+}
+```
+
+**tsconfig.json**:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"]
+    }
+  }
+}
+```
+
+### Styling
+
+#### Tailwind CSS
+**Version**: `^3.4.0`
+```json
+{
+  "tailwindcss": "^3.4.0",
+  "autoprefixer": "^10.4.0",
+  "postcss": "^8.4.0"
+}
+```
+
+#### shadcn/ui
+**Version**: Latest (installé via CLI)
+**Components utilisés**:
+- Alert, AlertDialog
+- Button
+- Card
+- Checkbox
+- Dialog, DropdownMenu
+- Form, Input, Label
+- Select, Textarea
+- Table
+- Tabs
+- Toast, Toaster
+- Tooltip
+- Badge
+- Skeleton
+- Popover
+- Calendar
+- Command
+
+**Installation**:
+```bash
+npx shadcn-ui@latest init
+npx shadcn-ui@latest add button card dialog ...
+```
+
+#### Radix UI
+**Version**: Via shadcn/ui
+```json
+{
+  "@radix-ui/react-dialog": "^1.0.5",
+  "@radix-ui/react-dropdown-menu": "^2.0.6",
+  "@radix-ui/react-select": "^2.0.0",
+  "@radix-ui/react-tabs": "^1.0.4",
+  "@radix-ui/react-tooltip": "^1.0.7"
+}
+```
+
+### Icons
+**Lucide React**: `^0.263.0`
+```json
+{
+  "lucide-react": "^0.263.0"
+}
+```
+
+### Charts & Visualization
+**Recharts**: `^2.10.0`
+```json
+{
+  "recharts": "^2.10.0"
+}
+```
+
+### State Management
+
+#### Zustand
+**Version**: `^4.5.0`  
+**Usage**: Global state (admin session, filters, cache)
+```json
+{
+  "zustand": "^4.5.0"
+}
+```
+
+#### TanStack Query (React Query)
+**Version**: `^5.25.0`  
+**Usage**: Data fetching, caching, synchronization
+```json
+{
+  "@tanstack/react-query": "^5.25.0",
+  "@tanstack/react-query-devtools": "^5.25.0"
+}
+```
+
+### Forms & Validation
+
+#### React Hook Form
+**Version**: `^7.50.0`
+```json
+{
+  "react-hook-form": "^7.50.0"
+}
+```
+
+#### Zod
+**Version**: `^3.22.0`  
+**Usage**: Schema validation (client + server)
+```json
+{
+  "zod": "^3.22.0",
+  "@hookform/resolvers": "^3.3.0"
+}
+```
+
+### Date & Time
+**date-fns**: `^3.0.0`
+```json
+{
+  "date-fns": "^3.0.0"
+}
+```
+
+### Utilities
+```json
+{
+  "clsx": "^2.1.0",
+  "tailwind-merge": "^2.2.0",
+  "class-variance-authority": "^0.7.0"
+}
+```
+
+### Dev Dependencies
+```json
+{
+  "@types/node": "^20.11.0",
+  "@types/react": "^19.0.0",
+  "@types/react-dom": "^19.0.0",
+  "eslint": "^8.56.0",
+  "eslint-config-next": "^15.0.0",
+  "prettier": "^3.2.0"
+}
+```
+
+## 2. BACKEND
+
+### NestJS
+**Version**: `^10.3.0`  
+**Raison**:
+- Architecture modulaire et scalable
+- Dependency Injection
+- Decorators pour routes et middleware
+- Guards, Interceptors, Pipes built-in
+- Support TypeScript natif
+- Documentation auto (Swagger)
+
+```json
+{
+  "@nestjs/common": "^10.3.0",
+  "@nestjs/core": "^10.3.0",
+  "@nestjs/platform-express": "^10.3.0"
+}
+```
+
+### Database
+
+#### Prisma ORM
+**Version**: `^5.9.0`  
+**Raison**:
+- Type-safe database client
+- Migrations automatiques
+- Schema declaratif
+- Excellent DX avec autocomplete
+- Support PostgreSQL full-featured
+
+```json
+{
+  "prisma": "^5.9.0",
+  "@prisma/client": "^5.9.0"
+}
+```
+
+#### PostgreSQL
+**Version**: `15-alpine` (Docker)  
+**Raison**:
+- Robuste et mature
+- ACID compliant
+- Full-text search
+- JSON support natif
+- Excellent pour relations complexes
+
+**Connection Pool**:
+- Min: 2
+- Max: 20
+
+### Caching
+
+#### Redis
+**Version**: `7-alpine` (Docker)  
+**Libraries**:
+```json
+{
+  "@nestjs-modules/ioredis": "^2.0.2",
+  "ioredis": "^5.3.0"
+}
+```
+
+### Validation
+```json
+{
+  "zod": "^3.22.0",
+  "class-validator": "^0.14.1",
+  "class-transformer": "^0.5.1"
+}
+```
+
+### Authentication & Security
+
+#### JWT
+```json
+{
+  "@nestjs/jwt": "^10.2.0",
+  "@nestjs/passport": "^10.0.3",
+  "passport": "^0.7.0",
+  "passport-jwt": "^4.0.1"
+}
+```
+
+#### Hashing
+```json
+{
+  "bcrypt": "^5.1.1",
+  "@types/bcrypt": "^5.0.2"
+}
+```
+
+#### Rate Limiting
+```json
+{
+  "@nestjs/throttler": "^5.1.0"
+}
+```
+
+### File Upload & Storage
+
+#### AWS SDK
+```json
+{
+  "@aws-sdk/client-s3": "^3.515.0",
+  "@aws-sdk/s3-request-presigner": "^3.515.0",
+  "@aws-sdk/client-rekognition": "^3.515.0"
+}
+```
+
+#### Multer
+```json
+{
+  "@nestjs/platform-express": "^10.3.0",
+  "multer": "^1.4.5-lts.1",
+  "@types/multer": "^1.4.11"
+}
+```
+
+### Email
+
+#### SendGrid
+```json
+{
+  "@sendgrid/mail": "^8.1.0"
+}
+```
+
+### External Integrations
+
+#### Yoti (KYC)
+```json
+{
+  "yoti": "^4.0.0"
+}
+```
+
+#### Google Vision AI
+```json
+{
+  "@google-cloud/vision": "^4.1.0"
+}
+```
+
+#### Stripe (Payments)
+```json
+{
+  "stripe": "^14.16.0"
+}
+```
+
+### WebSocket
+```json
+{
+  "@nestjs/websockets": "^10.3.0",
+  "@nestjs/platform-socket.io": "^10.3.0",
+  "socket.io": "^4.6.0"
+}
+```
+
+### Documentation
+```json
+{
+  "@nestjs/swagger": "^7.2.0"
+}
+```
+
+### Testing
+```json
+{
+  "@nestjs/testing": "^10.3.0",
+  "jest": "^29.7.0",
+  "@types/jest": "^29.5.0",
+  "ts-jest": "^29.1.0",
+  "supertest": "^6.3.0",
+  "@types/supertest": "^6.0.0"
+}
+```
+
+### Monitoring & Logging
+
+#### Logging
+```json
+{
+  "winston": "^3.11.0",
+  "nest-winston": "^1.9.4"
+}
+```
+
+#### Error Tracking
+```json
+{
+  "@sentry/node": "^7.100.0",
+  "@sentry/nestjs": "^7.100.0"
+}
+```
+
+#### APM
+```json
+{
+  "dd-trace": "^5.0.0"
+}
+```
+
+### Utilities
+```json
+{
+  "date-fns": "^3.0.0",
+  "lodash": "^4.17.21",
+  "@types/lodash": "^4.14.202"
+}
+```
+
+## 3. DATABASE
+
+### PostgreSQL 15
+
+**Extensions Requises**:
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm"; -- For full-text search
+```
+
+**Configuration**:
+```conf
+# postgresql.conf
+max_connections = 100
+shared_buffers = 256MB
+effective_cache_size = 1GB
+maintenance_work_mem = 64MB
+checkpoint_completion_target = 0.9
+wal_buffers = 16MB
+default_statistics_target = 100
+random_page_cost = 1.1
+effective_io_concurrency = 200
+work_mem = 2621kB
+min_wal_size = 1GB
+max_wal_size = 4GB
+```
+
+### Redis 7
+
+**Configuration**:
+```conf
+# redis.conf
+maxmemory 256mb
+maxmemory-policy allkeys-lru
+appendonly yes
+appendfsync everysec
+```
+
+## 4. INFRASTRUCTURE
+
+### Docker
+
+**Versions**:
+- Docker Engine: `^24.0.0`
+- Docker Compose: `^2.20.0`
+
+**Images utilisées**:
+```yaml
+services:
+  postgres:
+    image: postgres:15-alpine
+  redis:
+    image: redis:7-alpine
+  api:
+    build: ./apps/api
+  web:
+    build: ./apps/web
+```
+
+### Nginx (Reverse Proxy)
+**Version**: `alpine` (latest stable)
+
+```nginx
+worker_processes auto;
+events {
+  worker_connections 1024;
+}
+http {
+  upstream api {
+    server api:4000;
+  }
+  upstream web {
+    server web:3000;
+  }
+  # ... routes
+}
+```
+
+## 5. EXTERNAL SERVICES
+
+### Storage
+
+#### AWS S3
+**SDK**: `@aws-sdk/client-s3` v3
+**Regions**: 
+- Primary: `eu-west-1`
+- Backup: `eu-central-1`
+
+**Buckets**:
+- `oliver-storage-{env}`: Content (posts, videos)
+- `oliver-kyc-documents-{env}`: KYC docs (encrypted)
+- `oliver-exports-{env}`: Accounting exports
+- `oliver-backups-{env}`: Database backups
+
+#### Cloudflare R2 (Alternative)
+**SDK**: Compatible S3
+**Raison**: Pas de frais egress
+
+### KYC Verification
+
+#### Yoti (Primary)
+**SDK**: `yoti` v4
+**Features**:
+- Document verification
+- Liveness detection
+- Face matching
+
+#### Jumio (Fallback)
+**SDK**: REST API
+**Features**:
+- ID verification
+- AML checks
+
+### AI Moderation
+
+#### Google Cloud Vision API
+**SDK**: `@google-cloud/vision` v4
+**Features**:
+- Safe search detection
+- Label detection
+- Text detection (OCR)
+
+#### AWS Rekognition
+**SDK**: `@aws-sdk/client-rekognition` v3
+**Features**:
+- Content moderation
+- Face detection
+- Celebrity recognition
+
+### Email
+
+#### SendGrid (Primary)
+**SDK**: `@sendgrid/mail` v8
+**Features**:
+- Transactional emails
+- Templates
+- Tracking
+- 100k emails/month free
+
+#### AWS SES (Fallback)
+**SDK**: `@aws-sdk/client-ses` v3
+
+### Payments
+
+#### Stripe
+**SDK**: `stripe` v14
+**Products**:
+- Stripe Payments
+- Stripe Connect (for payouts)
+- Stripe Billing (subscriptions)
+
+#### CCBill (Alternative - Adult Industry)
+**Integration**: REST API
+**Features**:
+- Recurring billing
+- Multi-currency
+- Chargeback management
+
+### Monitoring
+
+#### Sentry (Error Tracking)
+**SDK**: 
+- Frontend: `@sentry/nextjs`
+- Backend: `@sentry/nestjs`
+
+**Features**:
+- Error tracking
+- Performance monitoring
+- Release tracking
+
+#### Datadog (APM)
+**SDK**: `dd-trace`
+**Metrics**:
+- APM
+- Infrastructure monitoring
+- Log management
+- Real User Monitoring (RUM)
+
+#### LogRocket (Session Replay)
+**SDK**: `logrocket`
+**Features**:
+- Session replay
+- Console logs
+- Network requests
+- User identification
+
+## 6. CI/CD
+
+### GitHub Actions
+
+**Workflows**:
+- `ci.yml`: Tests, linting, build
+- `deploy-staging.yml`: Deploy to staging
+- `deploy-production.yml`: Deploy to production
+
+**Actions utilisées**:
+```yaml
+actions/checkout@v3
+actions/setup-node@v3
+docker/build-push-action@v5
+```
+
+### Container Registry
+
+**Primary**: AWS ECR
+**Alternative**: GitHub Container Registry
+
+## 7. ENVIRONMENTS
+
+### Development
+```
+NODE_ENV=development
+API_URL=http://localhost:4000
+DATABASE_URL=postgresql://localhost:5432/oliver_dev
+REDIS_HOST=localhost
+```
+
+### Staging
+```
+NODE_ENV=staging
+API_URL=https://api-staging.oliver.com
+DATABASE_URL=postgresql://staging-db:5432/oliver_staging
+REDIS_HOST=staging-redis
+```
+
+### Production
+```
+NODE_ENV=production
+API_URL=https://api.oliver.com
+DATABASE_URL=postgresql://prod-db:5432/oliver_production
+REDIS_HOST=prod-redis
+```
+
+## 8. VERSIONS SUMMARY
+
+```json
+{
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "frontend": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.6.0",
+    "tailwindcss": "^3.4.0"
+  },
+  "backend": {
+    "@nestjs/core": "^10.3.0",
+    "prisma": "^5.9.0",
+    "typescript": "^5.6.0"
+  },
+  "databases": {
+    "postgresql": "15",
+    "redis": "7"
+  }
+}
+```
+
+## 9. PACKAGE MANAGERS
+
+### Primary: pnpm
+**Version**: `^9.0.0`  
+**Raison**:
+- Performance (hard links)
+- Disk space efficient
+- Strict dependency resolution
+- Workspaces support
+
+**Workspace Structure**:
+```yaml
+packages:
+  - 'apps/*'
+  - 'packages/*'
+```
+
+### Alternative: npm
+**Version**: `^10.0.0`
+
+## 10. CODE QUALITY
+
+### ESLint
+**Version**: `^8.56.0`
+**Config**: `eslint-config-next`
+
+```json
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
+}
+```
+
+### Prettier
+**Version**: `^3.2.0`
+
+```json
+{
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100
+}
+```
+
+### Husky + Lint-Staged
+```json
+{
+  "husky": "^9.0.0",
+  "lint-staged": "^15.2.0"
+}
+```
+
+**Pre-commit**:
+```bash
+npx lint-staged
+```
+
+## 11. TESTING
+
+### Frontend
+```json
+{
+  "@testing-library/react": "^14.2.0",
+  "@testing-library/jest-dom": "^6.2.0",
+  "vitest": "^1.2.0"
+}
+```
+
+### Backend
+```json
+{
+  "jest": "^29.7.0",
+  "@nestjs/testing": "^10.3.0"
+}
+```
+
+### E2E
+```json
+{
+  "@playwright/test": "^1.41.0"
+}
+```
+
+## 12. PERFORMANCE TARGETS
+
+### Frontend
+- **Lighthouse Score**: >90
+- **First Contentful Paint**: <1.5s
+- **Time to Interactive**: <3.5s
+- **Cumulative Layout Shift**: <0.1
+
+### Backend
+- **Response Time** (p95): <200ms
+- **Error Rate**: <0.1%
+- **Uptime**: >99.9%
+
+### Database
+- **Query Time** (p95): <50ms
+- **Connection Pool Usage**: <80%
+
+## 13. SECURITY
+
+### Dependencies Audit
+```bash
+# Run weekly
+pnpm audit
+npm audit
+```
+
+### Dependabot
+**Config**: `.github/dependabot.yml`
+```yaml
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+```
+
+### OWASP
+- SQL Injection: ✅ Protected (Prisma)
+- XSS: ✅ Protected (DOMPurify)
+- CSRF: ✅ Protected (Tokens)
+- Authentication: ✅ JWT + 2FA
+- Rate Limiting: ✅ Throttler
+
+## 14. DOCUMENTATION
+
+### API Documentation
+**Tool**: Swagger UI  
+**URL**: `/api/docs`
+
+### Code Documentation
+**Tool**: TypeDoc  
+**Generate**:
+```bash
+pnpm docs:generate
+```
+
+### Architecture Diagrams
+**Tool**: Mermaid (in markdown)
+
+## 15. MIGRATION PATH
+
+### From Development to Production
+
+1. **Database**:
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+2. **Build**:
+   ```bash
+   pnpm build
+   ```
+
+3. **Docker**:
+   ```bash
+   docker-compose -f docker-compose.prod.yml up -d
+   ```
+
+4. **Monitoring**:
+   - Enable Sentry
+   - Enable Datadog
+   - Configure alerts
+
+## 16. COST OPTIMIZATION
+
+### Development
+- **Cost**: ~$0/month
+- Local PostgreSQL, Redis
+- Mock external services
+
+### Staging
+- **Cost**: ~$100-200/month
+- Shared resources
+- Minimal redundancy
+
+### Production
+- **Cost**: ~$500-1000/month
+- High availability
+- Auto-scaling
+- Full monitoring
+
+---
+
+**Version**: 1.0.0  
+**Dernière mise à jour**: 2025-10-20  
+**Responsable**: Tech Lead Oliver Platform

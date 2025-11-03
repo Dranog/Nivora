@@ -1,0 +1,59 @@
+{
+  "$schema": "https://raw.githubusercontent.com/continuedev/continue/main/config.schema.json",
+  "defaultModel": "OpenAI 4o-mini",
+  "models": [
+    {
+      "title": "OpenAI 4o-mini",
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "apiBase": "https://api.openai.com/v1",
+      "apiKey": "${env:OPENAI_API_KEY}",
+      "temperature": 0.2,
+      "maxTokens": 8000
+    },
+    {
+      "title": "OpenAI 4.1-mini",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "apiBase": "https://api.openai.com/v1",
+      "apiKey": "${env:OPENAI_API_KEY}",
+      "temperature": 0.2,
+      "maxTokens": 8000
+    }
+  ],
+  "experimental": { "readWriteFilesystem": true },
+  "allowCommands": true,
+  "ignore": [
+    "**/node_modules/**","**/.next/**","**/dist/**","**/.turbo/**",
+    "**/.pnpm-store/**","**/.git/**","**/coverage/**"
+  ],
+  "readOnly": [],
+  "git": {
+    "requireGitCleanBeforeApply": false,
+    "createBranchPerApply": true,
+    "branchPrefix": "ai/"
+  },
+  "quickActions": [
+    {
+      "name": "Plan & Apply (feature slice)",
+      "prompt": "Tu es un agent de refactor/feature slice pour un monorepo PNPM (apps/web Next.js 15 React 19, apps/api NestJS). Lis le contexte, propose un PLAN concis (étapes numérotées, fichiers impactés), puis génère des diffs par fichier. Respecte TS strict, validation Zod côté web et DTO/class-validator côté API, tests unitaires si pertinent, accessibilité, logs/try-catch. Ne crée pas de TODO.",
+      "autoApply": false
+    },
+    { "name": "Fix test", "prompt": "Diagnostique et corrige l'erreur de test affichée. Ne modifie que le code nécessaire. Ajoute les assertions utiles et garde la dette technique à zéro.", "autoApply": false },
+    { "name": "Harden (security + types)", "prompt": "Renforce les types (TS strict), la validation d'entrée/sortie, les erreurs explicites, et la sécurité (headers, rate-limit hooks, guards). Aucun any. Pas de TODO.", "autoApply": false }
+  ],
+  "commands": [
+    { "name": "web:dev", "run": "pnpm --filter @oliver/web dev", "cwd": "${workspaceRoot}" },
+    { "name": "api:dev", "run": "pnpm --filter @oliver/api start:dev", "cwd": "${workspaceRoot}" },
+    { "name": "typecheck", "run": "pnpm -r type-check", "cwd": "${workspaceRoot}" },
+    { "name": "tests", "run": "pnpm -r test", "cwd": "${workspaceRoot}" },
+    { "name": "build", "run": "pnpm -r build", "cwd": "${workspaceRoot}" }
+  ],
+  "rules": [
+    "Toujours proposer un PLAN avant de générer des modifications multi-fichiers.",
+    "Toujours montrer les diffs et attendre validation avant d'écrire sur disque.",
+    "Respecter la convention commit: type(scope): message (ex: feat(kyc): add admin detail view).",
+    "Ne jamais introduire de TODO, placeholder ou ...rest non nécessaires.",
+    "Couvrir les entrées/sorties par schémas (Zod côté web, class-validator côté API)."
+  ]
+}

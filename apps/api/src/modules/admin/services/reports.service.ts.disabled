@@ -1,0 +1,670 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../../common/prisma/prisma.service';
+import { AuditService } from '../../../common/audit/audit.service';
+import { Prisma } from '@prisma/client';
+import {
+  ReportType,
+  ReportSeverity,
+  ReportStatus,
+  type ReportsQuery,
+  type ReportsListResponseDto,
+  type ReportDto,
+  type ReportDetailDto,
+  type ReportStatsDto,
+  type CreateReportDto,
+  type UpdateReportDto,
+  type ResolveReportDto,
+  type DismissReportDto,
+  type AssignReportDto,
+  type BulkReportActionDto,
+  type BulkReportActionResponseDto,
+} from '../dto/reports.dto';
+
+@Injectable()
+export class ReportsService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService
+  ) {}
+
+  /**
+   * Get paginated list of reports with filters
+   */
+  async getReports(query: ReportsQuery): Promise<ReportsListResponseDto> {
+    const {
+      page,
+      limit,
+      search,
+      type,
+      severity,
+      status,
+      assignedToId,
+      sortBy,
+      sortOrder,
+      createdFrom,
+      createdTo,
+    } = query;
+
+    // Build where clause
+    const where: Prisma.ReportWhereInput = {};
+
+    // Search filter (reason, description)
+    if (search) {
+      where.OR = [
+        { reason: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Type filter
+    if (type) {
+      where.resource = type;
+    }
+
+    // Severity filter
+    if (severity) {
+      where.severity = severity;
+    }
+
+    // Status filter
+    if (status) {
+      where.status = status;
+    }
+
+    // Assigned filter
+    if (assignedToId) {
+      if (assignedToId === 'unassigned') {
+        where.assignedToId = null;
+      } else {
+        where.assignedToId = assignedToId;
+      }
+    }
+
+    // Date range filter
+    if (createdFrom || createdTo) {
+      where.createdAt = {};
+      if (createdFrom) {
+        where.createdAt.gte = new Date(createdFrom);
+      }
+      if (createdTo) {
+        where.createdAt.lte = new Date(createdTo);
+      }
+    }
+
+    // Count total
+    const total = await this.prisma.report.count({ where });
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(total / limit);
+
+    // Build orderBy
+    const orderBy: Prisma.ReportOrderByWithRelationInput = { [sortBy]: sortOrder };
+
+    // Fetch reports
+    const reports = await this.prisma.report.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      include: {
+        reporter: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        targetUser: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        reviewedBy: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return {
+      reports: reports.map((r) => this.mapToReportDto(r)),
+      total,
+      page,
+      limit,
+      totalPages,
+    };
+  }
+
+  /**
+   * Get report statistics
+   */
+  async getReportStats(): Promise<ReportStatsDto> {
+    const now = new Date();
+    const todayStart = new Date(now.setHours(0, 0, 0, 0));
+    const weekStart = new Date(now.setDate(now.getDate() - 7));
+
+    const [
+      totalReports,
+      pendingReports,
+      inReviewReports,
+      resolvedReports,
+      dismissedReports,
+      criticalReports,
+      highSeverityReports,
+      newReportsToday,
+      newReportsThisWeek,
+    ] = await Promise.all([
+      this.prisma.report.count(),
+      this.prisma.report.count({ where: { status: ReportStatus.PENDING } }),
+      this.prisma.report.count({ where: { status: ReportStatus.UNDER_REVIEW } }),
+      this.prisma.report.count({ where: { status: ReportStatus.RESOLVED } }),
+      this.prisma.report.count({ where: { status: ReportStatus.DISMISSED } }),
+      this.prisma.report.count({ where: { severity: ReportSeverity.CRITICAL } }),
+      this.prisma.report.count({ where: { severity: ReportSeverity.HIGH } }),
+      this.prisma.report.count({ where: { createdAt: { gte: todayStart } } }),
+      this.prisma.report.count({ where: { createdAt: { gte: weekStart } } }),
+    ]);
+
+    // Calculate average resolution time (in hours)
+    const resolvedReportsWithTime = await this.prisma.report.findMany({
+      where: {
+        status: ReportStatus.RESOLVED,
+      },
+      select: {
+        createdAt: true,
+        updatedAt: true,
+      },
+      take: 100, // Sample for performance
+    });
+
+    let averageResolutionTime = 0;
+    if (resolvedReportsWithTime.length > 0) {
+      const totalTime = resolvedReportsWithTime.reduce((acc, r) => {
+        const diff = r.updatedAt.getTime() - r.createdAt.getTime();
+        return acc + diff;
+      }, 0);
+      averageResolutionTime = totalTime / resolvedReportsWithTime.length / (1000 * 60 * 60); // Convert to hours
+    }
+
+    return {
+      totalReports,
+      pendingReports,
+      inReviewReports,
+      resolvedReports,
+      dismissedReports,
+      criticalReports,
+      highSeverityReports,
+      newReportsToday,
+      newReportsThisWeek,
+      averageResolutionTime: Math.round(averageResolutionTime * 10) / 10,
+    };
+  }
+
+  /**
+   * Get report detail by ID
+   */
+  async getReportDetail(reportId: string, adminId: string): Promise<ReportDetailDto> {
+    const report = await this.prisma.report.findUnique({
+      where: { id: reportId },
+      include: {
+        reporter: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        targetUser: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        assignedTo: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        reviewedBy: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!report) {
+      throw new NotFoundException('Report not found');
+    }
+
+    // Fetch target content based on type
+    let targetContent = null;
+    if (report.resource === ReportType.POST) {
+      targetContent = await this.prisma.post.findUnique({
+        where: { id: report.targetId },
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          author: {
+            select: { id: true, username: true, avatar: true },
+          },
+        },
+      });
+    } else if (report.resource === ReportType.USER) {
+      targetContent = await this.prisma.user.findUnique({
+        where: { id: report.targetId },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          avatar: true,
+          bio: true,
+          createdAt: true,
+        },
+      });
+    }
+    // Add other types as needed
+
+    // Fetch moderation history from audit log
+    const moderationHistory = await this.prisma.auditLog.findMany({
+      where: {
+        resource: 'REPORT',
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        event: true,
+        userId: true,
+        createdAt: true,
+        meta: true,
+      },
+    });
+
+    const historyWithUsers = await Promise.all(
+      moderationHistory.map(async (h) => {
+        const user = h.userId ? await this.prisma.user.findUnique({
+          where: { id: h.userId },
+          select: { id: true, username: true },
+        }) : null;
+        return {
+          id: h.id,
+          action: h.event, // DTO expects action
+          performedBy: user ? { id: user.id, username: user.username } : { id: h.userId || 'unknown', username: 'Unknown' },
+          timestamp: h.createdAt.toISOString(),
+          notes: ((h.meta as any)?.notes || null) as string | null,
+        };
+      })
+    );
+
+    // Fetch related reports (same target or same reporter)
+    const relatedReports = await this.prisma.report.findMany({
+      where: {
+        OR: [
+          { reporterId: report.reporterId, id: { not: reportId } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        reason: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    // Audit this access
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_VIEW_REPORT_DETAIL',
+      resource: 'REPORT',
+    });
+
+    return {
+      id: report.id,
+      reporterId: report.reporterId,
+      reporter: report.reporter,
+      targetType: report.resource as any, // Alias field
+      targetId: report.targetId,
+      targetUserId: report.targetUserId,
+      targetUser: report.targetUser,
+      severity: (report.severity || report.priority) as any,
+      status: report.status as any,
+      reason: report.reason,
+      description: report.description || null,
+      assignedToId: report.assignedToId,
+      assignedTo: report.assignedTo,
+      reviewedById: report.reviewedById,
+      reviewedBy: report.reviewedBy,
+      resolution: report.resolution || null,
+      createdAt: report.createdAt.toISOString(),
+      updatedAt: report.updatedAt.toISOString(),
+      targetContent,
+      moderationHistory: historyWithUsers,
+      relatedReports: relatedReports.map((r) => ({
+        id: r.id,
+        reason: r.reason,
+        status: r.status as any, // Cast Prisma enum to DTO enum
+        createdAt: r.createdAt.toISOString(),
+      })),
+    };
+  }
+
+  /**
+   * Create this.mapToReportDto(report)
+   */
+  async createReport(
+    data: CreateReportDto,
+    reporterId: string
+  ): Promise<ReportDto> {
+    // Verify target exists
+
+    // Get target user ID if applicable
+    let targetUserId: string | null = null;
+    if (data.targetType === ReportType.USER) {
+      targetUserId = data.targetId;
+    } else if (data.targetType === ReportType.POST) {
+      const post = await this.prisma.post.findUnique({
+        where: { id: data.targetId },
+        select: { authorId: true },
+      });
+      targetUserId = post?.authorId || null;
+    }
+
+    const report = await this.prisma.report.create({
+      data: {
+        reporterId,
+        targetId: data.targetId,
+        targetType: data.targetType as any,
+        targetUserId,
+        reason: data.reason,
+        description: data.description,
+        priority: data.severity as any, // severity -> priority
+        status: ReportStatus.PENDING,
+      },
+      include: {
+        reporter: {
+          select: { id: true, username: true, email: true, avatar: true },
+        },
+        targetUser: {
+          select: { id: true, username: true, email: true, avatar: true },
+        },
+        assignedTo: {
+          select: { id: true, username: true, email: true },
+        },
+        reviewedBy: {
+          select: { id: true, username: true, email: true },
+        },
+      },
+    });
+
+    // Map to DTO
+    return {
+      id: report.id,
+      reporterId: report.reporterId,
+      reporter: report.reporter,
+      targetType: report.targetType as any,
+      targetId: report.targetId,
+      targetUserId: report.targetUserId,
+      targetUser: report.targetUser,
+      severity: (report.priority || report.severity) as any,
+      status: report.status as any,
+      reason: report.reason,
+      description: report.description || null,
+      assignedToId: report.assignedToId,
+      assignedTo: report.assignedTo,
+      reviewedById: report.reviewedById,
+      reviewedBy: report.reviewedBy,
+      resolution: report.resolution || null,
+      createdAt: report.createdAt.toISOString(),
+      updatedAt: report.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Update this.mapToReportDto(report)
+   */
+  async updateReport(
+    reportId: string,
+    data: UpdateReportDto,
+    adminId: string
+  ): Promise<ReportDto> {
+    const report = await this.prisma.report.update({
+      where: { id: reportId },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+      include: {
+        reporter: {
+          select: { id: true, username: true, email: true, avatar: true },
+        },
+        targetUser: {
+          select: { id: true, username: true, email: true, avatar: true },
+        },
+        assignedTo: {
+          select: { id: true, username: true, email: true },
+        },
+        reviewedBy: {
+          select: { id: true, username: true, email: true },
+        },
+      },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_UPDATE_REPORT',
+      resource: 'REPORT',
+      meta: { changes: data },
+    });
+
+    // Map to DTO
+    return {
+      id: report.id,
+      reporterId: report.reporterId,
+      reporter: report.reporter,
+      targetType: report.targetType as any,
+      targetId: report.targetId,
+      targetUserId: report.targetUserId,
+      targetUser: report.targetUser,
+      severity: (report.priority || report.severity) as any,
+      status: report.status as any,
+      reason: report.reason,
+      description: report.description || null,
+      assignedToId: report.assignedToId,
+      assignedTo: report.assignedTo,
+      reviewedById: report.reviewedById,
+      reviewedBy: report.reviewedBy,
+      resolution: report.resolution || null,
+      createdAt: report.createdAt.toISOString(),
+      updatedAt: report.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Resolve this.mapToReportDto(report)
+   */
+  async resolveReport(
+    reportId: string,
+    data: ResolveReportDto,
+    adminId: string
+  ): Promise<void> {
+    await this.prisma.report.update({
+      where: { id: reportId },
+      data: {
+        status: ReportStatus.RESOLVED,
+        resolution: data.resolution,
+        reviewedById: adminId,
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_RESOLVE_REPORT',
+      resource: 'REPORT',
+      meta: { action: data.action, resolution: data.resolution },
+    });
+
+    // TODO: Send notification to reporter if data.notifyReporter is true
+  }
+
+  /**
+   * Dismiss this.mapToReportDto(report)
+   */
+  async dismissReport(
+    reportId: string,
+    data: DismissReportDto,
+    adminId: string
+  ): Promise<void> {
+    await this.prisma.report.update({
+      where: { id: reportId },
+      data: {
+        status: ReportStatus.DISMISSED,
+        resolution: data.reason,
+        reviewedById: adminId,
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_DISMISS_REPORT',
+      resource: 'REPORT',
+      meta: { reason: data.reason },
+    });
+
+    // TODO: Send notification to reporter if data.notifyReporter is true
+  }
+
+  /**
+   * Assign this.mapToReportDto(report)
+   */
+  async assignReport(
+    reportId: string,
+    data: AssignReportDto,
+    adminId: string
+  ): Promise<void> {
+    await this.prisma.report.update({
+      where: { id: reportId },
+      data: {
+        assignedToId: data.assignedToId,
+        status: ReportStatus.UNDER_REVIEW,
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_ASSIGN_REPORT',
+      resource: 'REPORT',
+      meta: { assignedToId: data.assignedToId },
+    });
+  }
+
+  /**
+   * Bulk action on reports
+   */
+  async bulkAction(
+    data: BulkReportActionDto,
+    adminId: string
+  ): Promise<BulkReportActionResponseDto> {
+    const { reportIds, action, assignedToId, reason } = data;
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [] as Array<{ reportId: string; error: string }>,
+    };
+
+    for (const reportId of reportIds) {
+      try {
+        switch (action) {
+          case 'assign':
+            if (!assignedToId) {
+              throw new BadRequestException('assignedToId is required for assign action');
+            }
+            await this.assignReport(reportId, { assignedToId }, adminId);
+            break;
+          case 'dismiss':
+            await this.dismissReport(reportId, { reason: reason || 'Bulk dismiss', notifyReporter: false }, adminId);
+            break;
+          case 'mark_in_review':
+            await this.updateReport(reportId, { status: ReportStatus.UNDER_REVIEW }, adminId);
+            break;
+          default:
+            throw new BadRequestException(`Unknown event: ${action}`);
+        }
+        results.success++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          reportId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+
+    await this.audit.log({
+      userId: adminId,
+      event: 'ADMIN_BULK_ACTION_REPORTS',
+      resource: 'REPORT',
+      meta: { action, reportIds, results },
+    });
+
+    return results;
+  }
+
+  /**
+   * Helper: Verify target exists
+   */
+
+  /**
+   * Helper: Map Prisma report to DTO
+   */
+  private mapToReportDto(report: any): ReportDto {
+    return {
+      id: report.id,
+      reporterId: report.reporterId,
+      reporter: report.reporter,
+      targetType: report.targetType as any,
+      targetId: report.targetId,
+      targetUserId: report.targetUserId,
+      targetUser: report.targetUser,
+      severity: report.severity,
+      status: report.status,
+      reason: report.reason,
+      description: report.description,
+      assignedToId: report.assignedToId,
+      assignedTo: report.assignedTo,
+      reviewedById: report.reviewedById,
+      reviewedBy: report.reviewedBy,
+      resolution: report.resolution,
+      createdAt: report.createdAt.toISOString(),
+      updatedAt: report.updatedAt.toISOString(),
+    };
+  }
+}
