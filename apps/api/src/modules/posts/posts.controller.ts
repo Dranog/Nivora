@@ -50,6 +50,38 @@ export class PostsController {
   async remove(@Param('id') id: string) {
     return this.postsService.delete(id);
   }
+
+  // ========== LIKE POST ==========
+  @Post(':id/like')
+  @UseGuards(JwtAuthGuard)
+  async likePost(@Param('id') postId: string, @Request() req: any) {
+    return this.postsService.likePost(postId, req.user!.id);
+  }
+
+  // ========== UNLIKE POST ==========
+  @Delete(':id/like')
+  @UseGuards(JwtAuthGuard)
+  async unlikePost(@Param('id') postId: string, @Request() req: any) {
+    return this.postsService.unlikePost(postId, req.user!.id);
+  }
+
+  // ========== CREATE COMMENT ==========
+  @Post(':id/comments')
+  @UseGuards(JwtAuthGuard)
+  async createComment(
+    @Param('id') postId: string,
+    @Body() body: { content: string },
+    @Request() req: any,
+  ) {
+    return this.postsService.createComment(postId, req.user!.id, body.content);
+  }
+
+  // ========== GET COMMENTS ==========
+  @Get(':id/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getComments(@Param('id') postId: string) {
+    return this.postsService.getComments(postId);
+  }
 }
 
 @Controller('creators')

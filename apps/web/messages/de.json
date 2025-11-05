@@ -1214,6 +1214,202 @@
       }
     }
   },
+  "profile": {
+    "notFound": {
+      "title": "404",
+      "message": "Benutzer nicht gefunden",
+      "description": "Dieser Benutzer existiert nicht"
+    },
+    "back": "Zurück",
+    "viewProfile": "Profil von {name} anzeigen",
+    "subscriptions": "{count} Abonnements",
+    "roles": {
+      "creator": "Ersteller",
+      "fan": "Fan"
+    },
+    "stats": {
+      "totalSpent": "Gesamtausgaben",
+      "subscriptions": "Abonnements",
+      "likedPosts": "Gelikte Beiträge",
+      "memberSince": "Mitglied Seit"
+    },
+    "tabs": {
+      "posts": "Beiträge",
+      "media": "Medien",
+      "about": "Über",
+      "subscriptions": "Abonnements",
+      "history": "Verlauf",
+      "settings": "Einstellungen"
+    },
+    "whatIOffer": {
+      "title": "Was ich anbiete",
+      "preview": "Vorschau",
+      "showMore": "Mehr anzeigen"
+    },
+    "about": {
+      "title": "Über mich",
+      "subtitle": "Lernen Sie mich kennen",
+      "whoIAm": "Wer ich bin",
+      "whatIOffer": "Was ich anbiete",
+      "memberSince": "Mitglied seit",
+      "posts": "Beiträge",
+      "newContentWeekly": "Jede Woche neuer Inhalt 🔥",
+      "subscribeNow": "Jetzt abonnieren",
+      "noBio": "Keine Biografie vorhanden"
+    },
+    "mediaTabs": {
+      "all": "Alle",
+      "photos": "Fotos",
+      "videos": "Videos"
+    },
+    "subscriptions": {
+      "title": "Meine Abonnements",
+      "creator": "Ersteller",
+      "plan": "Plan",
+      "since": "Seit",
+      "nextBilling": "Nächste Zahlung",
+      "status": "Status",
+      "statuses": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv"
+      },
+      "noSubscriptions": "Keine aktiven Abonnements",
+      "description": "Wählen Sie den passenden Plan",
+      "subscribe": "Abonnieren"
+    },
+    "history": {
+      "title": "Kaufverlauf",
+      "date": "Datum",
+      "description": "Beschreibung",
+      "amount": "Betrag",
+      "status": "Status",
+      "statuses": {
+        "completed": "Abgeschlossen"
+      }
+    },
+    "settings": {
+      "title": "Kontoeinstellungen",
+      "email": "E-Mail",
+      "username": "Benutzername",
+      "editProfile": "Profil Bearbeiten"
+    },
+    "header": {
+      "search": "Suchen",
+      "notifications": "Benachrichtigungen"
+    },
+    "badge": {
+      "goldCreator": "Gold Creator",
+      "popular": "Am Beliebtesten"
+    },
+    "creator": {
+      "followers": "Follower",
+      "subscribe": "Abonnieren",
+      "message": "Nachricht",
+      "tip": "Trinkgeld",
+      "more": "Mehr",
+      "subscriptionsSection": {
+        "title": "Abonnements",
+        "subtitle": "Wählen Sie Ihre Zugriffsstufe",
+        "totalPosts": "Beiträge"
+      },
+      "subscriptions": "Abonnements",
+      "popular": "Am Beliebtesten",
+      "perMonth": "/Monat",
+      "locked": "Abonnement erforderlich",
+      "lockedPrice": "Entsperren",
+      "playVideo": "Video abspielen",
+      "subscribed": "Abonniert",
+      "tabs": {
+        "all": "Alle",
+        "photos": "Fotos",
+        "videos": "Videos",
+        "free": "Kostenlos",
+        "paid": "Bezahlt"
+      }
+    },
+    "content": {
+      "freePhotos": "Kostenlose Fotos",
+      "freePhotosDescription": "Für alle zugängliche Inhalte",
+      "exclusiveContent": "Exklusive Inhalte",
+      "exclusiveContentDescription": "Nur für Abonnenten",
+      "subscriptionRequired": "Abonnement erforderlich",
+      "videos": "Videos",
+      "videosDescription": "Tutorials und Sessions",
+      "all": "Alle",
+      "recent": "Aktuell",
+      "popular": "Beliebt"
+    },
+    "post": {
+      "likes": "{count} Likes",
+      "comments": "{count} Kommentare",
+      "writeComment": "Einen Kommentar schreiben...",
+      "sendTip": "Trinkgeld senden",
+      "noComments": "Noch keine Kommentare",
+      "beFirst": "Sei der Erste, der kommentiert!",
+      "creator": "Ersteller",
+      "justNow": "Gerade eben",
+      "minutesAgo": "Vor {count} Min.",
+      "hoursAgo": "Vor {count} Std.",
+      "daysAgo": "Vor {count} Tagen"
+    },
+    "tipModal": {
+      "title": "Trinkgeld an {name} senden",
+      "description": "Unterstützen Sie Ihren Lieblings-Creator mit einem Trinkgeld",
+      "amountLabel": "Betrag",
+      "messageLabel": "Nachricht",
+      "optional": "(optional)",
+      "messagePlaceholder": "Fügen Sie eine Nachricht hinzu...",
+      "cancel": "Abbrechen",
+      "send": "Trinkgeld Senden",
+      "sending": "Wird gesendet...",
+      "success": "{amount}€ an {name} gesendet!",
+      "error": "Fehler beim Senden des Trinkgelds",
+      "invalidAmount": "Ungültiger Betrag"
+    }
+  },
+  "messages": {
+    "tips": {
+      "title": "Trinkgeld Senden",
+      "description": "Unterstützen Sie {creator} mit einem Trinkgeld",
+      "amount": "Betrag (€)",
+      "message": "Nachricht (optional)",
+      "messagePlaceholder": "Fügen Sie eine Nachricht für {creator} hinzu...",
+      "confirm": "Zahlung Bestätigen",
+      "quickAmounts": "Schnellbeträge"
+    },
+    "time": {
+      "justNow": "Gerade eben",
+      "minutesAgo": "Vor {count} Min",
+      "hoursAgo": "Vor {count}h",
+      "yesterday": "Gestern",
+      "daysAgo": "Vor {count}T"
+    },
+    "media": {
+      "unlock": "Entsperren",
+      "unlockTitle": "Inhalt entsperren",
+      "unlockDescription": "Dieser Inhalt ist gesperrt. Möchten Sie ihn kaufen?",
+      "photo": "Foto",
+      "video": "Video",
+      "type": "Typ",
+      "access": "Zugriff",
+      "price": "Preis",
+      "confirmPurchase": "Kauf bestätigen",
+      "purchased": "Gekauft",
+      "purchasedOn": "Gekauft am {date}",
+      "purchaseSuccess": "Inhalt freigeschaltet!",
+      "purchaseSuccessDescription": "Sie können diesen Inhalt jetzt ansehen",
+      "purchaseError": "Kauffehler",
+      "purchaseErrorDescription": "Zahlung konnte nicht verarbeitet werden"
+    }
+  },
+  "toasts": {
+    "tips": {
+      "success": "Trinkgeld Gesendet!",
+      "successDescription": "Trinkgeld von €{amount} gesendet!",
+      "error": "Sendefehler",
+      "errorDescription": "Zahlung konnte nicht verarbeitet werden"
+    }
+  },
   "common": {
     "logout": "Abmelden",
     "profile": "Profil",

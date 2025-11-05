@@ -168,7 +168,7 @@ export function useApproveContent(
         }
       );
 
-      return { previousData };
+      return { previousData } as any;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: moderationKeys.lists() });
@@ -180,8 +180,9 @@ export function useApproveContent(
     },
     onError: (error, variables, context) => {
       // Rollback on error
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
+      const ctx = context as any;
+      if (ctx?.previousData) {
+        ctx.previousData.forEach(([queryKey, data]: [any, any]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
@@ -221,7 +222,7 @@ export function useRejectContent(
         }
       );
 
-      return { previousData };
+      return { previousData } as any;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: moderationKeys.lists() });
@@ -232,8 +233,9 @@ export function useRejectContent(
       });
     },
     onError: (error, variables, context) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
+      const ctx = context as any;
+      if (ctx?.previousData) {
+        ctx.previousData.forEach(([queryKey, data]: [any, any]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }

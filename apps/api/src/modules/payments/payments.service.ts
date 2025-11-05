@@ -208,6 +208,10 @@ export class PaymentsService {
         await this.handlePaymentSuccess(event.data.object as Stripe.PaymentIntent);
         break;
 
+      case 'checkout.session.completed':
+        await this.handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        break;
+
       case 'charge.refunded':
         await this.handleRefund(event.data.object as Stripe.Charge);
         break;
@@ -331,5 +335,200 @@ export class PaymentsService {
     this.logger.log(`Dispute received: ${dispute.id}`);
     this.logger.warn('Dispute handling disabled - stripePaymentIntentId field not in schema');
     return;
+  }
+
+  private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+    const metadata = session.metadata as any;
+    const type = metadata.type;
+
+    this.logger.log(`Checkout session completed: ${type} - ${session.id}`);
+
+    if (type === 'tip') {
+      // Create tip record
+      const tip = await prisma.tip.create({
+        data: {
+          id: randomUUID(),
+          fanId: metadata.userId,
+          creatorId: metadata.creatorId,
+          amount: Math.round(parseFloat(metadata.amount) * 100), // Convert EUR to cents
+          currency: Currency.EUR,
+          message: metadata.message || null,
+          status: 'PAID',
+          stripeSessionId: session.id,
+        },
+      });
+
+      this.logger.log(`Tip created: ${tip.id} - ${metadata.amount}€`);
+
+      // Create comment as tip
+      const latestPost = await prisma.post.findFirst({
+        where: { creatorId: metadata.creatorId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (latestPost) {
+        await prisma.comment.create({
+          data: {
+            id: randomUUID(),
+            type: 'tip',
+            content: `A envoyé un tip de ${metadata.amount}€`,
+            postId: latestPost.id,
+            userId: metadata.userId,
+            tipAmount: parseFloat(metadata.amount),
+            tipMessage: metadata.message || null,
+          },
+        });
+
+        this.logger.log(`Tip comment created for post ${latestPost.id}`);
+      }
+
+      // Create ledger entries
+      await this.ledgerService.createPaymentEntries({
+        fanId: metadata.userId,
+        authorId: metadata.creatorId,
+        amountCents: Math.round(parseFloat(metadata.amount) * 100),
+        type: 'TIP',
+        referenceId: tip.id,
+      });
+    } else if (type === 'unlock') {
+      // Create unlocked post record
+      const unlockPrice = Math.round(parseFloat(metadata.amount) * 100);
+
+      const unlockedPost = await prisma.unlockedPost.create({
+        data: {
+          id: randomUUID(),
+          userId: metadata.userId,
+          postId: metadata.postId,
+          amount: parseFloat(metadata.amount),
+          stripeSessionId: session.id,
+        },
+      });
+
+      this.logger.log(`Post unlocked: ${metadata.postId} for user ${metadata.userId}`);
+
+      // Create ledger entries
+      await this.ledgerService.createPaymentEntries({
+        fanId: metadata.userId,
+        authorId: metadata.creatorId,
+        amountCents: unlockPrice,
+        type: 'PPV',
+        referenceId: unlockedPost.id,
+      });
+    }
+  }
+
+  // CCBill payment processing methods
+
+  async processTip(data: {
+    userId: string;
+    creatorId: string;
+    amount: number;
+    message: string;
+    ccbillSubscriptionId: string;
+  }) {
+    // Create tip
+    const tip = await prisma.tip.create({
+      data: {
+        id: randomUUID(),
+        fanId: data.userId,
+        creatorId: data.creatorId,
+        amount: Math.round(data.amount * 100), // Convert to cents
+        currency: Currency.EUR,
+        message: data.message,
+        status: 'PAID',
+        ccbillSubscriptionId: data.ccbillSubscriptionId,
+      },
+    });
+
+    this.logger.log(`CCBill tip created: ${tip.id} - ${data.amount}€`);
+
+    // Create comment as tip
+    const latestPost = await prisma.post.findFirst({
+      where: { creatorId: data.creatorId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (latestPost) {
+      await prisma.comment.create({
+        data: {
+          id: randomUUID(),
+          type: 'tip',
+          content: `A envoyé un tip de ${data.amount}€`,
+          postId: latestPost.id,
+          userId: data.userId,
+          tipAmount: data.amount,
+          tipMessage: data.message || null,
+        },
+      });
+
+      this.logger.log(`Tip comment created for post ${latestPost.id}`);
+    }
+
+    // Create ledger entries
+    await this.ledgerService.createPaymentEntries({
+      fanId: data.userId,
+      authorId: data.creatorId,
+      amountCents: Math.round(data.amount * 100),
+      type: 'TIP',
+      referenceId: tip.id,
+    });
+
+    return tip;
+  }
+
+  async processUnlock(data: {
+    userId: string;
+    postId: string;
+    amount: number;
+    ccbillSubscriptionId: string;
+  }) {
+    // Get post to find creator
+    const post = await prisma.post.findUnique({
+      where: { id: data.postId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    // Create unlocked post record
+    const unlockedPost = await prisma.unlockedPost.create({
+      data: {
+        id: randomUUID(),
+        userId: data.userId,
+        postId: data.postId,
+        amount: data.amount,
+        ccbillSubscriptionId: data.ccbillSubscriptionId,
+      },
+    });
+
+    this.logger.log(`CCBill post unlocked: ${data.postId} for user ${data.userId}`);
+
+    // Create ledger entries
+    await this.ledgerService.createPaymentEntries({
+      fanId: data.userId,
+      authorId: post.creatorId,
+      amountCents: Math.round(data.amount * 100),
+      type: 'PPV',
+      referenceId: unlockedPost.id,
+    });
+
+    return unlockedPost;
+  }
+
+  async findBySubscriptionId(subscriptionId: string) {
+    // Try to find tip with this subscription ID
+    const tip = await prisma.tip.findFirst({
+      where: { ccbillSubscriptionId: subscriptionId },
+    });
+
+    if (tip) return tip;
+
+    // Try to find unlocked post with this subscription ID
+    const unlockedPost = await prisma.unlockedPost.findFirst({
+      where: { ccbillSubscriptionId: subscriptionId },
+    });
+
+    return unlockedPost;
   }
 }

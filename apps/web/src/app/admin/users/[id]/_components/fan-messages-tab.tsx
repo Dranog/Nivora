@@ -120,25 +120,23 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
 
   const handleViewConversation = (conversationId: string) => {
     setSelectedConversation(selectedConversation === conversationId ? null : conversationId);
-    const msgCount = conversationMessages[conversationId]?.length || 0;
-    adminToasts.general.info(`Affichage de ${msgCount} messages`);
   };
 
   const handleValidateFlag = async (flagId: string) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
-      adminToasts.general.success('Flag validé - Action automatique déclenchée');
+      adminToasts.general.updateSuccess();
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la validation du flag');
+      adminToasts.general.updateFailed();
     }
   };
 
   const handleIgnoreFlag = async (flagId: string) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 600));
-      adminToasts.general.info('Flag ignoré - IA mise à jour');
+      // Flag ignored - no toast needed
     } catch (error) {
-      adminToasts.general.error('Erreur lors de l\'ignorance du flag');
+      adminToasts.general.updateFailed();
     }
   };
 
@@ -148,9 +146,9 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      adminToasts.general.warning(`Avertissement envoyé à ${creatorName}`);
+      adminToasts.general.updateSuccess();
     } catch (error) {
-      adminToasts.general.error('Erreur lors de l\'envoi de l\'avertissement');
+      adminToasts.general.updateFailed();
     }
   };
 
@@ -160,66 +158,65 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
     );
 
     if (confirmation !== 'BANNIR') {
-      adminToasts.general.error('Bannissement annulé');
       return;
     }
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      adminToasts.general.error(`${creatorName} a été banni définitivement`);
+      adminToasts.users.banned();
     } catch (error) {
-      adminToasts.general.error('Erreur lors du bannissement');
+      adminToasts.users.banFailed();
     }
   };
 
   const handleDeleteMessage = async () => {
     if (!selectedMessage || !deleteReason.trim()) {
-      adminToasts.general.error('Raison requise (min 10 caractères)');
+      adminToasts.general.validationError('Raison requise (min 10 caractères)');
       return;
     }
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
-      adminToasts.general.success('Message supprimé');
+      adminToasts.general.deleteSuccess();
       setShowDeleteModal(false);
       setDeleteReason('');
       setSelectedMessage(null);
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la suppression');
+      adminToasts.general.deleteFailed();
     }
   };
 
   const handleContactFan = async () => {
     if (!emailSubject.trim() || !emailMessage.trim()) {
-      adminToasts.general.error('Sujet et message requis');
+      adminToasts.general.validationError('Sujet et message requis');
       return;
     }
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      adminToasts.general.success('Email de prévention envoyé au fan');
+      adminToasts.general.updateSuccess();
       setShowContactModal(false);
       setEmailSubject('');
       setEmailMessage('');
     } catch (error) {
-      adminToasts.general.error('Erreur lors de l\'envoi de l\'email');
+      adminToasts.general.updateFailed();
     }
   };
 
   const handleCloseConversation = async () => {
     if (!selectedConversation || !closeReason.trim()) {
-      adminToasts.general.error('Raison requise (min 10 caractères)');
+      adminToasts.general.validationError('Raison requise (min 10 caractères)');
       return;
     }
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      adminToasts.general.warning('Conversation fermée - Futurs messages bloqués');
+      adminToasts.general.updateSuccess();
       setShowCloseModal(false);
       setCloseReason('');
       setSelectedConversation(null);
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la fermeture');
+      adminToasts.general.updateFailed();
     }
   };
 
@@ -229,7 +226,7 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
       const messages = conversationMessages[conversationId] || [];
 
       if (!conversation) {
-        adminToasts.general.error('Conversation introuvable');
+        adminToasts.general.loadFailed();
         return;
       }
 
@@ -261,13 +258,12 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
           metadata: { conversationId },
         });
 
-        adminToasts.general.success('Conversation copiée avec watermark CONFIDENTIEL ADMIN');
-        adminToasts.general.info('La copie contient un watermark de traçabilité');
+        adminToasts.general.copySuccess();
       } else {
-        adminToasts.general.error('Erreur lors de la copie dans le presse-papiers');
+        adminToasts.general.updateFailed();
       }
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la copie');
+      adminToasts.general.updateFailed();
     }
   };
 
@@ -277,7 +273,7 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
       const messages = conversationMessages[conversationId] || [];
 
       if (!conversation) {
-        adminToasts.general.error('Conversation introuvable');
+        adminToasts.general.loadFailed();
         return;
       }
 
@@ -298,7 +294,7 @@ export function FanMessagesTab({ userId }: FanMessagesTabProps) {
       // Créer une fenêtre d'impression avec watermark
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
-        adminToasts.general.error('Impossible d\'ouvrir la fenêtre d\'impression (popup bloqué?)');
+        adminToasts.general.updateFailed();
         return;
       }
 
@@ -396,10 +392,9 @@ Accès par: admin@oliver.com | Date: ${timestamp}
         printWindow.print();
       }, 250);
 
-      adminToasts.general.success('Fenêtre d\'impression ouverte');
-      adminToasts.general.info('L\'impression contient un watermark de traçabilité');
+      // Print window opened successfully
     } catch (error) {
-      adminToasts.general.error('Erreur lors de l\'impression');
+      adminToasts.general.updateFailed();
     }
   };
 

@@ -1214,6 +1214,202 @@
       }
     }
   },
+  "profile": {
+    "notFound": {
+      "title": "404",
+      "message": "Usuario no encontrado",
+      "description": "Este usuario no existe"
+    },
+    "back": "Volver",
+    "viewProfile": "Ver perfil de {name}",
+    "subscriptions": "{count} suscripciones",
+    "roles": {
+      "creator": "Creador",
+      "fan": "Fan"
+    },
+    "stats": {
+      "totalSpent": "Gasto Total",
+      "subscriptions": "Suscripciones",
+      "likedPosts": "Posts Likeados",
+      "memberSince": "Miembro Desde"
+    },
+    "tabs": {
+      "posts": "Publicaciones",
+      "media": "Medios",
+      "about": "Acerca de",
+      "subscriptions": "Suscripciones",
+      "history": "Historial",
+      "settings": "Configuración"
+    },
+    "whatIOffer": {
+      "title": "Lo que ofrezco",
+      "preview": "Vista previa",
+      "showMore": "Ver más"
+    },
+    "about": {
+      "title": "Acerca de",
+      "subtitle": "Conóceme mejor",
+      "whoIAm": "Quién soy",
+      "whatIOffer": "Lo que ofrezco",
+      "memberSince": "Miembro desde",
+      "posts": "Publicaciones",
+      "newContentWeekly": "Nuevo contenido cada semana 🔥",
+      "subscribeNow": "Suscribirse ahora",
+      "noBio": "Sin biografía"
+    },
+    "mediaTabs": {
+      "all": "Todo",
+      "photos": "Fotos",
+      "videos": "Vídeos"
+    },
+    "subscriptions": {
+      "title": "Mis Suscripciones",
+      "creator": "Creador",
+      "plan": "Plan",
+      "since": "Desde",
+      "nextBilling": "Próximo Pago",
+      "status": "Estado",
+      "statuses": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "noSubscriptions": "Sin suscripciones activas",
+      "description": "Elige el plan que más te convenga",
+      "subscribe": "Suscribirse"
+    },
+    "history": {
+      "title": "Historial de Compras",
+      "date": "Fecha",
+      "description": "Descripción",
+      "amount": "Monto",
+      "status": "Estado",
+      "statuses": {
+        "completed": "Completado"
+      }
+    },
+    "settings": {
+      "title": "Configuración de Cuenta",
+      "email": "Email",
+      "username": "Nombre de usuario",
+      "editProfile": "Editar Perfil"
+    },
+    "header": {
+      "search": "Buscar",
+      "notifications": "Notificaciones"
+    },
+    "badge": {
+      "goldCreator": "Creador Gold",
+      "popular": "Más Popular"
+    },
+    "creator": {
+      "followers": "Seguidores",
+      "subscribe": "Suscribirse",
+      "message": "Mensaje",
+      "tip": "Propina",
+      "more": "Más",
+      "subscriptionsSection": {
+        "title": "Suscripciones",
+        "subtitle": "Elige tu nivel de acceso",
+        "totalPosts": "posts"
+      },
+      "subscriptions": "Suscripciones",
+      "popular": "Más Popular",
+      "perMonth": "/mes",
+      "locked": "Suscripción requerida",
+      "lockedPrice": "Desbloquear",
+      "playVideo": "Reproducir video",
+      "subscribed": "Suscrito",
+      "tabs": {
+        "all": "Todos",
+        "photos": "Fotos",
+        "videos": "Videos",
+        "free": "Gratis",
+        "paid": "De Pago"
+      }
+    },
+    "content": {
+      "freePhotos": "Fotos Gratuitas",
+      "freePhotosDescription": "Contenido accesible para todos",
+      "exclusiveContent": "Contenido Exclusivo",
+      "exclusiveContentDescription": "Reservado para suscriptores",
+      "subscriptionRequired": "Suscripción requerida",
+      "videos": "Videos",
+      "videosDescription": "Tutoriales y sesiones",
+      "all": "Todos",
+      "recent": "Recientes",
+      "popular": "Populares"
+    },
+    "post": {
+      "likes": "{count} me gusta",
+      "comments": "{count} comentarios",
+      "writeComment": "Escribe un comentario...",
+      "sendTip": "Enviar una Propina",
+      "noComments": "Aún no hay comentarios",
+      "beFirst": "¡Sé el primero en comentar!",
+      "creator": "Creador",
+      "justNow": "Justo ahora",
+      "minutesAgo": "Hace {count}min",
+      "hoursAgo": "Hace {count}h",
+      "daysAgo": "Hace {count}d"
+    },
+    "tipModal": {
+      "title": "Enviar una Propina a {name}",
+      "description": "Apoya a tu creador favorito con una propina",
+      "amountLabel": "Monto",
+      "messageLabel": "Mensaje",
+      "optional": "(opcional)",
+      "messagePlaceholder": "Añade un mensaje...",
+      "cancel": "Cancelar",
+      "send": "Enviar Propina",
+      "sending": "Enviando...",
+      "success": "¡{amount}€ enviados a {name}!",
+      "error": "Error al enviar la propina",
+      "invalidAmount": "Monto inválido"
+    }
+  },
+  "messages": {
+    "tips": {
+      "title": "Enviar una Propina",
+      "description": "Apoya a {creator} con una propina",
+      "amount": "Monto (€)",
+      "message": "Mensaje (opcional)",
+      "messagePlaceholder": "Añade un mensaje para {creator}...",
+      "confirm": "Confirmar Pago",
+      "quickAmounts": "Montos Rápidos"
+    },
+    "time": {
+      "justNow": "Ahora mismo",
+      "minutesAgo": "Hace {count} min",
+      "hoursAgo": "Hace {count}h",
+      "yesterday": "Ayer",
+      "daysAgo": "Hace {count}d"
+    },
+    "media": {
+      "unlock": "Desbloquear",
+      "unlockTitle": "Desbloquear contenido",
+      "unlockDescription": "Este contenido está bloqueado. ¿Desea comprarlo?",
+      "photo": "Foto",
+      "video": "Video",
+      "type": "Tipo",
+      "access": "Acceso",
+      "price": "Precio",
+      "confirmPurchase": "Confirmar compra",
+      "purchased": "Comprado",
+      "purchasedOn": "Comprado el {date}",
+      "purchaseSuccess": "¡Contenido desbloqueado!",
+      "purchaseSuccessDescription": "Ahora puedes ver este contenido",
+      "purchaseError": "Error de compra",
+      "purchaseErrorDescription": "No se pudo procesar el pago"
+    }
+  },
+  "toasts": {
+    "tips": {
+      "success": "¡Propina Enviada!",
+      "successDescription": "¡Propina de €{amount} enviada!",
+      "error": "Error de Envío",
+      "errorDescription": "No se puede procesar el pago"
+    }
+  },
   "common": {
     "logout": "Cerrar sesión",
     "profile": "Perfil",

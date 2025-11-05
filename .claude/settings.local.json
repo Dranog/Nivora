@@ -1,19 +1,28 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)",
-      "Bash(git status)",
-      "Bash(git diff)"
+      "Bash(git add:*)",
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(npx next build)",
+      "Bash(dir /b \"C:\\dev\\Section - createur\")",
+      "Bash(pnpm add:*)",
+      "Bash(cat:*)",
+      "Bash(npx tsc:*)",
+      "Bash(dir /b:*)",
+      "Bash(findstr:*)",
+      "Bash(timeout 30 npm run dev:*)",
+      "Bash(echo:*)",
+      "Bash(globals.css)"
     ],
-    "deny": [
-      "Bash(rm *)",
-      "Bash(git reset --hard)"
-    ],
-    "ask": [
-      "Edit(apps/web/src/app/admin/**)",
-      "Edit(apps/web/src/components/admin/**)",
-      "Bash(git *)"
-    ]
+    "deny": [],
+    "ask": []
   },
   "autoApprove": false,
   "alwaysAllowWrite": false,

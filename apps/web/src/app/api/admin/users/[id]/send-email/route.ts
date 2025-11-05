@@ -13,10 +13,11 @@ interface SendEmailBody {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = params.id;
+    const resolvedParams = await params;
+    const userId = resolvedParams.id;
     const body: SendEmailBody = await req.json();
 
     console.log('📧 [EMAIL API] Received email request:', {

@@ -556,39 +556,11 @@ function getMockFanPaymentMethods(userId: string): FanPaymentMethod[] {
 /**
  * Generate mock fan messages
  */
-function getMockFanMessages(userId: string, filters?: FanMessagesFilters): FanMessage[] {
+function getMockFanMessages(userId: string, filters?: FanMessagesFilters) {
   const messagesData = SupervisionMockData.generateMessagesData(userId);
 
-  // Flatten conversations into messages
-  const allMessages: FanMessage[] = messagesData.conversations.flatMap(conv => {
-    // Get messages for this conversation
-    const messages = SupervisionMockData.generateConversationMessages(conv.id);
-
-    return messages.map(msg => ({
-      id: msg.id,
-      conversationId: conv.id,
-      creatorId: conv.creatorId,
-      creatorName: conv.creatorName,
-      creatorHandle: conv.creatorHandle,
-      creatorAvatar: conv.creatorAvatar,
-      content: msg.content,
-      type: 'TEXT' as const,
-      isRead: msg.read,
-      createdAt: msg.timestamp.toISOString(),
-      senderId: msg.from === 'fan' ? userId : conv.creatorId,
-    }));
-  });
-
-  // Apply filters
-  let filtered = allMessages;
-  if (filters?.creatorId) {
-    filtered = filtered.filter(m => m.creatorId === filters.creatorId);
-  }
-  if (filters?.unreadOnly) {
-    filtered = filtered.filter(m => !m.isRead);
-  }
-
-  return filtered.slice(0, filters?.limit || 50);
+  // Return the full MessagesData object (not flattened messages)
+  return messagesData;
 }
 
 /**
@@ -788,7 +760,7 @@ export function useUpdateFanPreferences() {
     onSuccess: (data, variables) => {
       console.log('✅ [DEMO MODE] Fan preferences updated successfully');
       queryClient.invalidateQueries({ queryKey: fanKeys.preferences(variables.userId) });
-      adminToasts.general.saved();
+      adminToasts.general.saveSuccess();
     },
     onError: (error: Error) => {
       console.error('❌ [DEMO MODE] Fan preferences update failed', error);

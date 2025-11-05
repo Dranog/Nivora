@@ -1444,6 +1444,8 @@
       "description": "Cet utilisateur n'existe pas"
     },
     "back": "Retour",
+    "viewProfile": "Voir le profil de {name}",
+    "subscriptions": "{count} abonnements",
     "roles": {
       "creator": "Créateur",
       "fan": "Fan"
@@ -1455,12 +1457,38 @@
       "memberSince": "Membre Depuis"
     },
     "tabs": {
+      "posts": "Posts",
+      "media": "Médias",
+      "about": "À propos",
       "subscriptions": "Abonnements",
       "history": "Historique",
       "settings": "Paramètres"
     },
+    "whatIOffer": {
+      "title": "Ce que je propose",
+      "preview": "Aperçu",
+      "showMore": "Voir plus"
+    },
+    "about": {
+      "title": "À Propos",
+      "subtitle": "Apprenez à me connaître",
+      "whoIAm": "Qui je suis",
+      "whatIOffer": "Ce que j'offre",
+      "memberSince": "Membre depuis",
+      "posts": "Publications",
+      "newContentWeekly": "Nouveau contenu chaque semaine 🔥",
+      "subscribeNow": "S'abonner maintenant",
+      "noBio": "Aucune bio renseignée"
+    },
+    "mediaTabs": {
+      "all": "Tout",
+      "photos": "Photos",
+      "videos": "Vidéos"
+    },
     "subscriptions": {
-      "title": "Mes Abonnements",
+      "title": "Abonnements",
+      "description": "Choisissez le plan qui vous correspond",
+      "subscribe": "S'abonner",
       "creator": "Créateur",
       "plan": "Plan",
       "since": "Depuis",
@@ -1488,15 +1516,32 @@
       "username": "Nom d'utilisateur",
       "editProfile": "Modifier le Profil"
     },
+    "header": {
+      "search": "Rechercher",
+      "notifications": "Notifications"
+    },
+    "badge": {
+      "goldCreator": "Gold Creator",
+      "popular": "Plus populaire"
+    },
     "creator": {
       "followers": "Abonnés",
       "subscribe": "S'abonner",
+      "subscribed": "Abonné",
       "message": "Message",
       "tip": "Tip",
+      "more": "Plus",
+      "subscriptionsSection": {
+        "title": "Abonnements",
+        "subtitle": "Choisissez votre niveau d'accès",
+        "totalPosts": "posts"
+      },
       "subscriptions": "Abonnements",
       "popular": "Plus populaire",
       "perMonth": "/mois",
       "locked": "Abonnement requis",
+      "lockedPrice": "Déverrouiller",
+      "playVideo": "Lire la vidéo",
       "tabs": {
         "all": "Tous",
         "photos": "Photos",
@@ -1504,6 +1549,88 @@
         "free": "Gratuit",
         "paid": "Payant"
       }
+    },
+    "content": {
+      "freePhotos": "Photos Gratuites",
+      "freePhotosDescription": "Contenu accessible à tous",
+      "exclusiveContent": "Contenu Exclusif",
+      "exclusiveContentDescription": "Réservé aux abonnés",
+      "subscriptionRequired": "Abonnement requis",
+      "videos": "Vidéos",
+      "videosDescription": "Tutoriels et sessions",
+      "all": "Toutes",
+      "recent": "Récentes",
+      "popular": "Populaires"
+    },
+    "post": {
+      "likes": "{count} likes",
+      "comments": "{count} commentaires",
+      "writeComment": "Écrivez un commentaire...",
+      "sendTip": "Envoyer un Tip",
+      "noComments": "Aucun commentaire pour le moment",
+      "beFirst": "Soyez le premier à commenter !",
+      "creator": "Créateur",
+      "justNow": "À l'instant",
+      "minutesAgo": "Il y a {count}min",
+      "hoursAgo": "Il y a {count}h",
+      "daysAgo": "Il y a {count}j"
+    },
+    "tipModal": {
+      "title": "Envoyer un Tip à {name}",
+      "description": "Soutenez votre créateur préféré avec un pourboire",
+      "amountLabel": "Montant",
+      "messageLabel": "Message",
+      "optional": "(optionnel)",
+      "messagePlaceholder": "Ajoutez un message...",
+      "cancel": "Annuler",
+      "send": "Envoyer le Tip",
+      "sending": "Envoi en cours...",
+      "success": "{amount}€ envoyés à {name} !",
+      "error": "Erreur lors de l'envoi du tip",
+      "invalidAmount": "Montant invalide"
+    }
+  },
+  "messages": {
+    "tips": {
+      "title": "Envoyer un pourboire",
+      "description": "Soutenez {creator} avec un pourboire",
+      "amount": "Montant (€)",
+      "message": "Message (optionnel)",
+      "messagePlaceholder": "Ajoutez un message pour {creator}...",
+      "confirm": "Confirmer le paiement",
+      "quickAmounts": "Montants rapides"
+    },
+    "time": {
+      "justNow": "À l'instant",
+      "minutesAgo": "Il y a {count} min",
+      "hoursAgo": "Il y a {count}h",
+      "yesterday": "Hier",
+      "daysAgo": "Il y a {count}j"
+    },
+    "media": {
+      "unlock": "Déverrouiller",
+      "unlockTitle": "Déverrouiller le contenu",
+      "unlockDescription": "Ce contenu est verrouillé. Souhaitez-vous l'acheter ?",
+      "photo": "Photo",
+      "video": "Vidéo",
+      "type": "Type",
+      "access": "Accès",
+      "price": "Prix",
+      "confirmPurchase": "Confirmer l'achat",
+      "purchased": "Acheté",
+      "purchasedOn": "Acheté le {date}",
+      "purchaseSuccess": "Contenu déverrouillé !",
+      "purchaseSuccessDescription": "Vous pouvez maintenant voir ce contenu",
+      "purchaseError": "Échec de l'achat",
+      "purchaseErrorDescription": "Impossible de traiter le paiement"
+    }
+  },
+  "toasts": {
+    "tips": {
+      "success": "Pourboire envoyé !",
+      "successDescription": "Pourboire de {amount}€ envoyé !",
+      "error": "Erreur d'envoi",
+      "errorDescription": "Impossible de traiter le paiement"
     }
   },
   "common": {
@@ -1518,6 +1645,7 @@
     "back": "Retour",
     "thisMonth": "ce mois",
     "view": "Voir",
-    "actions": "Actions"
+    "actions": "Actions",
+    "processing": "Traitement..."
   }
 }

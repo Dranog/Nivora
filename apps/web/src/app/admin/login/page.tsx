@@ -42,6 +42,7 @@ export default function AdminLoginPage() {
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [twoFactorAttempts, setTwoFactorAttempts] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [pendingAuth, setPendingAuth] = useState<{ accessToken: string; refreshToken: string; user: any } | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -94,8 +95,9 @@ export default function AdminLoginPage() {
         user: data.user,
       });
 
-      // Store user ID for potential 2FA
+      // Store user ID and auth data for potential 2FA
       setUserId(data.user.id);
+      setPendingAuth({ accessToken: data.accessToken, refreshToken: data.refreshToken, user: data.user });
 
       // Check if 2FA is enabled (TODO: backend should indicate this in response)
       // For now, proceed directly to login
@@ -144,7 +146,9 @@ export default function AdminLoginPage() {
       if (data.valid) {
         // 2FA verified - complete login
         toast.success('Code 2FA vérifié');
-        completeLogin(email);
+        if (pendingAuth) {
+          completeLogin(pendingAuth.accessToken, pendingAuth.refreshToken, pendingAuth.user);
+        }
       } else {
         // Invalid code - increment attempts
         const newAttempts = twoFactorAttempts + 1;

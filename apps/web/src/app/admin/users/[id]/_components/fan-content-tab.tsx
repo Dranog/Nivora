@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,13 +18,39 @@ import {
   Film,
 } from 'lucide-react';
 import type { FanContent } from '../_types/fan-types';
+import { generateFanContent } from '../_data/fan-mock-data';
 
 interface FanContentTabProps {
-  content: FanContent;
+  userId: string;
 }
 
-export function FanContentTab({ content }: FanContentTabProps) {
+export function FanContentTab({ userId }: FanContentTabProps) {
   const [selectedTab, setSelectedTab] = useState<'followed' | 'subscriptions' | 'ppv' | 'favorites' | 'history'>('followed');
+  const [content, setContent] = useState<FanContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('🎬 [FAN CONTENT] Loading content for user:', userId);
+    setIsLoading(true);
+
+    // Simulate network delay
+    const timer = setTimeout(() => {
+      const data = generateFanContent(userId);
+      setContent(data);
+      setIsLoading(false);
+      console.log('✅ [FAN CONTENT] Content loaded', data);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [userId]);
+
+  if (isLoading || !content) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    );
+  }
 
   console.log('🎬 [FAN CONTENT] Rendering content tab');
 

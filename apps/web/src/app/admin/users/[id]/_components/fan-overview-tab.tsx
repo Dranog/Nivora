@@ -103,7 +103,7 @@ export function FanOverviewTab({ userId, onTabChange }: FanOverviewTabProps) {
     }
 
     setIsSavingNote(true);
-    console.log('📝 [SAVE NOTE] Saving note for user:', user.id, newNote);
+    console.log('📝 [SAVE NOTE] Saving note for user:', userId, newNote);
 
     try {
       // Simulate API call

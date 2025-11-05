@@ -86,10 +86,28 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
 
   // Construct moderation object from hooks data
   const moderation: FanModeration = {
-    reports: reports || [],
-    warnings: warnings || [],
-    sanctions: [], // TODO: Get from warnings if available
+    reports: (reports || []).map(r => ({
+      id: r.id,
+      date: new Date(r.createdAt),
+      reason: r.reason,
+      reportedBy: 'Fan',
+      reportedByAvatar: '',
+      content: r.description || '',
+      contentType: r.targetType === 'POST' ? 'comment' as const : r.targetType === 'MESSAGE' ? 'message' as const : 'profile' as const,
+      status: r.status === 'PENDING' ? 'pending' as const : r.status === 'REVIEWED' ? 'reviewed' as const : r.status === 'RESOLVED' ? 'action_taken' as const : 'dismissed' as const,
+      reviewedAt: r.resolvedAt ? new Date(r.resolvedAt) : undefined,
+      action: r.resolution,
+    })),
+    sanctions: (warnings || []).map(w => ({
+      id: w.id,
+      type: 'warning' as const,
+      reason: w.reason,
+      appliedBy: 'Admin',
+      appliedAt: new Date(w.createdAt),
+      notes: w.description,
+    })),
     adminNotes: [], // TODO: Get from backend when endpoint exists
+    flaggedComments: [], // TODO: Get from backend when endpoint exists
   };
 
   const handleResolveReport = (report: { id: string; reportedBy: string; reason: string }) => {
@@ -98,7 +116,7 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
   };
 
   const handleResolveSuccess = () => {
-    adminToasts.general.success('Signalement résolu avec succès');
+    adminToasts.general.updateSuccess();
     setSelectedReport(null);
   };
 
@@ -123,7 +141,7 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
 
   const handleAddNote = async () => {
     if (!newNote.trim()) {
-      adminToasts.general.error('Veuillez saisir une note');
+      adminToasts.general.validationError('Veuillez saisir une note');
       return;
     }
 
@@ -133,12 +151,12 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      adminToasts.general.success('Note ajoutée avec succès');
+      adminToasts.general.saveSuccess();
       setNewNote('');
       console.log('✅ [ADD NOTE] Note added successfully');
     } catch (error) {
       console.error('❌ [ADD NOTE] Error:', error);
-      adminToasts.general.error('Erreur lors de l\'ajout de la note');
+      adminToasts.general.saveFailed();
     } finally {
       setIsAddingNote(false);
     }
@@ -146,7 +164,7 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
 
   const handleWarn = async () => {
     if (!warnReason.trim()) {
-      adminToasts.general.error('Veuillez saisir un motif');
+      adminToasts.general.validationError('Veuillez saisir un motif');
       return;
     }
 
@@ -155,19 +173,19 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      adminToasts.general.warning('Avertissement envoyé à l\'utilisateur');
+      adminToasts.general.updateSuccess();
       setShowWarnDialog(false);
       setWarnReason('');
       console.log('✅ [WARN] Warning sent successfully');
     } catch (error) {
       console.error('❌ [WARN] Error:', error);
-      adminToasts.general.error('Erreur lors de l\'envoi de l\'avertissement');
+      adminToasts.general.updateFailed();
     }
   };
 
   const handleSuspend = async () => {
     if (!suspendReason.trim()) {
-      adminToasts.general.error('Veuillez saisir un motif');
+      adminToasts.general.validationError('Veuillez saisir un motif');
       return;
     }
 
@@ -176,20 +194,20 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      adminToasts.general.warning(`Utilisateur suspendu pour ${suspendDuration} jours`);
+      adminToasts.users.updated();
       setShowSuspendDialog(false);
       setSuspendReason('');
       setSuspendDuration('7');
       console.log('✅ [SUSPEND] User suspended successfully');
     } catch (error) {
       console.error('❌ [SUSPEND] Error:', error);
-      adminToasts.general.error('Erreur lors de la suspension');
+      adminToasts.users.updateFailed();
     }
   };
 
   const handleBan = async () => {
     if (!banReason.trim()) {
-      adminToasts.general.error('Veuillez saisir un motif');
+      adminToasts.general.validationError('Veuillez saisir un motif');
       return;
     }
 
@@ -198,13 +216,13 @@ export function FanModerationTab({ userId }: FanModerationTabProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      adminToasts.general.error('Utilisateur banni définitivement');
+      adminToasts.users.banned();
       setShowBanDialog(false);
       setBanReason('');
       console.log('✅ [BAN] User banned successfully');
     } catch (error) {
       console.error('❌ [BAN] Error:', error);
-      adminToasts.general.error('Erreur lors du bannissement');
+      adminToasts.users.banFailed();
     }
   };
 

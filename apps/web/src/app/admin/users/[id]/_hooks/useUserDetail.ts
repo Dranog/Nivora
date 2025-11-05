@@ -30,7 +30,7 @@ function getMockUserDetail(userId: string): UserDetailDto {
   const role = isCreator ? 'CREATOR' : 'USER';
 
   // Mock user data
-  const mockUsers: Record<string, Partial<UserDetailDto>> = {
+  const mockUsers: Record<string, any> = {
     '1': {
       id: '1',
       email: 'robert.fox@example.com',
@@ -228,12 +228,12 @@ export function useUserDetail(userId: string) {
   // Derive user type
   const isFan = useMemo(() => {
     if (!data) return false;
-    return data.role === 'USER';
+    return (data as any).role === 'USER';
   }, [data]);
 
   const isCreator = useMemo(() => {
     if (!data) return false;
-    return data.role === 'CREATOR';
+    return (data as any).role === 'CREATOR';
   }, [data]);
 
   // Mutations

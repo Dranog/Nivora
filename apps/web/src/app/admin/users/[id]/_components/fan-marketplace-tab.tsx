@@ -119,15 +119,14 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
 
   const handleViewResponses = (annonceId: string) => {
     setSelectedAnnonce(selectedAnnonce === annonceId ? null : annonceId);
-    adminToasts.general.info(`Affichage des ${responses[annonceId]?.length || 0} réponses`);
   };
 
   const handleFlagAction = async (flagId: string, action: 'validate' | 'ignore') => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
-      adminToasts.general.success(`Flag ${action === 'validate' ? 'validé' : 'ignoré'}`);
+      adminToasts.general.updateSuccess();
     } catch (error) {
-      adminToasts.general.error('Erreur lors du traitement du flag');
+      adminToasts.general.updateFailed('Erreur lors du traitement du flag');
     }
   };
 
@@ -137,9 +136,9 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      adminToasts.general.warning(`Avertissement envoyé à ${creatorName}`);
+      adminToasts.general.updateSuccess();
     } catch (error) {
-      adminToasts.general.error('Erreur lors de l\'envoi de l\'avertissement');
+      adminToasts.general.updateFailed('Erreur lors de l\'envoi de l\'avertissement');
     }
   };
 
@@ -151,9 +150,9 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      adminToasts.general.error(`${creatorName} a été banni définitivement`);
+      adminToasts.users.banned();
     } catch (error) {
-      adminToasts.general.error('Erreur lors du bannissement');
+      adminToasts.users.banFailed('Erreur lors du bannissement');
     }
   };
 
@@ -178,9 +177,9 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
         },
       });
 
-      adminToasts.general.success('Rapport détaillé affiché');
+      adminToasts.general.updateSuccess();
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la génération du rapport');
+      adminToasts.general.updateFailed();
     }
   };
 
@@ -204,9 +203,9 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
         },
       });
 
-      adminToasts.general.success('Rapport interne généré et enregistré dans le système');
+      adminToasts.general.saveSuccess();
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la génération du rapport interne');
+      adminToasts.general.saveFailed();
     }
   };
 
@@ -215,7 +214,6 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
   // ============================================
 
   const handleViewPurchaseConversation = async (purchaseId: string) => {
-    adminToasts.general.info('Navigation vers la conversation');
     // TODO: Navigate to Messages tab with conversation focused
     await logAdminAction({
       adminId: 'ADMIN-TEMP',
@@ -229,7 +227,6 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
   const handleViewPurchaseDetails = (purchase: FanMarketplacePurchase) => {
     setSelectedPurchase(purchase);
     setShowPurchaseDetailsModal(true);
-    adminToasts.general.info(`Détails de l'achat ${purchase.id}`);
   };
 
   const handleForceRefund = async () => {
@@ -247,7 +244,7 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
 
       if (!validation.success) {
         const firstError = validation.error.issues[0];
-        adminToasts.general.error(firstError.message);
+        adminToasts.general.validationError(firstError.message);
         return;
       }
 
@@ -291,7 +288,7 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
 
       if (!validation.success) {
         const firstError = validation.error.issues[0];
-        adminToasts.general.error(firstError.message);
+        adminToasts.general.validationError(firstError.message);
         return;
       }
 
@@ -316,13 +313,13 @@ export function FanMarketplaceTab({ userId }: FanMarketplaceTabProps) {
         mediation: 'Médiation',
       };
 
-      adminToasts.general.success(`Litige résolu : ${resolutionLabels[disputeResolution]}`);
+      adminToasts.general.updateSuccess();
       setShowDisputeModal(false);
       setMessageFan('');
       setMessageCreator('');
       setSelectedPurchase(null);
     } catch (error) {
-      adminToasts.general.error('Erreur lors de la résolution du litige');
+      adminToasts.general.updateFailed();
     }
   };
 

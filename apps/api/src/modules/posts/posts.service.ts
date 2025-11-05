@@ -222,4 +222,125 @@ export class PostsService {
 
     return { success: true };
   }
+
+  // ========== LIKE POST ==========
+  async likePost(postId: string, userId: string) {
+    // Check if already liked
+    const existing = await prisma.reaction.findUnique({
+      where: {
+        userId_postId_type: {
+          userId,
+          postId,
+          type: 'LIKE',
+        },
+      },
+    });
+
+    if (existing) {
+      throw new BadRequestException('Vous avez déjà liké ce post');
+    }
+
+    // Create like reaction
+    return prisma.reaction.create({
+      data: {
+        id: randomUUID(),
+        userId,
+        postId,
+        type: 'LIKE',
+      },
+    });
+  }
+
+  // ========== UNLIKE POST ==========
+  async unlikePost(postId: string, userId: string) {
+    const existing = await prisma.reaction.findUnique({
+      where: {
+        userId_postId_type: {
+          userId,
+          postId,
+          type: 'LIKE',
+        },
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Vous n\'avez pas liké ce post');
+    }
+
+    return prisma.reaction.delete({
+      where: {
+        userId_postId_type: {
+          userId,
+          postId,
+          type: 'LIKE',
+        },
+      },
+    });
+  }
+
+  // ========== CREATE COMMENT ==========
+  async createComment(postId: string, userId: string, content: string) {
+    // Check if user has already commented today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const commentToday = await prisma.comment.findFirst({
+      where: {
+        postId,
+        userId,
+        createdAt: {
+          gte: today,
+        },
+      },
+    });
+
+    if (commentToday) {
+      throw new BadRequestException(
+        'Vous avez déjà commenté ce post aujourd\'hui. Revenez demain !',
+      );
+    }
+
+    // Sanitize content
+    const sanitizedContent = xss(content);
+
+    // Create comment
+    return prisma.comment.create({
+      data: {
+        id: randomUUID(),
+        postId,
+        userId,
+        content: sanitizedContent,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+  }
+
+  // ========== GET COMMENTS ==========
+  async getComments(postId: string) {
+    return prisma.comment.findMany({
+      where: { postId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatar: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 }

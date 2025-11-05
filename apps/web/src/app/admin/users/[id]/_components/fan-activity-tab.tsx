@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,18 +26,44 @@ import {
 } from 'lucide-react';
 import type { FanActivity, ActivityLog } from '../_types/fan-types';
 import { ActivityDetailsModal } from '@/components/admin/modals/activity-details-modal';
+import { generateFanActivity } from '../_data/fan-mock-data';
 
 interface FanActivityTabProps {
-  activity: FanActivity;
+  userId: string;
 }
 
 const ITEMS_PER_PAGE = 50;
 
-export function FanActivityTab({ activity }: FanActivityTabProps) {
+export function FanActivityTab({ userId }: FanActivityTabProps) {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedActivity, setSelectedActivity] = useState<ActivityLog | null>(null);
+  const [activity, setActivity] = useState<FanActivity | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('📋 [FAN ACTIVITY] Loading activity for user:', userId);
+    setIsLoading(true);
+
+    // Simulate network delay
+    const timer = setTimeout(() => {
+      const data = generateFanActivity(userId, currentPage);
+      setActivity(data);
+      setIsLoading(false);
+      console.log('✅ [FAN ACTIVITY] Activity loaded', data);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [userId, currentPage]);
+
+  if (isLoading || !activity) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    );
+  }
 
   console.log('📋 [FAN ACTIVITY] Rendering activity tab');
 

@@ -1216,6 +1216,202 @@
       }
     }
   },
+  "profile": {
+    "notFound": {
+      "title": "404",
+      "message": "User not found",
+      "description": "This user does not exist"
+    },
+    "back": "Back",
+    "viewProfile": "View {name}'s profile",
+    "subscriptions": "{count} subscriptions",
+    "roles": {
+      "creator": "Creator",
+      "fan": "Fan"
+    },
+    "stats": {
+      "totalSpent": "Total Spent",
+      "subscriptions": "Subscriptions",
+      "likedPosts": "Liked Posts",
+      "memberSince": "Member Since"
+    },
+    "tabs": {
+      "posts": "Posts",
+      "media": "Media",
+      "about": "About",
+      "subscriptions": "Subscriptions",
+      "history": "History",
+      "settings": "Settings"
+    },
+    "whatIOffer": {
+      "title": "What I Offer",
+      "preview": "Preview",
+      "showMore": "Show More"
+    },
+    "about": {
+      "title": "About",
+      "subtitle": "Get to know me",
+      "whoIAm": "Who I am",
+      "whatIOffer": "What I offer",
+      "memberSince": "Member since",
+      "posts": "Posts",
+      "newContentWeekly": "New content every week 🔥",
+      "subscribeNow": "Subscribe now",
+      "noBio": "No bio provided"
+    },
+    "mediaTabs": {
+      "all": "All",
+      "photos": "Photos",
+      "videos": "Videos"
+    },
+    "subscriptions": {
+      "title": "My Subscriptions",
+      "creator": "Creator",
+      "plan": "Plan",
+      "since": "Since",
+      "nextBilling": "Next Payment",
+      "status": "Status",
+      "statuses": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "noSubscriptions": "No active subscriptions",
+      "description": "Choose the plan that suits you",
+      "subscribe": "Subscribe"
+    },
+    "history": {
+      "title": "Purchase History",
+      "date": "Date",
+      "description": "Description",
+      "amount": "Amount",
+      "status": "Status",
+      "statuses": {
+        "completed": "Completed"
+      }
+    },
+    "settings": {
+      "title": "Account Settings",
+      "email": "Email",
+      "username": "Username",
+      "editProfile": "Edit Profile"
+    },
+    "header": {
+      "search": "Search",
+      "notifications": "Notifications"
+    },
+    "badge": {
+      "goldCreator": "Gold Creator",
+      "popular": "Most Popular"
+    },
+    "creator": {
+      "followers": "Followers",
+      "subscribe": "Subscribe",
+      "message": "Message",
+      "tip": "Tip",
+      "more": "More",
+      "subscriptionsSection": {
+        "title": "Subscriptions",
+        "subtitle": "Choose your access level",
+        "totalPosts": "posts"
+      },
+      "subscriptions": "Subscriptions",
+      "popular": "Most Popular",
+      "perMonth": "/month",
+      "locked": "Subscription required",
+      "lockedPrice": "Unlock",
+      "playVideo": "Play video",
+      "subscribed": "Subscribed",
+      "tabs": {
+        "all": "All",
+        "photos": "Photos",
+        "videos": "Videos",
+        "free": "Free",
+        "paid": "Paid"
+      }
+    },
+    "content": {
+      "freePhotos": "Free Photos",
+      "freePhotosDescription": "Content accessible to everyone",
+      "exclusiveContent": "Exclusive Content",
+      "exclusiveContentDescription": "Reserved for subscribers",
+      "subscriptionRequired": "Subscription required",
+      "videos": "Videos",
+      "videosDescription": "Tutorials and sessions",
+      "all": "All",
+      "recent": "Recent",
+      "popular": "Popular"
+    },
+    "post": {
+      "likes": "{count} likes",
+      "comments": "{count} comments",
+      "writeComment": "Write a comment...",
+      "sendTip": "Send a Tip",
+      "noComments": "No comments yet",
+      "beFirst": "Be the first to comment!",
+      "creator": "Creator",
+      "justNow": "Just now",
+      "minutesAgo": "{count}min ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
+    },
+    "tipModal": {
+      "title": "Send a Tip to {name}",
+      "description": "Support your favorite creator with a tip",
+      "amountLabel": "Amount",
+      "messageLabel": "Message",
+      "optional": "(optional)",
+      "messagePlaceholder": "Add a message...",
+      "cancel": "Cancel",
+      "send": "Send Tip",
+      "sending": "Sending...",
+      "success": "{amount}€ sent to {name}!",
+      "error": "Error sending tip",
+      "invalidAmount": "Invalid amount"
+    }
+  },
+  "messages": {
+    "tips": {
+      "title": "Send a Tip",
+      "description": "Support {creator} with a tip",
+      "amount": "Amount (€)",
+      "message": "Message (optional)",
+      "messagePlaceholder": "Add a message for {creator}...",
+      "confirm": "Confirm Payment",
+      "quickAmounts": "Quick Amounts"
+    },
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{count} min ago",
+      "hoursAgo": "{count}h ago",
+      "yesterday": "Yesterday",
+      "daysAgo": "{count}d ago"
+    },
+    "media": {
+      "unlock": "Unlock",
+      "unlockTitle": "Unlock content",
+      "unlockDescription": "This content is locked. Do you want to purchase it?",
+      "photo": "Photo",
+      "video": "Video",
+      "type": "Type",
+      "access": "Access",
+      "price": "Price",
+      "confirmPurchase": "Confirm purchase",
+      "purchased": "Purchased",
+      "purchasedOn": "Purchased on {date}",
+      "purchaseSuccess": "Content unlocked!",
+      "purchaseSuccessDescription": "You can now view this content",
+      "purchaseError": "Purchase failed",
+      "purchaseErrorDescription": "Unable to process payment"
+    }
+  },
+  "toasts": {
+    "tips": {
+      "success": "Tip Sent!",
+      "successDescription": "Tip of €{amount} sent!",
+      "error": "Send Error",
+      "errorDescription": "Unable to process payment"
+    }
+  },
   "common": {
     "logout": "Logout",
     "profile": "Profile",
@@ -1225,6 +1421,7 @@
     "success": "Success",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "back": "Back"
+    "back": "Back",
+    "processing": "Processing..."
   }
 }

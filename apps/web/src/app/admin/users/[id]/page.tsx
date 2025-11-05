@@ -294,98 +294,55 @@ export default function UserDetailPage() {
             <>
               <TabsContent value="apercu">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanOverviewTab
-                    user={demoUser}
-                    totalWatchTime={(contentStats as any).totalWatchTime || 0}
-                    videosWatched={(contentStats as any).videosWatched || 0}
-                    activeSubscriptions={subscriptions.filter((s: any) => s.status === 'active').length}
-                    totalSpent={subscriptions.reduce((sum: number, s: any) => sum + (s.amount || 0), 0)}
-                    subscriptions={subscriptions.map((s: any) => ({
-                      id: s.id,
-                      creatorName: s.creatorName,
-                      creatorHandle: s.creatorHandle || s.creatorName.toLowerCase().replace(/\s+/g, ''),
-                      creatorAvatar: s.avatar || '',
-                      amount: s.amount || 0,
-                      startDate: s.startDate || new Date(),
-                    }))}
-                    recentActivity={(fanData.activity as any).recentActivity || []}
-                    favoriteCreators={(fanData.activity as any).favoriteCreators || []}
-                  />
+                  <FanOverviewTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="analytics">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanAnalyticsTab
-                    user={demoUser}
-                    analytics={fanData.analytics as any}
-                  />
+                  <FanAnalyticsTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="finances">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanFinancesTab
-                    user={demoUser}
-                    finances={fanData.finances as any}
-                  />
+                  <FanFinancesTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="moderation">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanModerationTab
-                    user={demoUser}
-                    moderation={fanData.moderation as any}
-                  />
+                  <FanModerationTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="contenu">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanContentTab
-                    user={demoUser}
-                    content={fanData.content as any}
-                  />
+                  <FanContentTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="activite">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanActivityTab
-                    user={demoUser}
-                    activity={fanData.activity as any}
-                  />
+                  <FanActivityTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="parametres">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanSettingsTab
-                    user={demoUser}
-                    userId={userId}
-                  />
+                  <FanSettingsTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="marketplace">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanMarketplaceTab
-                    user={demoUser}
-                    marketplace={fanData.marketplace as any}
-                    marketplaceResponses={fanData.marketplaceResponses as any}
-                    marketplacePurchases={fanData.marketplacePurchases as any}
-                  />
+                  <FanMarketplaceTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="messages">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <FanMessagesTab
-                    user={demoUser}
-                    messages={fanData.messages as any}
-                    conversationMessages={fanData.conversationMessages as any}
-                  />
+                  <FanMessagesTab userId={userId} />
                 </Suspense>
               </TabsContent>
             </>
@@ -409,25 +366,13 @@ export default function UserDetailPage() {
 
               <TabsContent value="analytics">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <CreatorAnalyticsTab
-                    revenueOverTime={creatorData.activityChart?.revenue || []}
-                    subscribersGrowth={creatorData.activityChart?.subscribers || []}
-                    contentPerformance={creatorData.topContent || []}
-                    engagementMetrics={creatorData.analytics as any}
-                  />
+                  <CreatorAnalyticsTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
               <TabsContent value="revenus">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <CreatorRevenueTab
-                    revenue={creatorData.revenue as any}
-                    tips={creatorTips as any}
-                    ppvSales={creatorPPVSales as any}
-                    payoutHistory={creatorPayoutHistory as any}
-                    activeSubscribers={creatorData.subscribers?.filter((s: any) => s.status === 'active') || []}
-                    marketplaceTransactions={[]}
-                  />
+                  <CreatorRevenueTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
@@ -442,10 +387,7 @@ export default function UserDetailPage() {
 
               <TabsContent value="abonnes">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <CreatorSubscribersTab
-                    subscribers={creatorData.subscribers as any || []}
-                    stats={creatorData.subscriberStats as any}
-                  />
+                  <CreatorSubscribersTab userId={userId} />
                 </Suspense>
               </TabsContent>
 
@@ -480,11 +422,7 @@ export default function UserDetailPage() {
 
               <TabsContent value="parametres">
                 <Suspense fallback={<TabLoadingFallback />}>
-                  <CreatorSettingsTab
-                    settings={creatorData.settings as any}
-                    creatorId={userId}
-                    creatorName={demoUser.name}
-                  />
+                  <CreatorSettingsTab userId={userId} />
                 </Suspense>
               </TabsContent>
             </>

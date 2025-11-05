@@ -1,6 +1,6 @@
 /**
  * Purchase Modal - F5 Anti-Leak
- * Modal for purchasing locked content
+ * Modal for purchasing locked content via CCBill
  */
 
 'use client';
@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2, Lock, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useCCBillCheckout } from '@/hooks/useCCBillCheckout';
 
 interface PurchaseModalProps {
   open: boolean;
@@ -41,39 +42,25 @@ export function PurchaseModal({
 }: PurchaseModalProps) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const { toast } = useToast();
+  const { createUnlockCheckout } = useCCBillCheckout();
 
   /**
-   * Handle purchase (mock implementation)
+   * Handle purchase via CCBill
    */
   const handlePurchase = async () => {
     try {
       setIsPurchasing(true);
 
-      // In production, this would be an actual API call:
-      // const response = await fetch(`/api/posts/${postId}/purchase`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      // });
-      // if (!response.ok) throw new Error('Purchase failed');
-
-      // Mock delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      toast({
-        title: 'Purchase Successful',
-        description: `You now have access to "${postTitle}"`,
-      });
-
-      onOpenChange(false);
-      onPurchaseSuccess?.();
+      // Redirect to CCBill payment page
+      await createUnlockCheckout(postId);
+      // User will be redirected to CCBill and then to /payment/success
     } catch (error) {
+      setIsPurchasing(false);
       toast({
         title: 'Purchase Failed',
         description: error instanceof Error ? error.message : 'Unable to complete purchase',
         variant: 'destructive',
       });
-    } finally {
-      setIsPurchasing(false);
     }
   };
 
@@ -149,13 +136,18 @@ export function PurchaseModal({
             {isPurchasing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
+                Redirecting to payment...
               </>
             ) : (
               <>Purchase for ${price.toFixed(2)}</>
             )}
           </Button>
         </DialogFooter>
+
+        {/* CCBill Badge */}
+        <p className="text-xs text-center text-muted-foreground mt-2">
+          Secure payment powered by CCBill
+        </p>
       </DialogContent>
     </Dialog>
   );

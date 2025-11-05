@@ -61,9 +61,9 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
   const handleDownloadInvoice = (invoiceUrl: string, transactionId: string) => {
     if (invoiceUrl) {
       window.open(invoiceUrl, '_blank', 'noopener,noreferrer');
-      adminToasts.general.info('Facture ouverte dans un nouvel onglet');
+      console.log('Facture ouverte dans un nouvel onglet');
     } else {
-      adminToasts.general.info('Téléchargement de la facture...');
+      console.log('Téléchargement de la facture...');
       // TODO: Implement invoice download
     }
   };
@@ -120,7 +120,7 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
   };
 
   const handleViewMarketplaceTransaction = (transaction: any) => {
-    adminToasts.general.info('Détails de la transaction marketplace');
+    console.log('Détails de la transaction marketplace');
     // TODO: Open transaction detail modal
   };
 
@@ -128,16 +128,16 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
   const subscriptions = useMemo(() => {
     if (!transactions) return [];
     return transactions
-      .filter((t) => t.type === 'subscription' || t.type === 'SUBSCRIPTION')
+      .filter((t) => t.type === 'SUBSCRIPTION')
       .map((t) => ({
         id: t.id,
         creatorName: t.description?.split(' - ')[0] || 'Créateur',
         creatorHandle: t.description?.toLowerCase().replace(/\s/g, '') || 'creator',
         creatorAvatar: '',
         amount: t.amount,
-        status: t.status === 'completed' || t.status === 'COMPLETED' ? 'active' : 'cancelled',
-        startDate: new Date(t.date),
-        nextBilling: new Date(new Date(t.date).setMonth(new Date(t.date).getMonth() + 1)),
+        status: t.status === 'COMPLETED' ? 'active' : 'cancelled',
+        startDate: new Date(t.createdAt),
+        nextBilling: new Date(new Date(t.createdAt).setMonth(new Date(t.createdAt).getMonth() + 1)),
         plan: 'Mensuel',
       }));
   }, [transactions]);
@@ -145,20 +145,20 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
   const tips = useMemo(() => {
     if (!transactions) return [];
     return transactions
-      .filter((t) => t.type === 'tip' || t.type === 'TIP')
+      .filter((t) => t.type === 'TIP')
       .map((t) => ({
         id: t.id,
         creatorName: t.description?.split(' - ')[0] || 'Créateur',
         creatorAvatar: '',
         amount: t.amount,
-        date: new Date(t.date),
+        date: new Date(t.createdAt),
       }));
   }, [transactions]);
 
   const marketplaceTransactions = useMemo(() => {
     if (!transactions) return [];
     return transactions
-      .filter((t) => t.type === 'marketplace' || t.type === 'MARKETPLACE')
+      .filter((t) => t.type === 'MARKETPLACE')
       .map((t) => ({
         id: t.id,
         annonceId: t.id,
@@ -166,7 +166,7 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
         creatorUsername: t.description?.split(' - ')[0] || 'Créateur',
         amount: t.amount,
         status: t.status?.toLowerCase() || 'completed',
-        date: t.date,
+        date: new Date(t.createdAt),
         deliveryDate: null,
       }));
   }, [transactions]);
@@ -503,7 +503,7 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
                 <tbody>
                   {filteredTransactions.slice(0, 15).map((tx) => {
                     const statusConfig = getStatusBadge(tx.status || 'completed');
-                    const txDate = typeof tx.date === 'string' ? new Date(tx.date) : tx.date;
+                    const txDate = typeof tx.createdAt === 'string' ? new Date(tx.createdAt) : tx.createdAt;
                     return (
                       <tr key={tx.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 px-4 text-sm text-gray-900">
@@ -536,7 +536,7 @@ export function FanFinancesTab({ userId }: FanFinancesTabProps) {
                             >
                               <Download className="w-4 h-4" />
                             </Button>
-                            {(tx.status === 'completed' || tx.status === 'COMPLETED') && (
+                            {tx.status === 'COMPLETED' && (
                               <Button
                                 variant="ghost"
                                 size="sm"

@@ -70,8 +70,8 @@ const DEMO_BALANCE: BalanceData = {
 
 const DEMO_UPCOMING_PAYMENTS: UpcomingPayment[] = [
   { days: 3, amount: 3200, status: 'pending' },
-  { days: 10, amount: 4500, status: 'scheduled' },
-  { days: 17, amount: 2100, status: 'scheduled' },
+  { days: 10, amount: 4500, status: 'released' },
+  { days: 17, amount: 2100, status: 'released' },
 ];
 
 const DEMO_EVOLUTION_7D: Evolution7dData = {

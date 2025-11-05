@@ -188,9 +188,10 @@ httpClient.interceptors.response.use(
 
     // 422 Validation Error
     if (error.response?.status === 422) {
-      const message = Array.isArray(error.response.data?.message)
-        ? error.response.data.message.join(', ')
-        : error.response.data?.message || 'Données invalides';
+      const data = error.response.data as any;
+      const message = Array.isArray(data?.message)
+        ? data.message.join(', ')
+        : data?.message || 'Données invalides';
 
       toast.error('Validation échouée', {
         description: message,

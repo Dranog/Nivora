@@ -40,9 +40,9 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
   const { data: preferences, isLoading, error } = useFanPreferences(userId);
   const updatePreferencesMutation = useUpdateFanPreferences();
 
-  const [isEmailVerified, setIsEmailVerified] = useState(preferences?.emailVerified || false);
-  const [isBlocked, setIsBlocked] = useState(preferences?.isBlocked || false);
-  const [has2FA, setHas2FA] = useState(preferences?.has2FA || false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false); // TODO: Get from user account data
+  const [isBlocked, setIsBlocked] = useState(false); // TODO: Get from user account data
+  const [has2FA, setHas2FA] = useState(false); // TODO: Get from user account data
 
   const [showVerifyEmailDialog, setShowVerifyEmailDialog] = useState(false);
   const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
@@ -77,7 +77,7 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
     );
   }
 
-  const userEmail = preferences.email || 'N/A';
+  const userEmail = 'user@example.com'; // TODO: Get from user account data
 
   const handleVerifyEmail = async () => {
     setIsProcessing(true);
@@ -87,12 +87,12 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       setIsEmailVerified(true);
-      adminToasts.general.success('Email vérifié avec succès');
+      adminToasts.general.updateSuccess();
       setShowVerifyEmailDialog(false);
       console.log('✅ [VERIFY EMAIL] Email verified successfully');
     } catch (error) {
       console.error('❌ [VERIFY EMAIL] Error:', error);
-      adminToasts.general.error('Erreur lors de la vérification de l\'email');
+      adminToasts.general.updateFailed();
     } finally {
       setIsProcessing(false);
     }
@@ -105,12 +105,12 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      adminToasts.general.success(`Email de réinitialisation envoyé à ${userEmail}`);
+      adminToasts.general.updateSuccess();
       setShowResetPasswordDialog(false);
       console.log('✅ [RESET PASSWORD] Reset email sent successfully');
     } catch (error) {
       console.error('❌ [RESET PASSWORD] Error:', error);
-      adminToasts.general.error('Erreur lors de l\'envoi de l\'email');
+      adminToasts.general.updateFailed();
     } finally {
       setIsProcessing(false);
     }
@@ -118,22 +118,22 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
 
   const handleDeleteAccount = async () => {
     if (!deleteReason.trim()) {
-      adminToasts.general.error('Veuillez saisir une raison');
+      adminToasts.general.validationError('Veuillez saisir une raison');
       return;
     }
 
     if (deleteConfirmation1.toLowerCase() !== 'supprimer') {
-      adminToasts.general.error('Confirmation 1 incorrecte');
+      adminToasts.general.validationError('Confirmation 1 incorrecte');
       return;
     }
 
     if (deleteConfirmation2.toLowerCase() !== 'définitif') {
-      adminToasts.general.error('Confirmation 2 incorrecte');
+      adminToasts.general.validationError('Confirmation 2 incorrecte');
       return;
     }
 
     if (deleteConfirmation3.toLowerCase() !== 'confirmer') {
-      adminToasts.general.error('Confirmation 3 incorrecte');
+      adminToasts.general.validationError('Confirmation 3 incorrecte');
       return;
     }
 
@@ -143,12 +143,12 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      adminToasts.general.error('Compte supprimé définitivement');
+      adminToasts.users.deleted();
       setShowDeleteAccountDialog(false);
       console.log('✅ [DELETE ACCOUNT] Account deleted successfully');
     } catch (error) {
       console.error('❌ [DELETE ACCOUNT] Error:', error);
-      adminToasts.general.error('Erreur lors de la suppression du compte');
+      adminToasts.general.deleteFailed();
     } finally {
       setIsProcessing(false);
     }
@@ -163,14 +163,12 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       setIsBlocked(!isBlocked);
-      toast[isBlocked ? 'success' : 'warning'](
-        isBlocked ? 'Utilisateur débloqué' : 'Utilisateur bloqué'
-      );
+      adminToasts.general.updateSuccess();
       setShowBlockDialog(false);
       console.log(`✅ [BLOCK TOGGLE] User ${action}ed successfully`);
     } catch (error) {
       console.error('❌ [BLOCK TOGGLE] Error:', error);
-      adminToasts.general.error(`Erreur lors du ${action}age`);
+      adminToasts.general.updateFailed();
     } finally {
       setIsProcessing(false);
     }
@@ -185,14 +183,12 @@ export function FanSettingsTab({ userId }: FanSettingsTabProps) {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       setHas2FA(!has2FA);
-      toast[has2FA ? 'warning' : 'success'](
-        has2FA ? 'Authentification à deux facteurs désactivée' : 'Authentification à deux facteurs activée'
-      );
+      adminToasts.general.updateSuccess();
       setShow2FADialog(false);
       console.log(`✅ [2FA TOGGLE] 2FA ${action}ed successfully`);
     } catch (error) {
       console.error('❌ [2FA TOGGLE] Error:', error);
-      adminToasts.general.error(`Erreur lors de la ${action}ion de la 2FA`);
+      adminToasts.general.updateFailed();
     } finally {
       setIsProcessing(false);
     }

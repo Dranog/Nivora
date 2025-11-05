@@ -1,22 +1,13 @@
 /**
- * Public Layout - F1 Shell SPA
- * Layout for public pages (landing, about, etc.)
- * Header + Content + Footer
+ * Public Layout - Standalone
+ * No header, no footer, no wrapper
+ * Just returns children as-is
  */
-
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
-  );
+  return children;
 }

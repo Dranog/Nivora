@@ -119,23 +119,28 @@ model Payout {
 }
 
 model Post {
-  id             String      @id
+  id             String         @id
   creatorId      String
   caption        String?
-  isPaid         Boolean     @default(false)
+  isPaid         Boolean        @default(false)
   price          Int?
-  status         PostStatus  @default(DRAFT)
-  createdAt      DateTime    @default(now())
+  status         PostStatus     @default(DRAFT)
+  createdAt      DateTime       @default(now())
   updatedAt      DateTime
-  isPPV          Boolean     @default(false)
+  isPPV          Boolean        @default(false)
   boostExpiresAt DateTime?
   categoryId     String?
-  isBoosted      Boolean     @default(false)
+  isBoosted      Boolean        @default(false)
+  isLocked       Boolean        @default(false)
+  unlockPrice    Float?         @default(10)
+  tier           String?
   media          Media[]
-  category       Category?   @relation(fields: [categoryId], references: [id])
-  user           User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  category       Category?      @relation(fields: [categoryId], references: [id])
+  user           User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   purchases      Purchase[]
   reactions      Reaction[]
+  comments       Comment[]
+  unlockedBy     UnlockedPost[] @relation("UnlockedBy")
 
   @@index([categoryId])
   @@index([creatorId, createdAt(sort: Desc)])
@@ -174,6 +179,24 @@ model Reaction {
   @@unique([userId, postId, type])
   @@index([postId])
   @@map("reactions")
+}
+
+model Comment {
+  id         String   @id
+  postId     String
+  userId     String
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  type       String   @default("comment")
+  tipAmount  Float?
+  tipMessage String?
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt(sort: Desc)])
+  @@index([userId])
+  @@map("comments")
 }
 
 model StripeEvent {
@@ -244,6 +267,8 @@ model Tip {
   createdAt                  DateTime @default(now())
   status                     String   @default("PAID")
   stripePaymentIntentId      String?
+  stripeSessionId            String?  @unique
+  ccbillSubscriptionId       String?  @unique
   users_Tip_creatorIdTousers User     @relation("Tip_creatorIdTousers", fields: [creatorId], references: [id], onDelete: Cascade)
   users_Tip_fanIdTousers     User     @relation("Tip_fanIdTousers", fields: [fanId], references: [id], onDelete: Cascade)
 
@@ -251,6 +276,23 @@ model Tip {
   @@index([creatorId])
   @@index([fanId])
   @@map("tips")
+}
+
+model UnlockedPost {
+  id                   String   @id
+  userId               String
+  postId               String
+  amount               Float
+  stripeSessionId      String?  @unique
+  ccbillSubscriptionId String?  @unique
+  createdAt            DateTime @default(now())
+  user                 User     @relation("UnlockedPosts", fields: [userId], references: [id], onDelete: Cascade)
+  post                 Post     @relation("UnlockedBy", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@map("unlocked_posts")
 }
 
 model AuditLog {
@@ -832,11 +874,13 @@ model User {
   postsCreated                                            Post[]
   purchases                                               Purchase[]
   reactions                                               Reaction[]
+  comments                                                Comment[]
   Subscription_Subscription_creatorIdTousers              Subscription[]     @relation("Subscription_creatorIdTousers")
   Subscription_Subscription_fanIdTousers                  Subscription[]     @relation("Subscription_fanIdTousers")
   tickets                                                 Ticket[]
   Tip_Tip_creatorIdTousers                                Tip[]              @relation("Tip_creatorIdTousers")
   Tip_Tip_fanIdTousers                                    Tip[]              @relation("Tip_fanIdTousers")
+  unlockedPosts                                           UnlockedPost[]     @relation("UnlockedPosts")
   auditLogs                                               AuditLog[]
   boosts                                                  Boost[]
   conversations_conversations_user1IdTousers              Conversation[]     @relation("conversations_user1IdTousers")
